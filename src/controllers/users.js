@@ -3,7 +3,7 @@ const User = mongoose.model('User');
 
 // Find a user with an id
 exports.findByID = (req, res) => {
-    User.findById(req.params.id)
+    User.findById(req.params.id, 'username email')
         .then(user => {
             if (!user) {
                 return res.status(404).json({

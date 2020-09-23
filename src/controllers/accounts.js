@@ -10,7 +10,7 @@ exports.findAllAccountsByUserID = (req, res) => {
                     message: "No user with selected ID!"
                 });
             }
-            res.status(200).json(accounts);
+            res.status(200).json(accounts.accounts);
         })
         .catch(error => {
             res.status(500).send({
