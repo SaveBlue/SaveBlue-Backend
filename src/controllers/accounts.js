@@ -48,7 +48,7 @@ exports.createAccount = (req, res) => {
 
     let newAccount = {
         name: req.body.name || "New Account",
-        currentBalance: 0,
+        currentBalance: req.body.currentBalance,
         budgets: [],
         goals: [],
         expenses: [],
@@ -57,7 +57,7 @@ exports.createAccount = (req, res) => {
     };
 
     //finds user and appends newAccount to the accounts array, then returns the new list of all account names
-    User.findByIdAndUpdate(req.params.uid,{$push: {accounts: newAccount}},{new:true, select:'accounts.id accounts.name'} )
+    User.findByIdAndUpdate(req.params.uid,{$push: {accounts: newAccount}},{new:true, select:'accounts._id accounts.name accounts.currentBalance accounts.startOfMonth'} )
         .then(accounts => {
 
             if (!accounts) {
@@ -65,7 +65,7 @@ exports.createAccount = (req, res) => {
                     message: "No user with selected ID!"
                 });
             }
-            res.status(200).json(accounts);
+            res.status(200).json(accounts.accounts);
 
         })
         .catch(error => {
