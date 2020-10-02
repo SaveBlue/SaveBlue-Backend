@@ -48,7 +48,7 @@ exports.createAccount = (req, res) => {
 
     let newAccount = {
         name: req.body.name || "New Account",
-        currentBalance: req.body.currentBalance,
+        currentBalance: 0,
         budgets: [],
         goals: [],
         expenses: [],
@@ -132,11 +132,6 @@ exports.updateAccountByID = (req, res) => {
             // check if updating name
             if(req.body.name) {
                 account.name = req.body.name;
-            }
-
-            // check if updating currentBalance
-            if(req.body.currentBalance) {
-                account.currentBalance = req.body.currentBalance;
             }
 
             // check if updating startOfMonth and format it correctly

@@ -20,12 +20,15 @@ module.exports = expensesRouter => {
     router.get("/:id",[authJWT.verifyTokenExpense], expensesController.findExpenseByID);
 
     // Create an expense
+    // TODO: middleware balance change
     router.post("/",[authJWT.verifyTokenExpenseIncomePost], expensesController.create);
 
     // Delete an expense by ID
+    // TODO: middleware balance change
     router.delete("/:id",[authJWT.verifyTokenExpense], expensesController.delete);
 
     // Update an expense by ID
+    // TODO: handle account changes (substract to new acc, add from old acc), middleware balance change
     router.put("/:id",[authJWT.verifyTokenExpense], expensesController.update);
 
     expensesRouter.use('/api/expenses', router);

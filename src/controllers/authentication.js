@@ -5,6 +5,8 @@ const User = mongoose.model('User');
 // Register a new user
 exports.register = (req, res) => {
 
+
+    // TODO: put in middleware?
     //Validate request
     if (!req.body.username || !req.body.password ||  !req.body.email) {
         return res.status(400).json({message: "All data must be present"});
@@ -21,6 +23,7 @@ exports.register = (req, res) => {
     newUser.hashPassword(req.body.password)
 
     // Save new User in the database
+    // TODO: is it safe to return whole new user?
     newUser
         .save(newUser)
         .then(data => {

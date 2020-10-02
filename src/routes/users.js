@@ -16,6 +16,7 @@ module.exports = usersRouter => {
     router.get("/:id", [authJWT.verifyTokenUser], usersController.findByID);
 
     // Delete user by ID
+    // TODO: fetch all incomes and expenses with the user id and delete them
     router.delete("/:id", [authJWT.verifyTokenUser], usersController.delete);
 
     // Update user by ID
