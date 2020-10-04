@@ -102,6 +102,9 @@ exports.update = (req, res) => {
     if(req.body.amount){
         editedIncome["amount"] = req.body.amount;
     }
+    if(req.body.accountID){
+        editedIncome["accountID"] = req.body.accountID;
+    }
 
     Income.findByIdAndUpdate(req.params.id, { $set: editedIncome }, {new: true})
         .then(income => {

@@ -48,7 +48,7 @@ exports.createAccount = (req, res) => {
 
     let newAccount = {
         name: req.body.name || "New Account",
-        currentBalance: req.body.currentBalance,
+        currentBalance: 0,
         budgets: [],
         goals: [],
         expenses: [],
@@ -117,7 +117,7 @@ exports.deleteAccountByID = (req, res) => {
 exports.updateAccountByID = (req, res) => {
 
     // find the user who has the required account
-    User.findOne({'accounts._id': req.params.id}, 'accounts.name accounts.currentBalance accounts.startOfMonth')
+    User.findOne({'accounts._id': req.params.id}, 'accounts._id accounts.name accounts.startOfMonth')
         .then(user => {
 
             if (!user) {
@@ -127,16 +127,11 @@ exports.updateAccountByID = (req, res) => {
             }
 
             // get wanted account from found user
-            let account = user.accounts[0];
+            let account = user.accounts.id(req.params.id);
 
             // check if updating name
             if(req.body.name) {
                 account.name = req.body.name;
-            }
-
-            // check if updating currentBalance
-            if(req.body.currentBalance) {
-                account.currentBalance = req.body.currentBalance;
             }
 
             // check if updating startOfMonth and format it correctly
@@ -149,6 +144,8 @@ exports.updateAccountByID = (req, res) => {
                 if(account.startOfMonth < 1)
                     account.startOfMonth = 1
             }
+
+            console.log(account)
 
             // save updated user data (updated account)
             user.save()

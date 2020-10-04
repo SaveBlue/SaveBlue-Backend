@@ -12,7 +12,7 @@ module.exports = incomesRouter => {
     const incomesController = require("../controllers/incomes");
     const router = require("express").Router();
 
-    // Get all incomes of account by user ID
+    // Get all incomes of account by account ID
     // TODO: limit the number of returned incomes
     router.get("/find/:aid",[authJWT.verifyTokenAccount], incomesController.findAllIncomesByAccountID);
 
