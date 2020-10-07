@@ -78,9 +78,10 @@ exports.delete = (req, res) => {
                 return res.status(404).send({message: "No expense with selected ID!"});
             }
 
+
             // update account balance
             try {
-                await updateAccountBalances.updateAccountBalances(newExpense.accountID, newExpense.amount, "-");
+                await updateAccountBalances.updateAccountBalances(expense.accountID, expense.amount, "+");
                 res.send({message: "Expense deleted!"});
             }
             catch (err){
@@ -114,7 +115,7 @@ exports.update = (req, res) => {
         editedExpense["amount"] = req.body.amount;
     }
 
-    Expense.findByIdAndUpdate(req.params.id, {$set: editedExpense}, {new: true})
+    Expense.findByIdAndUpdate(req.params.id, {$set: editedExpense})
         .then(async expense => {
             if (!expense) {
                 return res.status(404).send({
@@ -128,13 +129,16 @@ exports.update = (req, res) => {
             let difference = Math.abs(oldAmount - newAmount);
             let operation = oldAmount >= newAmount ? "+" : "-";
 
-            try {
-                await updateAccountBalances.updateAccountBalances(expense.accountID, difference, operation);
-                res.send({message: "Expense updated!"});
+            // only update account if there is a difference between amounts
+            if(difference !== 0) {
+                try {
+                    await updateAccountBalances.updateAccountBalances(expense.accountID, difference, operation);
+                } catch (err) {
+                    return res.status(500).send({message: err});
+                }
             }
-            catch (err){
-                res.status(500).send({ message: err });
-            }
+
+            res.send({message: "Expense updated!"});
         })
         .catch(error => {
             res.status(500).send({

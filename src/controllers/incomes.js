@@ -3,7 +3,7 @@ const Income = mongoose.model('Income');
 const updateAccountBalances = require('../services/updateAccountBalances');
 
 exports.findAllIncomesByAccountID = (req, res) => {
-    Income.find({accountID : req.params.aid})
+    Income.find({accountID: req.params.aid})
         .then(incomes => {
             if (incomes.length === 0) {
                 return res.status(404).json({
@@ -40,7 +40,7 @@ exports.findIncomeByID = (req, res) => {
 // Create an income
 exports.create = (req, res) => {
 
-    const newIncome = new Income ({
+    const newIncome = new Income({
         userID: req.body.userID,
         accountID: req.body.accountID,
         name: req.body.name,
@@ -69,14 +69,12 @@ exports.delete = (req, res) => {
         .then(income => {
 
             if (!income) {
-                res.status(404).send({
+                return res.status(404).send({
                     message: `No income with selected ID!`
                 });
-            } else {
-                res.send({
-                    message: "Income deleted!"
-                });
             }
+            res.send({message: "Income deleted!"});
+
         })
         .catch(error => {
             res.status(500).send({
@@ -91,31 +89,31 @@ exports.update = (req, res) => {
     let editedIncome = {};
 
     // Add properties to the object
-    if(req.body.name){
+    if (req.body.name) {
         editedIncome["name"] = req.body.name;
     }
-    if(req.body.description){
+    if (req.body.description) {
         editedIncome["description"] = req.body.description;
     }
-    if(req.body.date){
+    if (req.body.date) {
         editedIncome["date"] = req.body.date;
     }
-    if(req.body.amount){
+    if (req.body.amount) {
         editedIncome["amount"] = req.body.amount;
     }
-    if(req.body.accountID){
+    if (req.body.accountID) {
         editedIncome["accountID"] = req.body.accountID;
     }
 
-    Income.findByIdAndUpdate(req.params.id, { $set: editedIncome }, {new: true})
+    Income.findByIdAndUpdate(req.params.id, {$set: editedIncome}, {new: true})
         .then(income => {
             if (!income) {
-                res.status(404).send({
+                return res.status(404).send({
                     message: `No income with selected ID!`
                 });
-            } else {
-                res.status(200).json(income);
             }
+            res.status(200).json(income);
+
         })
         .catch(error => {
             res.status(500).send({

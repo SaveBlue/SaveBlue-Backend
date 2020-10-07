@@ -24,14 +24,12 @@ exports.delete = (req, res) => {
     User.findByIdAndDelete(req.params.id)
         .then(user => {
             if (!user) {
-                res.status(404).send({
+                return res.status(404).send({
                     message: `No user with selected ID!`
                 });
-            } else {
-                res.send({
-                    message: "User deleted!"
-                });
             }
+            res.send({message: "User deleted!"});
+
         })
         .catch(error => {
             res.status(500).send({
@@ -44,7 +42,7 @@ exports.delete = (req, res) => {
 exports.update = (req, res) => {
     console.log(req.body);
 
-    User.findById({_id: req.params.id}, 'username email hashedPassword salt')
+    User.findById(req.params.id, 'username email hashedPassword salt')
         .then(user => {
 
             if (!user) {
@@ -53,19 +51,17 @@ exports.update = (req, res) => {
                 });
             }
 
-            console.log(user)
-
-            if(req.body.username)
+            if (req.body.username)
                 user.username = req.body.username;
 
             // check for correct form of email if it is to be updated
-            if(req.body.email)
-                if((/(?:[a-z0-9!#$%&'+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)])/.test(req.body.email)))
+            if (req.body.email)
+                if ((/(?:[a-z0-9!#$%&'+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)])/.test(req.body.email)))
                     user.email = req.body.email;
                 else
                     return res.status(400).json({message: "Email address is not valid!"});
 
-            if(req.body.password)
+            if (req.body.password)
                 user.hashPassword(req.body.password);
 
             // save updated user data

@@ -145,8 +145,6 @@ exports.updateAccountByID = (req, res) => {
                     account.startOfMonth = 1
             }
 
-            console.log(account)
-
             // save updated user data (updated account)
             user.save()
                 .then(() => {
