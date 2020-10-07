@@ -19,9 +19,11 @@ module.exports = accountsRouter => {
     router.get("/find/:id",[authJWT.verifyTokenAccount], accountsController.findAccountByID);
 
     // Delete specific account by account ID
+    // TODO: fetch all incomes and expenses for the account and delete them
     router.delete("/:id",[authJWT.verifyTokenAccount], accountsController.deleteAccountByID);
 
     // Update specific account's info by account ID
+    // TODO: think about goals and budgets
     router.put("/:id",[authJWT.verifyTokenAccount], accountsController.updateAccountByID);
 
     // Create account to user by user ID

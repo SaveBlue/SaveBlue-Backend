@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
 const Expense = mongoose.model('Expense');
+const updateAccountBalances = require('../services/updateAccountBalances');
 
 exports.findAllExpensesByAccountID = (req, res) => {
-    Expense.find({accountID : req.params.aid})
+    Expense.find({accountID: req.params.aid})
         .then(expenses => {
             if (expenses.length === 0) {
                 return res.status(404).json({
@@ -39,7 +40,7 @@ exports.findExpenseByID = (req, res) => {
 // Create an expense
 exports.create = (req, res) => {
 
-    const newExpense = new Expense ({
+    const newExpense = new Expense({
         userID: req.body.userID,
         accountID: req.body.accountID,
         name: req.body.name,
@@ -51,8 +52,14 @@ exports.create = (req, res) => {
     // save expense
     newExpense
         .save(newExpense)
-        .then(data => {
-            res.send(data);
+        .then(async data => {
+            // update account balance
+            try {
+                await updateAccountBalances.updateAccountBalances(newExpense.accountID, newExpense.amount, "-");
+                res.send(data);
+            } catch (err) {
+                res.status(500).send({message: err});
+            }
         })
         .catch(error => {
             res.status(500).send({
@@ -65,17 +72,21 @@ exports.create = (req, res) => {
 // Delete expense with the ID
 exports.delete = (req, res) => {
     Expense.findByIdAndDelete(req.params.id)
-        .then(expense => {
+        .then(async expense => {
 
             if (!expense) {
-                res.status(404).send({
-                    message: `No expense with selected ID!`
-                });
-            } else {
-                res.send({
-                    message: "Expense deleted!"
-                });
+                return res.status(404).send({message: "No expense with selected ID!"});
             }
+
+            // update account balance
+            try {
+                await updateAccountBalances.updateAccountBalances(newExpense.accountID, newExpense.amount, "-");
+                res.send({message: "Expense deleted!"});
+            }
+            catch (err){
+                res.status(500).send({ message: err });
+            }
+
         })
         .catch(error => {
             res.status(500).send({
@@ -90,27 +101,39 @@ exports.update = (req, res) => {
     let editedExpense = {};
 
     // Add properties to the object
-    if(req.body.name){
+    if (req.body.name) {
         editedExpense["name"] = req.body.name;
     }
-    if(req.body.description){
+    if (req.body.description) {
         editedExpense["description"] = req.body.description;
     }
-    if(req.body.date){
+    if (req.body.date) {
         editedExpense["date"] = req.body.date;
     }
-    if(req.body.amount){
+    if (req.body.amount) {
         editedExpense["amount"] = req.body.amount;
     }
 
-    Expense.findByIdAndUpdate(req.params.id, { $set: editedExpense }, {new: true})
-        .then(expense => {
+    Expense.findByIdAndUpdate(req.params.id, {$set: editedExpense}, {new: true})
+        .then(async expense => {
             if (!expense) {
-                res.status(404).send({
+                return res.status(404).send({
                     message: `No expense with selected ID!`
                 });
-            } else {
-                res.status(200).json(expense);
+            }
+
+            // Get expense amount difference and choose operation
+            let oldAmount = expense.amount;
+            let newAmount = editedExpense.amount;
+            let difference = Math.abs(oldAmount - newAmount);
+            let operation = oldAmount >= newAmount ? "+" : "-";
+
+            try {
+                await updateAccountBalances.updateAccountBalances(expense.accountID, difference, operation);
+                res.send({message: "Expense updated!"});
+            }
+            catch (err){
+                res.status(500).send({ message: err });
             }
         })
         .catch(error => {
