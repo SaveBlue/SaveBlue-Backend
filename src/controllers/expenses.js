@@ -53,6 +53,7 @@ exports.create = (req, res) => {
     newExpense
         .save(newExpense)
         .then(async data => {
+
             // update account balance
             try {
                 await updateAccountBalances.updateAccountBalances(newExpense.accountID, newExpense.amount, "-");
@@ -77,7 +78,6 @@ exports.delete = (req, res) => {
             if (!expense) {
                 return res.status(404).send({message: "No expense with selected ID!"});
             }
-
 
             // update account balance
             try {

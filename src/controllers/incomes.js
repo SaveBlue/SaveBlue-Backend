@@ -52,8 +52,15 @@ exports.create = (req, res) => {
     // save income
     newIncome
         .save(newIncome)
-        .then(data => {
-            res.send(data);
+        .then(async data => {
+
+            // update account balance
+            try {
+                await updateAccountBalances.updateAccountBalances(newIncome.accountID, newIncome.amount, "+");
+                res.send(data);
+            } catch (err) {
+                res.status(500).send({message: err});
+            }
         })
         .catch(error => {
             res.status(500).send({
@@ -66,14 +73,22 @@ exports.create = (req, res) => {
 // Delete income with the ID
 exports.delete = (req, res) => {
     Income.findByIdAndDelete(req.params.id)
-        .then(income => {
+        .then(async income => {
 
             if (!income) {
                 return res.status(404).send({
                     message: `No income with selected ID!`
                 });
             }
-            res.send({message: "Income deleted!"});
+
+            // update account balance
+            try {
+                await updateAccountBalances.updateAccountBalances(income.accountID, income.amount, "-");
+                res.send({message: "Income deleted!"});
+            }
+            catch (err){
+                res.status(500).send({ message: err });
+            }
 
         })
         .catch(error => {
@@ -105,14 +120,30 @@ exports.update = (req, res) => {
         editedIncome["accountID"] = req.body.accountID;
     }
 
-    Income.findByIdAndUpdate(req.params.id, {$set: editedIncome}, {new: true})
-        .then(income => {
+    Income.findByIdAndUpdate(req.params.id, {$set: editedIncome})
+        .then(async income => {
             if (!income) {
                 return res.status(404).send({
                     message: `No income with selected ID!`
                 });
             }
-            res.status(200).json(income);
+
+            // Get income amount difference and choose operation
+            let oldAmount = income.amount;
+            let newAmount = editedIncome.amount;
+            let difference = Math.abs(oldAmount - newAmount);
+            let operation = oldAmount >= newAmount ? "-" : "+";
+
+            // only update account if there is a difference between amounts
+            if(difference !== 0) {
+                try {
+                    await updateAccountBalances.updateAccountBalances(income.accountID, difference, operation);
+                } catch (err) {
+                    return res.status(500).send({message: err});
+                }
+            }
+
+            res.send({message: "Income updated!"});
 
         })
         .catch(error => {
