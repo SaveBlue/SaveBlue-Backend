@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
+const deleteUserEntries = require('../services/deleteUserEntries');
 
 // Find all accounts of user with selected id
 exports.findAllAccountsByUserID = (req, res) => {
@@ -95,7 +96,22 @@ exports.deleteAccountByID = (req, res) => {
 
             // save updated user data (deleted account)
             user.save()
-                .then(() => {
+                .then(async () => {
+
+                    // Delete account's incomes from db
+                    try {
+                        await deleteUserEntries.deleteIncomes("accountID", req.params.id);
+                    }catch (err){
+                        return res.status(500).send({message: err});
+                    }
+
+                    // Delete account's expenses from db
+                    try {
+                        await deleteUserEntries.deleteExpenses("accountID", req.params.id);
+                    }catch (err){
+                        return res.status(500).send({message: err});
+                    }
+
                     res.status(200).json(user)
                 })
                 .catch(error => {

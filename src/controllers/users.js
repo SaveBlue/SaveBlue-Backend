@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
+const deleteUserEntries = require('../services/deleteUserEntries');
 
 // Find a user with an id
 exports.findByID = (req, res) => {
@@ -22,12 +23,27 @@ exports.findByID = (req, res) => {
 // Delete user's account with the specified id in the request
 exports.delete = (req, res) => {
     User.findByIdAndDelete(req.params.id)
-        .then(user => {
+        .then(async user => {
             if (!user) {
                 return res.status(404).send({
                     message: `No user with selected ID!`
                 });
             }
+
+            // Delete user's incomes from db
+            try {
+                await deleteUserEntries.deleteIncomes("userID", req.params.id);
+            }catch (err){
+                return res.status(500).send({message: err});
+            }
+
+            // Delete user's expenses from db
+            try {
+                await deleteUserEntries.deleteExpenses("userID", req.params.id);
+            }catch (err){
+                return res.status(500).send({message: err});
+            }
+
             res.send({message: "User deleted!"});
 
         })
