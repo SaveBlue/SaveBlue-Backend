@@ -20,15 +20,12 @@ module.exports = incomesRouter => {
     router.get("/:id", [authJWT.verifyTokenIncome], incomesController.findIncomeByID);
 
     // Create income
-    // TODO: middleware balance change
     router.post("/", [authJWT.verifyTokenExpenseIncomePost], incomesController.create);
 
     // Delete income by ID
-    // TODO: middleware balance change
     router.delete("/:id", [authJWT.verifyTokenIncome], incomesController.delete);
 
     // Update income by ID
-    // TODO: handle account changes (add to new acc, substract from old acc), middleware balance change
     router.put("/:id", [authJWT.verifyTokenIncome], incomesController.update);
 
     incomesRouter.use('/api/incomes', router);

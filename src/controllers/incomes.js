@@ -134,8 +134,26 @@ exports.update = (req, res) => {
             let difference = Math.abs(oldAmount - newAmount);
             let operation = oldAmount >= newAmount ? "-" : "+";
 
+            // handle account change
+            if (income.accountID !== editedIncome.accountID){
+
+                // subtract from old account
+                try {
+                    await updateAccountBalances.updateAccountBalances(income.accountID, oldAmount, "-");
+                } catch (err) {
+                    return res.status(500).send({message: err});
+                }
+
+                // add to new account
+                try {
+                    await updateAccountBalances.updateAccountBalances(editedIncome.accountID, newAmount, "+");
+                } catch (err) {
+                    return res.status(500).send({message: err});
+                }
+            }
+
             // only update account if there is a difference between amounts
-            if(difference !== 0) {
+            else if(difference !== 0) {
                 try {
                     await updateAccountBalances.updateAccountBalances(income.accountID, difference, operation);
                 } catch (err) {
