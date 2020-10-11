@@ -3,7 +3,7 @@ const Expense = mongoose.model('Expense');
 const updateAccountBalances = require('../services/updateAccountBalances');
 
 exports.findAllExpensesByAccountID = (req, res) => {
-    Expense.find({accountID: req.params.aid})
+    Expense.find({accountID: req.params.aid}, null, {sort: {date: -1}})
         .then(expenses => {
             if (expenses.length === 0) {
                 return res.status(404).json({
