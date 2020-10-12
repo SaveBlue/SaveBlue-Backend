@@ -7,7 +7,7 @@ exports.checkUniqueUsernameEmail = (req, res, next) => {
     User.findOne({'username': req.body.username}, 'username')
         .then(username => {
             if (username) {
-                return res.status(400).json({
+                return res.status(409).json({
                     message: "Duplicate username!"
                 });
             }
@@ -16,7 +16,7 @@ exports.checkUniqueUsernameEmail = (req, res, next) => {
             User.findOne({'email': req.body.email}, 'username')
                 .then(email => {
                     if (email) {
-                        return res.status(400).json({
+                        return res.status(409).json({
                             message: "Duplicate email!"
                         });
                     }
