@@ -6,7 +6,7 @@ exports.updateAccountBalances = (accountID, amount, operation) => {
     return new Promise((resolve, reject) => {
 
         // find the user who has the required account
-        User.findOne({'accounts._id': accountID}, 'accounts._id accounts.currentBalance')
+        User.findOne({'accounts._id': accountID}, 'accounts._id accounts.totalBalance')
             .then(user => {
 
                 if (!user) {
@@ -16,14 +16,14 @@ exports.updateAccountBalances = (accountID, amount, operation) => {
                 // get wanted account from found user
                 let account = user.accounts.id(accountID);
 
-                // add or subtract from account currentBalance
+                // add or subtract from account totalBalance
                 switch (operation) {
                     case "+":
-                        account.currentBalance += amount;
+                        account.totalBalance += amount;
                         break;
 
                     case "-":
-                        account.currentBalance -= amount;
+                        account.totalBalance -= amount;
                         break;
                 }
 
