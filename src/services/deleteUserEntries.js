@@ -11,12 +11,7 @@ exports.deleteIncomes = (deleteField, ID) => {
 
         // delete all incomes with provided userID / accountID
         Income.deleteMany(pair)
-            .then(response => {
-
-                if (response.deletedCount === 0) {
-                    reject("No incomes with selected field!");
-                }
-
+            .then(() => {
                 resolve();
             })
             .catch(error => {
@@ -34,13 +29,8 @@ exports.deleteExpenses = (deleteField, ID) => {
     return new Promise((resolve, reject) => {
 
         // delete all expenses with provided userID / accountID
-        Expense.deleteMany(pair,)
-            .then(response => {
-
-                if (response.deletedCount === 0) {
-                    reject("No expenses with selected field!");
-                }
-
+        Expense.deleteMany(pair)
+            .then(() => {
                 resolve();
             })
             .catch(error => {
