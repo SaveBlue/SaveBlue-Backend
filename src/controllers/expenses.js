@@ -43,7 +43,8 @@ exports.create = (req, res) => {
     const newExpense = new Expense({
         userID: req.body.userID,
         accountID: req.body.accountID,
-        name: req.body.name,
+        category1: req.body.category1,
+        category2: req.body.category2,
         description: req.body.description,
         date: req.body.date,
         amount: req.body.amount
@@ -102,8 +103,11 @@ exports.update = (req, res) => {
     let editedExpense = {};
 
     // Add properties to the object
-    if (req.body.name) {
-        editedExpense["name"] = req.body.name;
+    if (req.body.category1) {
+        editedExpense["category1"] = req.body.category1;
+    }
+    if (req.body.category2) {
+        editedExpense["category2"] = req.body.category2;
     }
     if (req.body.accountID) {
         editedExpense["accountID"] = req.body.accountID;
