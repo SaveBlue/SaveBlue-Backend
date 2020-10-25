@@ -1,11 +1,12 @@
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
 
-exports.updateAccountBalances = (accountID, amount, operation) => {
+// Update account totalBalance
+exports.updateTotalBalances = (accountID, amount, operation) => {
 
     return new Promise((resolve, reject) => {
 
-        // find the user who has the required account
+        // Find the user with requested account
         User.findOne({'accounts._id': accountID}, 'accounts._id accounts.totalBalance')
             .then(user => {
 
@@ -13,10 +14,10 @@ exports.updateAccountBalances = (accountID, amount, operation) => {
                     reject("No account with selected ID!");
                 }
 
-                // get wanted account from found user
+                // Get requested account from the user
                 let account = user.accounts.id(accountID);
 
-                // add or subtract from account totalBalance
+                // Add or subtract from account totalBalance
                 switch (operation) {
                     case "+":
                         account.totalBalance += amount;
@@ -27,7 +28,7 @@ exports.updateAccountBalances = (accountID, amount, operation) => {
                         break;
                 }
 
-                // save updated user data (updated account)
+                // Save updated user data (updated account)
                 user.save()
                     .then(() => {
                         resolve();

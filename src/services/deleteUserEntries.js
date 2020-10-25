@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const Income = mongoose.model('Income');
 const Expense = mongoose.model('Expense');
 
+
+// Delete all incomes with provided userID / accountID
 exports.deleteIncomes = (deleteField, ID) => {
 
     let pair = {};
@@ -9,7 +11,6 @@ exports.deleteIncomes = (deleteField, ID) => {
 
     return new Promise((resolve, reject) => {
 
-        // delete all incomes with provided userID / accountID
         Income.deleteMany(pair)
             .then(() => {
                 resolve();
@@ -21,6 +22,7 @@ exports.deleteIncomes = (deleteField, ID) => {
     })
 }
 
+// Delete all expenses with provided userID / accountID
 exports.deleteExpenses = (deleteField, ID) => {
 
     let pair = {};
@@ -28,7 +30,6 @@ exports.deleteExpenses = (deleteField, ID) => {
 
     return new Promise((resolve, reject) => {
 
-        // delete all expenses with provided userID / accountID
         Expense.deleteMany(pair)
             .then(() => {
                 resolve();
