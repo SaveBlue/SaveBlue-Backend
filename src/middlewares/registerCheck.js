@@ -1,9 +1,10 @@
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
 
+
 exports.checkUniqueUsernameEmail = (req, res, next) => {
 
-    //  check for username
+    //  Check username duplicates
     User.findOne({'username': req.body.username}, 'username')
         .then(username => {
             if (username) {
@@ -12,7 +13,7 @@ exports.checkUniqueUsernameEmail = (req, res, next) => {
                 });
             }
 
-            // check for email
+            // Check email duplicates
             User.findOne({'email': req.body.email}, 'username')
                 .then(email => {
                     if (email) {
@@ -21,7 +22,7 @@ exports.checkUniqueUsernameEmail = (req, res, next) => {
                         });
                     }
 
-                    // if both unique proceed
+                    // If both unique proceed
                     next();
 
                 })

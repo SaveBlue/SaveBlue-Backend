@@ -8,6 +8,7 @@ const Income = mongoose.model('Income');
 
 // Verify User
 verifyTokenUser = (req, res, next) => {
+
     let token = req.headers["x-access-token"];
 
     if (!token) {
@@ -19,16 +20,19 @@ verifyTokenUser = (req, res, next) => {
             return res.status(401).send({message: "Unauthorized!"});
         }
 
-        // verify that sent user id is the same as token's
+        // Verify that sent user id is the same as token's
         if(req.params.id === decoded.id || req.params.uid === decoded.id)
             next();
         else
             return res.status(401).send({message: "Unauthorized!"});
     });
 };
+//----------------------------------------------------------------------------------------------------------------------
+
 
 // Verify Account
 verifyTokenAccount = (req, res, next) => {
+
     let token = req.headers["x-access-token"];
 
     if (!token) {
@@ -40,15 +44,18 @@ verifyTokenAccount = (req, res, next) => {
             return res.status(401).send({message: "Unauthorized!"});
         }
 
-        // verification if the account id belongs to the same user id provided in JWT token
-        // uses either id or aid from request parameters
+        // Verification if the account id belongs to the same user id provided in JWT token
+        // Uses either id or aid from request parameters
         verifyUsersCall(req, res, next, {'accounts._id': req.params.id || req.params.aid},decoded.id)
 
     });
 };
+//----------------------------------------------------------------------------------------------------------------------
+
 
 // Verify Expenses
 verifyTokenExpense = (req, res, next) => {
+
     let token = req.headers["x-access-token"];
 
     if (!token) {
@@ -60,7 +67,7 @@ verifyTokenExpense = (req, res, next) => {
             return res.status(401).send({message: "Unauthorized!"});
         }
 
-        // verification if user id in expense belongs to the same user id provided in JWT token
+        // Verification if user id in expense belongs to the same user id provided in JWT token
         Expense.findById(req.params.id, 'userID')
             .then(userID => {
 
@@ -70,7 +77,7 @@ verifyTokenExpense = (req, res, next) => {
                     });
                 }
 
-                // verify that user id of requested expense is the same as the one provided in JWT token
+                // Verify that user id of requested expense is the same as the one provided in JWT token
                 if(userID.userID === decoded.id)
                     next();
                 else
@@ -85,9 +92,12 @@ verifyTokenExpense = (req, res, next) => {
 
     });
 };
+//----------------------------------------------------------------------------------------------------------------------
+
 
 // Verify Incomes
 verifyTokenIncome = (req, res, next) => {
+
     let token = req.headers["x-access-token"];
 
     if (!token) {
@@ -99,7 +109,7 @@ verifyTokenIncome = (req, res, next) => {
             return res.status(401).send({message: "Unauthorized!"});
         }
 
-        // verification if user id in expense belongs to the same user id provided in JWT token
+        // Verification if user id in expense belongs to the same user id provided in JWT token
         Income.findById(req.params.id, 'userID')
             .then(userID => {
 
@@ -109,7 +119,7 @@ verifyTokenIncome = (req, res, next) => {
                     });
                 }
 
-                // verify that user id of requested income is the same as the one provided in JWT token
+                // Verify that user id of requested income is the same as the one provided in JWT token
                 if(userID.userID === decoded.id)
                     next();
                 else
@@ -124,8 +134,11 @@ verifyTokenIncome = (req, res, next) => {
 
     });
 };
+//----------------------------------------------------------------------------------------------------------------------
+
 
 verifyTokenExpenseIncomePost = (req, res, next) => {
+
     let token = req.headers["x-access-token"];
 
     if (!token) {
@@ -137,17 +150,16 @@ verifyTokenExpenseIncomePost = (req, res, next) => {
             return res.status(401).send({message: "Unauthorized!"});
         }
 
-        // verification if user id in expense request belongs to the same user id provided in JWT token
+        // Verification if user id in expense request belongs to the same user id provided in JWT token
         if(req.body.userID !== decoded.id)
             return res.status(401).send({message: "Unauthorized!"});
 
-        // verification if users account id in expense request belongs to the same user provided in JWT token
+        // Verification if users account id in expense request belongs to the same user provided in JWT token
         verifyUsersCall(req, res, next, {'accounts._id': req.body.accountID},decoded.id)
 
     });
 };
-
-
+//----------------------------------------------------------------------------------------------------------------------
 
 
 /**
@@ -161,6 +173,7 @@ verifyTokenExpenseIncomePost = (req, res, next) => {
  * Function checks users permission if his JWT token allows access to requested data
  */
 verifyUsersCall = (req, res, next, searchParam, decodedID) =>{
+
     User.findOne(searchParam, '_id')
         .then(ID => {
 
@@ -170,7 +183,7 @@ verifyUsersCall = (req, res, next, searchParam, decodedID) =>{
                 });
             }
 
-            // verify that user id of requested account is the same as the one provided in JWT token
+            // Verify that user id of requested account is the same as the one provided in JWT token
             if(ID._id.equals(decodedID))
                 next();
             else
@@ -183,6 +196,8 @@ verifyUsersCall = (req, res, next, searchParam, decodedID) =>{
             });
         });
 }
+//----------------------------------------------------------------------------------------------------------------------
+
 
 const authJwt = {
     verifyTokenUser: verifyTokenUser,
