@@ -1,4 +1,8 @@
+const router = require("express").Router();
 const authJWT = require("../middlewares/authJWT");
+const accountsController = require("../controllers/accounts");
+
+
 module.exports = accountsRouter => {
 
     accountsRouter.use(function (req, res, next) {
@@ -9,8 +13,6 @@ module.exports = accountsRouter => {
         next();
     });
 
-    const accountsController = require("../controllers/accounts");
-    const router = require("express").Router();
 
     // Get all accounts of user by user ID
     router.get("/:uid",[authJWT.verifyTokenUser], accountsController.findAllAccountsByUserID);
@@ -22,10 +24,10 @@ module.exports = accountsRouter => {
     router.delete("/:id",[authJWT.verifyTokenAccount], accountsController.deleteAccountByID);
 
     // Update specific account's info by account ID
-    // TODO: think about goals and budgets
+    // TODO: implement goals and budgets
     router.put("/:id",[authJWT.verifyTokenAccount], accountsController.updateAccountByID);
 
-    // Create account to user by user ID
+    // Create account of the user by user ID
     router.post("/:uid",[authJWT.verifyTokenUser], accountsController.createAccount);
 
     accountsRouter.use('/api/accounts', router);

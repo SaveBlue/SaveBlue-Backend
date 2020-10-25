@@ -1,4 +1,8 @@
+const router = require("express").Router();
 const authJWT = require("../middlewares/authJWT");
+const usersController = require("../controllers/users");
+
+
 module.exports = usersRouter => {
 
     usersRouter.use(function (req, res, next) {
@@ -9,8 +13,6 @@ module.exports = usersRouter => {
         next();
     });
 
-    const usersController = require("../controllers/users");
-    const router = require("express").Router();
 
     // Find user by ID
     router.get("/:id", [authJWT.verifyTokenUser], usersController.findByID);

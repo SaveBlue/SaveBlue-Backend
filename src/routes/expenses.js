@@ -1,4 +1,8 @@
+const router = require("express").Router();
 const authJWT = require("../middlewares/authJWT");
+const expensesController = require("../controllers/expenses");
+
+
 module.exports = expensesRouter => {
 
     expensesRouter.use(function (req, res, next) {
@@ -9,8 +13,6 @@ module.exports = expensesRouter => {
         next();
     });
 
-    const expensesController = require("../controllers/expenses");
-    const router = require("express").Router();
 
     // Get all expenses of account by account ID
     // TODO: limit the number of returned incomes
