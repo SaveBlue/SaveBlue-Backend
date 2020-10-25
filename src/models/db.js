@@ -5,6 +5,8 @@ if (process.env.NODE_ENV === 'production') {
     dbURI = process.env.MONGODB_CLOUD_URI;
 }
 
+
+// Connect to the database
 mongoose.connect(dbURI, {
     useNewUrlParser: true,
     useCreateIndex: true,
@@ -26,12 +28,15 @@ mongoose.connection.on('disconnected', () => {
     console.log('Mongoose not connected.');
 });
 
+
+// Close connection to the database
 const safeExit = (message, callback) => {
     mongoose.connection.close(() => {
         console.log(`Mongoose closed the connection via '${message}'.`);
         callback();
     });
 };
+
 
 // Nodemon restart
 process.once('SIGUSR2', () => {
@@ -40,6 +45,7 @@ process.once('SIGUSR2', () => {
     });
 });
 
+
 // Exit application
 process.on('SIGINT', () => {
     safeExit('Exit application', () => {
@@ -47,12 +53,14 @@ process.on('SIGINT', () => {
     });
 });
 
+
 // Exit application Heroku
 process.on('SIGTERM', () => {
     safeExit('Exit application Heroku', () => {
         process.exit(0);
     });
 });
+
 
 require('./users');
 require('./incomes');
