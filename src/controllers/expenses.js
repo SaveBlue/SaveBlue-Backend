@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const Expense = mongoose.model('Expense');
 const updateAccountBalances = require('../services/updateAccountBalances');
 
+
+// Find all expenses of the account with requested id
 exports.findAllExpensesByAccountID = (req, res) => {
     Expense.find({accountID: req.params.aid}, null, {sort: {date: -1}})
         .then(expenses => {
@@ -18,8 +20,10 @@ exports.findAllExpensesByAccountID = (req, res) => {
             });
         });
 }
+//----------------------------------------------------------------------------------------------------------------------
 
-// Find an expense with an id
+
+// Find an expense with requested id
 exports.findExpenseByID = (req, res) => {
     Expense.findById(req.params.id)
         .then(expense => {
@@ -36,6 +40,8 @@ exports.findExpenseByID = (req, res) => {
             });
         });
 };
+//----------------------------------------------------------------------------------------------------------------------
+
 
 // Create an expense
 exports.create = (req, res) => {
@@ -50,12 +56,12 @@ exports.create = (req, res) => {
         amount: req.body.amount
     });
 
-    // save expense
+    // Save expense
     newExpense
         .save(newExpense)
         .then(async data => {
 
-            // update account balance
+            // Update account balance
             try {
                 await updateAccountBalances.updateAccountBalances(newExpense.accountID, newExpense.amount, "-");
                 res.send(data);
@@ -70,8 +76,10 @@ exports.create = (req, res) => {
         });
 
 };
+//----------------------------------------------------------------------------------------------------------------------
 
-// Delete expense with the ID
+
+// Delete expense with requested ID
 exports.delete = (req, res) => {
     Expense.findByIdAndDelete(req.params.id)
         .then(async expense => {
@@ -80,7 +88,7 @@ exports.delete = (req, res) => {
                 return res.status(404).send({message: "No expense with selected ID!"});
             }
 
-            // update account balance
+            // Update account balance
             try {
                 await updateAccountBalances.updateAccountBalances(expense.accountID, expense.amount, "+");
                 res.send({message: "Expense deleted!"});
@@ -96,8 +104,10 @@ exports.delete = (req, res) => {
             });
         });
 };
+//----------------------------------------------------------------------------------------------------------------------
 
-// Delete expense with the ID
+
+// Delete expense with requested ID
 exports.update = (req, res) => {
 
     let editedExpense = {};
@@ -122,6 +132,7 @@ exports.update = (req, res) => {
         editedExpense["amount"] = req.body.amount;
     }
 
+    // Fetch the old expense and edit it
     Expense.findByIdAndUpdate(req.params.id, {$set: editedExpense})
         .then(async expense => {
             if (!expense) {
@@ -136,17 +147,17 @@ exports.update = (req, res) => {
             let difference = Math.abs(oldAmount - newAmount);
             let operation = oldAmount >= newAmount ? "+" : "-";
 
-            // handle account change
+            // Handle account change
             if (expense.accountID !== editedExpense.accountID){
 
-                // add back to old account
+                // Add back to old account
                 try {
                     await updateAccountBalances.updateAccountBalances(expense.accountID, oldAmount, "+");
                 } catch (err) {
                     return res.status(500).send({message: err});
                 }
 
-                // subtract from new account
+                // Subtract from new account
                 try {
                     await updateAccountBalances.updateAccountBalances(editedExpense.accountID, newAmount, "-");
                 } catch (err) {
@@ -154,7 +165,7 @@ exports.update = (req, res) => {
                 }
             }
 
-            // only update account if there is a difference between amounts
+            // Only update account if there is a difference between amounts
             else if(difference !== 0) {
                 try {
                     await updateAccountBalances.updateAccountBalances(expense.accountID, difference, operation);
@@ -171,4 +182,3 @@ exports.update = (req, res) => {
             });
         });
 };
-

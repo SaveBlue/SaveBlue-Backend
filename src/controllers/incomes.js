@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const Income = mongoose.model('Income');
 const updateAccountBalances = require('../services/updateAccountBalances');
 
+
+// Find all incomes of the account with requested id
 exports.findAllIncomesByAccountID = (req, res) => {
     Income.find({accountID: req.params.aid}, null, {sort: {date: -1}})
         .then(incomes => {
@@ -18,6 +20,8 @@ exports.findAllIncomesByAccountID = (req, res) => {
             });
         });
 }
+//----------------------------------------------------------------------------------------------------------------------
+
 
 // Find an income with an id
 exports.findIncomeByID = (req, res) => {
@@ -36,6 +40,8 @@ exports.findIncomeByID = (req, res) => {
             });
         });
 };
+//----------------------------------------------------------------------------------------------------------------------
+
 
 // Create an income
 exports.create = (req, res) => {
@@ -49,12 +55,12 @@ exports.create = (req, res) => {
         amount: req.body.amount
     });
 
-    // save income
+    // Save income
     newIncome
         .save(newIncome)
         .then(async data => {
 
-            // update account balance
+            // Update account balance
             try {
                 await updateAccountBalances.updateAccountBalances(newIncome.accountID, newIncome.amount, "+");
                 res.send(data);
@@ -69,19 +75,19 @@ exports.create = (req, res) => {
         });
 
 };
+//----------------------------------------------------------------------------------------------------------------------
 
-// Delete income with the ID
+
+// Delete income with requested ID
 exports.delete = (req, res) => {
     Income.findByIdAndDelete(req.params.id)
         .then(async income => {
 
             if (!income) {
-                return res.status(404).send({
-                    message: `No income with selected ID!`
-                });
+                return res.status(404).send({message: `No income with selected ID!`});
             }
 
-            // update account balance
+            // Update account balance
             try {
                 await updateAccountBalances.updateAccountBalances(income.accountID, income.amount, "-");
                 res.send({message: "Income deleted!"});
@@ -97,6 +103,8 @@ exports.delete = (req, res) => {
             });
         });
 };
+//----------------------------------------------------------------------------------------------------------------------
+
 
 // Delete income with the ID
 exports.update = (req, res) => {
@@ -134,17 +142,17 @@ exports.update = (req, res) => {
             let difference = Math.abs(oldAmount - newAmount);
             let operation = oldAmount >= newAmount ? "-" : "+";
 
-            // handle account change
+            // Handle account change
             if (income.accountID !== editedIncome.accountID){
 
-                // subtract from old account
+                // Subtract from old account
                 try {
                     await updateAccountBalances.updateAccountBalances(income.accountID, oldAmount, "-");
                 } catch (err) {
                     return res.status(500).send({message: err});
                 }
 
-                // add to new account
+                // Add to new account
                 try {
                     await updateAccountBalances.updateAccountBalances(editedIncome.accountID, newAmount, "+");
                 } catch (err) {
@@ -152,7 +160,7 @@ exports.update = (req, res) => {
                 }
             }
 
-            // only update account if there is a difference between amounts
+            // Only update account if there is a difference between amounts
             else if(difference !== 0) {
                 try {
                     await updateAccountBalances.updateAccountBalances(income.accountID, difference, operation);
@@ -170,4 +178,3 @@ exports.update = (req, res) => {
             });
         });
 };
-

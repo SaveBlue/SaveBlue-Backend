@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 const User = mongoose.model('User');
 const deleteUserEntries = require('../services/deleteUserEntries');
 
-// Find all accounts of user with selected id
+
+// Find all accounts of user with requested id
 exports.findAllAccountsByUserID = (req, res) => {
     User.findById( req.params.uid, 'accounts._id accounts.name accounts.totalBalance accounts.startOfMonth')
         .then(accounts => {
@@ -19,9 +20,10 @@ exports.findAllAccountsByUserID = (req, res) => {
             });
         });
 };
-//-----------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-// Find account with selected id
+
+// Find account with requested id
 exports.findAccountByID = (req, res) => {
 
     User.findOne({'accounts._id': req.params.id},{'accounts.$': 1} )
@@ -40,11 +42,10 @@ exports.findAccountByID = (req, res) => {
             });
         })
 };
-//-----------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 
-
-// Add a new account to an user with selected id
+// Add a new account to an user with requested id
 exports.createAccount = (req, res) => {
 
     let newAccount = {
@@ -57,7 +58,7 @@ exports.createAccount = (req, res) => {
         startOfMonth: 1
     };
 
-    //finds user and appends newAccount to the accounts array, then returns the new list of all account names
+    // Finds user and appends newAccount to the accounts array, then returns the new list of all account names
     User.findByIdAndUpdate(req.params.uid,{$push: {accounts: newAccount}},{new:true, select:'accounts._id accounts.name accounts.totalBalance accounts.startOfMonth'} )
         .then(accounts => {
 
@@ -75,13 +76,13 @@ exports.createAccount = (req, res) => {
             });
         });
 };
-//-----------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 
-// Delete account with selected id
+// Delete account with requested id
 exports.deleteAccountByID = (req, res) => {
 
-    // find the user who has the required account
+    // Find the user with the requested account
     User.findOne({'accounts._id': req.params.id},'accounts._id accounts.name')
         .then(user => {
 
@@ -91,10 +92,10 @@ exports.deleteAccountByID = (req, res) => {
                 });
             }
 
-            // remove the selected account
+            // Remove the selected account
             user.accounts.pull({'_id': req.params.id})
 
-            // save updated user data (deleted account)
+            // Save updated user data (deleted account)
             user.save()
                 .then(async () => {
 
@@ -126,13 +127,13 @@ exports.deleteAccountByID = (req, res) => {
             });
         })
 };
-//-----------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 
-// Update account with selected id
+// Update account with requested id
 exports.updateAccountByID = (req, res) => {
 
-    // find the user who has the required account
+    // Find the user with the requested account
     User.findOne({'accounts._id': req.params.id}, 'accounts._id accounts.name accounts.startOfMonth')
         .then(user => {
 
@@ -142,15 +143,15 @@ exports.updateAccountByID = (req, res) => {
                 });
             }
 
-            // get wanted account from found user
+            // Get the account from found user
             let account = user.accounts.id(req.params.id);
 
-            // check if updating name
+            // Check if updating account name
             if(req.body.name) {
                 account.name = req.body.name;
             }
 
-            // check if updating startOfMonth and format it correctly
+            // Check if updating startOfMonth and format it correctly
             if(req.body.startOfMonth) {
                 account.startOfMonth = req.body.startOfMonth;
 
@@ -161,7 +162,7 @@ exports.updateAccountByID = (req, res) => {
                     account.startOfMonth = 1
             }
 
-            // save updated user data (updated account)
+            // Save updated user data (updated account)
             user.save()
                 .then(() => {
                     res.status(200).json(account)
@@ -178,9 +179,3 @@ exports.updateAccountByID = (req, res) => {
             });
         })
 };
-
-
-
-
-
-
