@@ -125,6 +125,9 @@ exports.update = (req, res) => {
     if (req.body.description) {
         editedExpense["description"] = req.body.description;
     }
+    else{
+        editedExpense["description"] = "";
+    }
     if (req.body.date) {
         editedExpense["date"] = req.body.date;
     }
