@@ -63,7 +63,7 @@ exports.create = (req, res) => {
 
             // Update account balance
             try {
-                await updateAccountBalances.updateTotalBalances(newExpense.accountID, newExpense.amount, "-");
+                await updateAccountBalances.updateAllAccountBalances(newExpense.accountID, newExpense.amount, "-");
                 res.send(data);
             } catch (err) {
                 res.status(500).send({message: err});
@@ -90,7 +90,7 @@ exports.delete = (req, res) => {
 
             // Update account balance
             try {
-                await updateAccountBalances.updateTotalBalances(expense.accountID, expense.amount, "+");
+                await updateAccountBalances.updateAllAccountBalances(expense.accountID, expense.amount, "+");
                 res.send({message: "Expense deleted!"});
             }
             catch (err){
@@ -155,14 +155,14 @@ exports.update = (req, res) => {
 
                 // Add back to old account
                 try {
-                    await updateAccountBalances.updateTotalBalances(expense.accountID, oldAmount, "+");
+                    await updateAccountBalances.updateAllAccountBalances(expense.accountID, oldAmount, "+");
                 } catch (err) {
                     return res.status(500).send({message: err});
                 }
 
                 // Subtract from new account
                 try {
-                    await updateAccountBalances.updateTotalBalances(editedExpense.accountID, newAmount, "-");
+                    await updateAccountBalances.updateAllAccountBalances(editedExpense.accountID, newAmount, "-");
                 } catch (err) {
                     return res.status(500).send({message: err});
                 }
@@ -171,7 +171,7 @@ exports.update = (req, res) => {
             // Only update account if there is a difference between amounts
             else if(difference !== 0) {
                 try {
-                    await updateAccountBalances.updateTotalBalances(expense.accountID, difference, operation);
+                    await updateAccountBalances.updateAllAccountBalances(expense.accountID, difference, operation);
                 } catch (err) {
                     return res.status(500).send({message: err});
                 }

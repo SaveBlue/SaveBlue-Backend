@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 let Schema = mongoose.Schema;
 
 
-const allowedCategory1 = ["Salary / Wage", "Assets", "Student Work", "Other"]
+const allowedCategory1 = ["Salary & Wage", "Assets", "Student Work", "Funds Transfer", "Other"]
 
 
 const income = new Schema({
@@ -11,7 +11,7 @@ const income = new Schema({
     description: String,
     category1: { type: String, validate: {validator: validateCategory1, message: "Category does not exist."}, required: true },
     date: {type: Date, default: Date.now},
-    amount: {type: Number, required: true}
+    amount: {type: Number, min : 0.01, max : 1000000, required: true}
 });
 
 

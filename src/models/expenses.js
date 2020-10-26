@@ -3,7 +3,7 @@ let Schema = mongoose.Schema;
 
 
 const allowedCategory1 = ["Personal", "Food & Drinks", "Home & Utilities", "Transport", "Leisure", "Health"]
-const allowedCategory21 = ["Clothing & Footwear", "Personal Hygiene", "Personal Care Services", "Subscriptions", "Consumer Electronics", "Education", "Insurance", "Taxes", "Debts"]
+const allowedCategory21 = ["Clothing & Footwear", "Personal Hygiene", "Personal Care Services", "Subscriptions", "Consumer Electronics", "Education", "Insurance", "Taxes", "Debts", "Funds Transfer"]
 const allowedCategory22 = ["Groceries", "Restaurants", "Coffee & Tea", "Alcohol"]
 const allowedCategory23 = ["Bills", "Rent", "Household", "Goods", "Maintenance"]
 const allowedCategory24 = ["Public transport", "Taxi", "Tolls", "Parking", "Personal vehicle", "Gas"]
@@ -18,7 +18,7 @@ let expense = new Schema({
     category1: { type: String, validate: {validator: validateCategory1, message: "Category does not exist."}, required: true },
     category2: { type: String, validate: {validator: validateCategory2, message: "Category does not exist."}, required: true },
     date: {type: Date, default: Date.now},
-    amount: {type: Number, required: true}
+    amount: {type: Number, min : 0.01, max : 1000000, required: true}
 });
 
 
