@@ -2,13 +2,14 @@ const mongoose = require('mongoose');
 let Schema = mongoose.Schema;
 
 
-const allowedCategory1 = ["Personal", "Food & Drinks", "Home & Utilities", "Transport", "Leisure", "Health"]
-const allowedCategory21 = ["Clothing & Footwear", "Personal Hygiene", "Personal Care Services", "Subscriptions", "Consumer Electronics", "Education", "Insurance", "Taxes", "Debts", "Funds Transfer"]
+const allowedCategory1 = ["Personal", "Food & Drinks", "Home & Utilities", "Transport", "Leisure", "Health", "Finance"]
+const allowedCategory21 = ["Clothing & Footwear", "Personal Hygiene", "Personal Care Services", "Subscriptions", "Consumer Electronics", "Education"]
 const allowedCategory22 = ["Groceries", "Restaurants", "Coffee & Tea", "Alcohol"]
 const allowedCategory23 = ["Bills", "Rent", "Household", "Goods", "Maintenance"]
 const allowedCategory24 = ["Public transport", "Taxi", "Tolls", "Parking", "Personal vehicle", "Gas"]
 const allowedCategory25 = ["Sport", "Entertainment", "Culture", "Holidays"]
 const allowedCategory26 = ["Medicine & supplements", "Medical services & diagnostics"]
+const allowedCategory27 = ["Insurance", "Taxes", "Debts", "Funds Transfer"]
 
 
 let expense = new Schema({
@@ -44,6 +45,8 @@ function validateCategory2(category2){
             return allowedCategory25.includes(category2)
         case "Health":
             return allowedCategory26.includes(category2)
+        case "Finance":
+            return allowedCategory27.includes(category2)
 
     }
 }
