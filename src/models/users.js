@@ -25,6 +25,7 @@ const goal = new Schema({
 
 const account = new Schema({
     name: {type: String, required: true},
+    availableBalance: {type: Number, required: true},
     totalBalance: {type: Number, required: true},
     budgets: [budget],
     goals: [goal],

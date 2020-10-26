@@ -5,7 +5,7 @@ const deleteUserEntries = require('../services/deleteUserEntries');
 
 // Find all accounts of user with requested id
 exports.findAllAccountsByUserID = (req, res) => {
-    User.findById( req.params.uid, 'accounts._id accounts.name accounts.totalBalance accounts.startOfMonth')
+    User.findById( req.params.uid, 'accounts._id accounts.name accounts.totalBalance accounts.availableBalance accounts.startOfMonth')
         .then(accounts => {
             if (!accounts) {
                 return res.status(404).json({
@@ -51,6 +51,7 @@ exports.createAccount = (req, res) => {
     let newAccount = {
         name: req.body.name || "New Account",
         totalBalance: 0,
+        availableBalance: 0,
         budgets: [],
         goals: [],
         expenses: [],
@@ -59,7 +60,7 @@ exports.createAccount = (req, res) => {
     };
 
     // Finds user and appends newAccount to the accounts array, then returns the new list of all account names
-    User.findByIdAndUpdate(req.params.uid,{$push: {accounts: newAccount}},{new:true, select:'accounts._id accounts.name accounts.totalBalance accounts.startOfMonth'} )
+    User.findByIdAndUpdate(req.params.uid,{$push: {accounts: newAccount}},{new:true, select:'accounts._id accounts.name accounts.totalBalance accounts.availableBalance accounts.startOfMonth'} )
         .then(accounts => {
 
             if (!accounts) {
