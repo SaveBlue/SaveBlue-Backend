@@ -18,7 +18,7 @@ let expense = new Schema({
     category1: { type: String, validate: {validator: validateCategory1, message: "Category does not exist."}, required: true },
     category2: { type: String, validate: {validator: validateCategory2, message: "Category does not exist."}, required: true },
     date: {type: Date, default: Date.now},
-    amount: {type: Number, min : 0.01, max : 1000000, required: true}
+    amount: {type: Number, min : 0.01, max : 1000000, set: round, required: true}
 });
 
 
@@ -46,6 +46,12 @@ function validateCategory2(category2){
             return allowedCategory26.includes(category2)
 
     }
+}
+
+
+// Round amount to 2 decimal places
+function round(value) {
+    return value.toFixed(2);
 }
 
 

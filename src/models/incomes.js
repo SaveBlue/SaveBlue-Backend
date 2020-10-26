@@ -11,13 +11,19 @@ const income = new Schema({
     description: String,
     category1: { type: String, validate: {validator: validateCategory1, message: "Category does not exist."}, required: true },
     date: {type: Date, default: Date.now},
-    amount: {type: Number, min : 0.01, max : 1000000, required: true}
+    amount: {type: Number, min : 0.01, max : 1000000, set: round ,required: true}
 });
 
 
-// validate category1 with array of allowed categories1
+// Validate category1 with array of allowed categories1
 function validateCategory1(category1) {
     return allowedCategory1.includes(category1)
+}
+
+
+// Round amount to 2 decimal places
+function round(value) {
+    return value.toFixed(2);
 }
 
 
