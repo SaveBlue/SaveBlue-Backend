@@ -17,8 +17,6 @@ exports.updateAllAccountBalances = (accountID, amount, operation) => {
                 // Get requested account from the user
                 let account = user.accounts.id(accountID);
 
-                console.log(account)
-
                 // Add or subtract from account balance
                 switch (operation) {
                     case "+":
@@ -35,7 +33,6 @@ exports.updateAllAccountBalances = (accountID, amount, operation) => {
                 // Save updated user data (updated account)
                 user.save()
                     .then(() => {
-                        console.log(account)
                         resolve();
                     })
                     .catch(error => {
