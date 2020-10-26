@@ -61,7 +61,13 @@ exports.delete = (req, res) => {
 
 // Update user data of the user with requested id
 exports.update = (req, res) => {
-    console.log(req.body);
+
+    // Check lengths of fields
+    if ((req.body.username && req.body.username.length > 32) || (req.body.password && req.body.password.length > 128) || (req.body.email && req.body.email.length > 128)) {
+        return res.status(413).json({
+            message: "Field too long."
+        });
+    }
 
     User.findById(req.params.id, 'username email hashedPassword salt')
         .then(user => {

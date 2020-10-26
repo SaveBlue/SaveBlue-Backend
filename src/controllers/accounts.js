@@ -48,6 +48,13 @@ exports.findAccountByID = (req, res) => {
 // Add a new account to an user with requested id
 exports.createAccount = (req, res) => {
 
+    // Check account name length
+    if (req.body.name && req.body.name.length > 128) {
+        return res.status(413).json({
+            message: "Account name too long."
+        });
+    }
+
     let newAccount = {
         name: req.body.name || "New Account",
         totalBalance: 0,
@@ -133,6 +140,14 @@ exports.deleteAccountByID = (req, res) => {
 
 // Update account with requested id
 exports.updateAccountByID = (req, res) => {
+
+
+    // Check account name length
+    if (req.body.name && req.body.name.length > 128) {
+        return res.status(413).json({
+            message: "Account name too long."
+        });
+    }
 
     // Find the user with the requested account
     User.findOne({'accounts._id': req.params.id}, 'accounts._id accounts.name accounts.startOfMonth')

@@ -14,7 +14,7 @@ const allowedCategory26 = ["Medicine & supplements", "Medical services & diagnos
 let expense = new Schema({
     accountID: {type: String, required: true},
     userID: {type: String, required: true},
-    description: String,
+    description: {type: String, maxlength: 1024},
     category1: { type: String, validate: {validator: validateCategory1, message: "Category does not exist."}, required: true },
     category2: { type: String, validate: {validator: validateCategory2, message: "Category does not exist."}, required: true },
     date: {type: Date, default: Date.now},

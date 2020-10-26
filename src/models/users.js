@@ -15,7 +15,7 @@ const budget = new Schema({
 
 
 const goal = new Schema({
-    name: {type: String, required: true},
+    name: {type: String, maxlength: 32, required: true},
     description: String,
     targetAmount: {type: Number, required: true},
     currentAmount: {type: Number, default: 0},
@@ -24,7 +24,7 @@ const goal = new Schema({
 
 
 const account = new Schema({
-    name: {type: String, required: true},
+    name: {type: String, maxlength: 32,required: true},
     availableBalance: {type: Number, required: true},
     totalBalance: {type: Number, required: true},
     budgets: [budget],
@@ -35,8 +35,8 @@ const account = new Schema({
 
 
 const user = new Schema({
-    username: {type: String, required: true, unique:true},
-    email: {type: String, required: true, unique:true},
+    username: {type: String, maxlength: 32, required: true, unique:true},
+    email: {type: String, maxlength: 128, required: true, unique:true},
     hashedPassword: {type: String, required: true},
     salt: {type: String, required: true},
     accounts: {type: [account], required: true},

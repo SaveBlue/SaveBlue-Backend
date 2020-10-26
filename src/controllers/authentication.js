@@ -14,6 +14,13 @@ exports.register = (req, res) => {
         return res.status(400).json({message: "Email address is not valid!"});
     }
 
+    // Check lengths of fields
+    if (req.body.username.length > 32 || req.body.password.length > 128 || req.body.email.length > 128) {
+        return res.status(413).json({
+            message: "Field too long."
+        });
+    }
+
     // Create a new user
     let newUser = new User({
         username: req.body.username,

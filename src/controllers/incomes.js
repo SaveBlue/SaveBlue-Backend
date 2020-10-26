@@ -46,6 +46,13 @@ exports.findIncomeByID = (req, res) => {
 // Create an income
 exports.create = (req, res) => {
 
+    // Check income description length
+    if (req.body.description && req.body.description.length > 1024) {
+        return res.status(413).json({
+            message: "Description too long."
+        });
+    }
+
     const newIncome = new Income({
         userID: req.body.userID,
         accountID: req.body.accountID,
@@ -108,6 +115,13 @@ exports.delete = (req, res) => {
 
 // Delete income with the ID
 exports.update = (req, res) => {
+
+    // Check income description length
+    if (req.body.description && req.body.description.length > 1024) {
+        return res.status(413).json({
+            message: "Description too long."
+        });
+    }
 
     let editedIncome = {};
 

@@ -46,6 +46,13 @@ exports.findExpenseByID = (req, res) => {
 // Create an expense
 exports.create = (req, res) => {
 
+    // Check expense description length
+    if (req.body.description && req.body.description.length > 1024) {
+        return res.status(413).json({
+            message: "Description too long."
+        });
+    }
+
     const newExpense = new Expense({
         userID: req.body.userID,
         accountID: req.body.accountID,
@@ -109,6 +116,13 @@ exports.delete = (req, res) => {
 
 // Delete expense with requested ID
 exports.update = (req, res) => {
+
+    // Check expense description length
+    if (req.body.description && req.body.description.length > 1024) {
+        return res.status(413).json({
+            message: "Description too long."
+        });
+    }
 
     let editedExpense = {};
 
