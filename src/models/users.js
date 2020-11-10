@@ -17,7 +17,7 @@ const budget = new Schema({
 const goal = new Schema({
     name: {type: String, maxlength: 32, required: true},
     description: String,
-    targetAmount: {type: Number, required: true},
+    goalAmount: {type: Number, required: true},
     currentAmount: {type: Number, default: 0},
     complete: {type: Boolean, default: false},
 });

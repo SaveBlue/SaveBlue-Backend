@@ -28,6 +28,7 @@ require("./routes/users")(server);
 require("./routes/accounts")(server);
 require("./routes/incomes")(server);
 require("./routes/expenses")(server);
+require("./routes/goals")(server);
 require("./config/passport.js");
 
 

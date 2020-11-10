@@ -40,7 +40,7 @@ exports.findAccountByID = (req, res) => {
             res.status(500).send({
                 message: error.message || "An error occurred while fetching account!"
             });
-        })
+        });
 };
 //----------------------------------------------------------------------------------------------------------------------
 
