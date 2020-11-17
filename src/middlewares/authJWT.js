@@ -162,6 +162,28 @@ verifyTokenExpenseIncomePost = (req, res, next) => {
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Verify Goal
+verifyTokenGoal = (req, res, next) => {
+
+    let token = req.headers["x-access-token"];
+
+    if (!token) {
+        return res.status(403).send({message: "No token provided!"});
+    }
+
+    jwt.verify(token, config.secret, (err, decoded) => {
+        if (err) {
+            return res.status(401).send({message: "Unauthorized!"});
+        }
+
+        // Verification if the goal id belongs to the same user id provided in JWT token
+        verifyUsersCall(req, res, next, {'accounts.goals._id': req.params.id}, decoded.id)
+
+    });
+};
+//----------------------------------------------------------------------------------------------------------------------
+
+
 /**
  *
  * @param req - request (passthrough)
@@ -179,7 +201,7 @@ verifyUsersCall = (req, res, next, searchParam, decodedID) =>{
 
             if (!ID) {
                 return res.status(404).json({
-                    message: "No account with selected ID!"
+                    message: "No user with selected ID!"
                 });
             }
 
@@ -192,7 +214,7 @@ verifyUsersCall = (req, res, next, searchParam, decodedID) =>{
         })
         .catch(error => {
             res.status(500).send({
-                message: error.message || "An error occurred while fetching account!"
+                message: error.message || "An error occurred while fetching user!"
             });
         });
 }
@@ -204,6 +226,7 @@ const authJwt = {
     verifyTokenAccount: verifyTokenAccount,
     verifyTokenExpense: verifyTokenExpense,
     verifyTokenIncome: verifyTokenIncome,
-    verifyTokenExpenseIncomePost: verifyTokenExpenseIncomePost
+    verifyTokenExpenseIncomePost: verifyTokenExpenseIncomePost,
+    verifyTokenGoal: verifyTokenGoal
 };
 module.exports = authJwt;
