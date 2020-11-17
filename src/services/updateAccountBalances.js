@@ -46,3 +46,51 @@ exports.updateAllAccountBalances = (accountID, amount, operation) => {
             })
     })
 }
+
+// Update both availableAmount & goal currentAmount
+exports.updateGoalAmount = (goalID, amount, operation) => {
+
+    return new Promise((resolve, reject) => {
+
+        // Find the user with requested account
+        User.findOne({'accounts.goals._id': goalID}, 'accounts.goals')
+            .then(user => {
+
+                if (!user) {
+                    reject("No goal with selected ID!");
+                }
+
+                // Get requested account & goal from the user
+                let account = user.accounts[0];
+                let goal = user.accounts[0].goals.id(goalID);
+
+                // Add or subtract from account balance & goal currentAmount
+                switch (operation) {
+                    case "+":
+                        account.availableBalance -= amount;
+                        goal.currentAmount += amount;
+                        break;
+
+                    case "-":
+                        account.availableBalance += amount;
+                        goal.currentAmount -= amount;
+                        break;
+                }
+
+
+                // Save updated user data (updated account)
+                user.save()
+                    .then(() => {
+                        resolve();
+                    })
+                    .catch(error => {
+                        reject(error.message || "An error occurred while updating account!");
+
+                    });
+            })
+            .catch(error => {
+                reject(error.message || "An error occurred while fetching account!");
+
+            })
+    })
+}

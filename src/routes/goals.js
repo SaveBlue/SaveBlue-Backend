@@ -29,5 +29,8 @@ module.exports = goalsRouter => {
     // Update account goal by ID
     router.put("/:id", /*[authJWT.verifyTokenUser],*/ goalsController.update);
 
+    // Add to goal currentAmount
+    router.put("/currentAmount/:id", /*[authJWT.verifyTokenUser],*/ goalsController.updateGoalCurrentAmount);
+
     goalsRouter.use('/api/goals', router);
 };
