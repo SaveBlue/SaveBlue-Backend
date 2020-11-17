@@ -24,10 +24,10 @@ module.exports = goalsRouter => {
     router.post("/:aid", /*[authJWT.verifyTokenUser],*/ goalsController.create);
 
     // Delete account goal by ID
-    //router.delete("/:id", /*[authJWT.verifyTokenUser],*/ goalsController.delete);
+    router.delete("/:id", /*[authJWT.verifyTokenUser],*/ goalsController.delete);
 
     // Update account goal by ID
-    //router.put("/:id", /*[authJWT.verifyTokenUser],*/ goalsController.update);
+    router.put("/:id", /*[authJWT.verifyTokenUser],*/ goalsController.update);
 
     goalsRouter.use('/api/goals', router);
 };

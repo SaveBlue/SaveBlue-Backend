@@ -113,7 +113,7 @@ exports.delete = (req, res) => {
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Delete income with the ID
+// update income with the ID
 exports.update = (req, res) => {
 
     // Check income description length

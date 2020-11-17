@@ -3,7 +3,7 @@ const User = mongoose.model('User');
 //const deleteUserEntries = require('../services/deleteUserEntries');
 
 
-// Find an account goal with requested id
+// Find all goals of account with requested id
 exports.findAllGoals = (req, res) => {
 
     User.findOne({'accounts._id': req.params.aid},'accounts.goals')
@@ -20,14 +20,14 @@ exports.findAllGoals = (req, res) => {
         })
         .catch(error => {
             res.status(500).send({
-                message: error.message || "An error occurred while adding a new account!"
+                message: error.message || "An error occurred while retrieving goals!"
             });
         });
 };
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Find account with requested id
+// Find goal with requested id
 exports.findGoalByID = (req, res) => {
 
     User.findOne({'accounts.goals._id': req.params.id},'accounts.goals')
@@ -35,20 +35,108 @@ exports.findGoalByID = (req, res) => {
 
             if (!account) {
                 return res.status(404).json({
-                    message: "No account with selected ID!"
+                    message: "No goal with selected ID!"
                 });
             }
-            let goals = account.accounts[0].goals;
-            console.log(goals.id === req.params.id)
-            // TODO: tukaj sva ostala
-            res.status(200).json(goals);
+
+            res.status(200).json(account.accounts[0].goals[0]);
 
         })
         .catch(error => {
             res.status(500).send({
-                message: error.message || "An error occurred while adding a new account!"
+                message: error.message || "An error occurred while retrieving goal!"
             });
         });
+};
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// delete goal with requested id
+exports.delete = (req, res) => {
+
+    User.findOne({'accounts.goals._id': req.params.id},'accounts.goals')
+        .then(account => {
+
+            if (!account) {
+                return res.status(404).json({
+                    message: "No goal with selected ID!"
+                });
+            }
+            account.accounts[0].goals.pull({'_id': req.params.id});
+
+            // TODO service za denar
+
+            account.save()
+                .then(async () => {
+
+                    res.send({message: "Goal deleted!"});
+                })
+                .catch(error => {
+                    res.status(500).send({
+                        message: error.message || "An error occurred while deleting goal!"
+                    });
+                });
+        })
+        .catch(error => {
+            res.status(500).send({
+                message: error.message || "An error occurred while deleting goal!"
+            });
+        });
+};
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Update goal by ID
+exports.update = (req, res) => {
+
+    // Check goal name & description length
+    if (req.body.name && req.body.name.length > 64 && req.body.description && req.body.description.length > 1024) {
+        return res.status(413).json({
+            message: "Goal name or description too long."
+        });
+    }
+
+    // Find the user with the requested account
+    User.findOne({'accounts.goals._id': req.params.id}, 'accounts.goals')
+        .then(user => {
+
+            if (!user) {
+                return res.status(404).json({
+                    message: "No goal with selected ID!"
+                });
+            }
+
+            // Get the goal from found user
+            let goal = user.accounts[0].goals.id(req.params.id);
+
+
+            // Check if updating goal name
+            if(req.body.name) {
+                goal.name = req.body.name;
+            }
+
+            // Check if updating goal description
+            if(req.body.description) {
+                goal.description = req.body.description;
+            }
+
+            // TODO service za denar
+            // Save updated user data (updated goal)
+            user.save()
+                .then(() => {
+                    res.status(200).json(goal)
+                })
+                .catch(error => {
+                    res.status(500).send({
+                        message: error.message || "An error occurred while updating goal!"
+                    });
+                });
+        })
+        .catch(error => {
+            res.status(500).send({
+                message: error.message || "An error occurred while fetching goal!"
+            });
+        })
 };
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -56,10 +144,10 @@ exports.findGoalByID = (req, res) => {
 // Add a new goal to account with requested id
 exports.create = (req, res) => {
 
-    // Check account name length
-    if (req.body.name && req.body.name.length > 64 && req.body.description.length > 1024) {
+    // Check goal name & description length
+    if (req.body.name && req.body.name.length > 64 && req.body.description && req.body.description.length > 1024) {
         return res.status(413).json({
-            message: "Account name or description too long."
+            message: "Goal name or description too long."
         });
     }
 
@@ -96,7 +184,7 @@ exports.create = (req, res) => {
         })
         .catch(error => {
             res.status(500).send({
-                message: error.message || "An error occurred while adding a new account!"
+                message: error.message || "An error occurred while creating a new goal!"
             });
         });
 

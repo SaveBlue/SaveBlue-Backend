@@ -114,7 +114,7 @@ exports.delete = (req, res) => {
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Delete expense with requested ID
+// Update expense with requested ID
 exports.update = (req, res) => {
 
     // Check expense description length
