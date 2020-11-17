@@ -54,7 +54,7 @@ exports.findGoalByID = (req, res) => {
 exports.delete = (req, res) => {
 
     User.findOne({'accounts.goals._id': req.params.id}, 'accounts.goals')
-        .then(account => {
+        .then(async account => {
 
             if (!account) {
                 return res.status(404).json({
@@ -62,18 +62,19 @@ exports.delete = (req, res) => {
                 });
             }
             let goalCurrentAmount = account.accounts[0].goals.id(req.params.id).currentAmount;
+
+            // Delete goal's currentAmount from account
+            try {
+                await updateAccountBalances.updateGoalAmount(req.params.id, goalCurrentAmount, "-");
+            } catch (err) {
+                return res.status(500).send({message: err});
+            }
+
+            // Delete Goal from Account
             account.accounts[0].goals.pull({'_id': req.params.id});
 
-
             account.save()
-                .then(async () => {
-                    // Delete goal's currentAmount from account
-                    try {
-                        await updateAccountBalances.updateGoalAmount(req.params.id, goalCurrentAmount, "-");
-                    } catch (err) {
-                        return res.status(500).send({message: err});
-                    }
-
+                .then(() => {
                     res.send({message: "Goal deleted!"});
                 })
                 .catch(error => {
@@ -154,8 +155,8 @@ exports.update = (req, res) => {
 exports.updateGoalCurrentAmount = (req, res) => {
 
     // Find the user with the requested account
-    User.findOne({'accounts.goals._id': req.params.id}, 'accounts.goals')
-        .then(user => {
+    User.findOne({'accounts.goals._id': req.params.id}, 'accounts.availableBalance accounts.goals')
+        .then(async user => {
 
             if (!user) {
                 return res.status(404).json({
@@ -163,7 +164,8 @@ exports.updateGoalCurrentAmount = (req, res) => {
                 });
             }
 
-            // Get the goal from found user
+            // Get the goal & account from found user
+            let account = user.accounts[0];
             let goal = user.accounts[0].goals.id(req.params.id);
 
 
@@ -180,52 +182,39 @@ exports.updateGoalCurrentAmount = (req, res) => {
                 });
             }
 
-            // operation selection
-            switch (req.body.operation) {
-                case "+":
-                    goal.currentAmount += req.body.currentAmount;
-                    break;
-
-                case "-":
-                    // subtraction capping
-                    if (goal.currentAmount < req.body.currentAmount) {
-                        return res.status(400).json({
-                            message: "Can't subtract to negative!"
-                        });
-                    }
-                    goal.currentAmount -= req.body.currentAmount;
-                    break;
+            // check if subtraction bigger than currentAmount
+            if (req.body.operation === "-" && goal.currentAmount < req.body.currentAmount) {
+                return res.status(400).json({
+                    message: "Can't subtract to negative!"
+                });
             }
 
-            goal.currentAmount += req.body.currentAmount;
-
-            // Save updated user data (updated goal)
-            user.save()
-                .then(async () => {
-
-                    // update available amount in account
-                    try {
-                        // operation selection
-                        switch (req.body.operation) {
-                            case "+":
-                                await updateAccountBalances.updateGoalAmount(req.params.id, req.body.currentAmount, "+");
-                                break;
-
-                            case "-":
-                                await updateAccountBalances.updateGoalAmount(req.params.id, req.body.currentAmount, "-");
-                                break;
-                        }
-                    } catch (err) {
-                        return res.status(500).send({message: err});
-                    }
-
-                    res.status(200).json(goal)
-                })
-                .catch(error => {
-                    res.status(500).send({
-                        message: error.message || "An error occurred while updating goal!"
-                    });
+            // check if subtraction bigger than account availableAmount
+            if (req.body.operation === "+" && account.availableBalance < req.body.currentAmount) {
+                return res.status(400).json({
+                    message: "Can't subtract to negative!"
                 });
+            }
+
+            // update available amount in account
+            try {
+                // operation selection
+                switch (req.body.operation) {
+                    case "+":
+                        await updateAccountBalances.updateGoalAmount(req.params.id, req.body.currentAmount, "+");
+                        goal.currentAmount += req.body.currentAmount
+                        break;
+
+                    case "-":
+                        await updateAccountBalances.updateGoalAmount(req.params.id, req.body.currentAmount, "-");
+                        goal.currentAmount -= req.body.currentAmount
+                        break;
+                }
+            } catch (err) {
+                return res.status(500).send({message: err});
+            }
+            res.status(200).json(goal)
+
         })
         .catch(error => {
             res.status(500).send({

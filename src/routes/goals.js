@@ -30,7 +30,7 @@ module.exports = goalsRouter => {
     router.put("/:id", [authJWT.verifyTokenGoal], goalsController.update);
 
     // Add to goal currentAmount
-    router.put("/currentAmount/:id", [authJWT.verifyTokenGoal], goalsController.updateGoalCurrentAmount);
+    router.put("/currentAmountChange/:id", [authJWT.verifyTokenGoal], goalsController.updateGoalCurrentAmount);
 
     goalsRouter.use('/api/goals', router);
 };
