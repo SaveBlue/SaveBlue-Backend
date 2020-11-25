@@ -15,13 +15,13 @@ module.exports = usersRouter => {
 
 
     // Find user by ID
-    router.get("/:id", [authJWT.verifyTokenUser], usersController.findByID);
+    router.get("/:id", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenUser], usersController.findByID);
 
     // Delete user by ID
-    router.delete("/:id", [authJWT.verifyTokenUser], usersController.delete);
+    router.delete("/:id", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenUser], usersController.delete);
 
     // Update user by ID
-    router.put("/:id", [authJWT.verifyTokenUser], usersController.update);
+    router.put("/:id", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenUser], usersController.update);
 
     usersRouter.use('/api/users', router);
 };

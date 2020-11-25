@@ -15,20 +15,20 @@ module.exports = accountsRouter => {
 
 
     // Get all accounts of user by user ID
-    router.get("/:uid",[authJWT.verifyTokenUser], accountsController.findAllAccountsByUserID);
+    router.get("/:uid",[authJWT.verifyTokenWhitelist, authJWT.verifyTokenUser], accountsController.findAllAccountsByUserID);
 
     // Get all data of specific account by account ID
-    router.get("/find/:id",[authJWT.verifyTokenAccount], accountsController.findAccountByID);
+    router.get("/find/:id",[authJWT.verifyTokenWhitelist, authJWT.verifyTokenAccount], accountsController.findAccountByID);
 
     // Delete specific account by account ID
-    router.delete("/:id",[authJWT.verifyTokenAccount], accountsController.deleteAccountByID);
+    router.delete("/:id",[authJWT.verifyTokenWhitelist, authJWT.verifyTokenAccount], accountsController.deleteAccountByID);
 
     // Update specific account's info by account ID
     // TODO: implement goals and budgets
-    router.put("/:id",[authJWT.verifyTokenAccount], accountsController.updateAccountByID);
+    router.put("/:id",[authJWT.verifyTokenWhitelist, authJWT.verifyTokenAccount], accountsController.updateAccountByID);
 
     // Create account of the user by user ID
-    router.post("/:uid",[authJWT.verifyTokenUser], accountsController.createAccount);
+    router.post("/:uid",[authJWT.verifyTokenWhitelist, authJWT.verifyTokenUser], accountsController.createAccount);
 
     accountsRouter.use('/api/accounts', router);
 };

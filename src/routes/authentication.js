@@ -1,6 +1,8 @@
 const router = require("express").Router();
 const registerCheck = require("../middlewares/registerCheck")
 const authenticationController = require("../controllers/authentication");
+const authJWT = require("../middlewares/authJWT");
+
 
 
 module.exports = authenticationRouter => {
@@ -18,7 +20,10 @@ module.exports = authenticationRouter => {
     router.post("/register",[registerCheck.checkUniqueUsernameEmail], authenticationController.register);
 
     // Login to user account
-    router.post("/login",authenticationController.login);
+    router.post("/login", authenticationController.login);
+
+    // Logout the user
+    router.post("/logout", [authJWT.verifyTokenWhitelist], authenticationController.logout);
 
     authenticationRouter.use('/api/auth', router);
 }

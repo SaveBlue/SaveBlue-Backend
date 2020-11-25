@@ -62,6 +62,7 @@ process.on('SIGTERM', () => {
 });
 
 
+require('./tokens');
 require('./users');
 require('./incomes');
 require('./expenses');

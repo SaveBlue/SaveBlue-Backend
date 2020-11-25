@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const passport = require('passport');
 const User = mongoose.model('User');
+const Token = mongoose.model('Token');
 
 
 // Register a new user
@@ -57,10 +58,49 @@ exports.login = (req, res) => {
         if (error)
             return res.status(500).json(error);
         if (user) {
-            res.status(200).json({"JWT Token": user.generateJWT()});
+
+            let JWT = user.generateJWT();
+
+            let newToken = new Token({token: JWT});
+
+            // Save jwt to whitelist
+            newToken.save(newToken)
+                .then(() => {
+                    res.status(200).json({"JWT Token": JWT});
+                })
+                .catch(error => {
+                    res.status(500).send({
+                        message: error.message || "An error occurred while saving token!"
+                    });
+                });
+
+
         } else {
             res.status(401).json(info);
         }
     })(req, res);
 
+};
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// invalidates JWT from whitelist
+exports.logout = (req, res) => {
+    Token.deleteOne({'token': req.headers["x-access-token"]})
+        .then(token => {
+            if (!token) {
+                return res.status(404).json({
+                    message: "Token does not exist!"
+                });
+            }
+
+            res.status(200).json({
+                message: "Logged out!"
+            });
+        })
+        .catch(error => {
+            res.status(500).send({
+                message: error.message || "An error occurred while logging out!"
+            });
+        });
 };

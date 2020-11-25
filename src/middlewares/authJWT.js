@@ -4,6 +4,30 @@ const mongoose = require('mongoose');
 const User = mongoose.model('User');
 const Expense = mongoose.model('Expense');
 const Income = mongoose.model('Income');
+const Token = mongoose.model('Token');
+
+
+// Verify token in whitelist
+verifyTokenWhitelist = (req, res, next) => {
+
+    Token.findOne({'token': req.headers["x-access-token"]})
+        .then(token => {
+            if (!token) {
+                return res.status(401).json({
+                    message: "Unauthorized!"
+                });
+            }
+
+            next();
+
+        })
+        .catch(error => {
+            res.status(500).send({
+                message: error.message || "An error occurred while checking whitelist!"
+            });
+        });
+};
+//----------------------------------------------------------------------------------------------------------------------
 
 
 // Verify User
@@ -222,6 +246,7 @@ verifyUsersCall = (req, res, next, searchParam, decodedID) =>{
 
 
 const authJwt = {
+    verifyTokenWhitelist: verifyTokenWhitelist,
     verifyTokenUser: verifyTokenUser,
     verifyTokenAccount: verifyTokenAccount,
     verifyTokenExpense: verifyTokenExpense,

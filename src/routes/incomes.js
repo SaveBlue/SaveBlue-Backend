@@ -16,19 +16,19 @@ module.exports = incomesRouter => {
 
     // Get all incomes of account by account ID
     // TODO: limit the number of returned incomes
-    router.get("/find/:aid",[authJWT.verifyTokenAccount], incomesController.findAllIncomesByAccountID);
+    router.get("/find/:aid",[authJWT.verifyTokenWhitelist, authJWT.verifyTokenAccount], incomesController.findAllIncomesByAccountID);
 
     // Get an income by ID
-    router.get("/:id", [authJWT.verifyTokenIncome], incomesController.findIncomeByID);
+    router.get("/:id", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenIncome], incomesController.findIncomeByID);
 
     // Create income
-    router.post("/", [authJWT.verifyTokenExpenseIncomePost], incomesController.create);
+    router.post("/", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenExpenseIncomePost], incomesController.create);
 
     // Delete income by ID
-    router.delete("/:id", [authJWT.verifyTokenIncome], incomesController.delete);
+    router.delete("/:id", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenIncome], incomesController.delete);
 
     // Update income by ID
-    router.put("/:id", [authJWT.verifyTokenIncome], incomesController.update);
+    router.put("/:id", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenIncome], incomesController.update);
 
     incomesRouter.use('/api/incomes', router);
 };

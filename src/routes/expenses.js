@@ -16,19 +16,19 @@ module.exports = expensesRouter => {
 
     // Get all expenses of account by account ID
     // TODO: limit the number of returned incomes
-    router.get("/find/:aid",[authJWT.verifyTokenAccount], expensesController.findAllExpensesByAccountID);
+    router.get("/find/:aid",[authJWT.verifyTokenWhitelist, authJWT.verifyTokenAccount], expensesController.findAllExpensesByAccountID);
 
     // Get an expense by ID
-    router.get("/:id",[authJWT.verifyTokenExpense], expensesController.findExpenseByID);
+    router.get("/:id",[authJWT.verifyTokenWhitelist, authJWT.verifyTokenExpense], expensesController.findExpenseByID);
 
     // Create an expense
-    router.post("/",[authJWT.verifyTokenExpenseIncomePost], expensesController.create);
+    router.post("/",[authJWT.verifyTokenWhitelist, authJWT.verifyTokenExpenseIncomePost], expensesController.create);
 
     // Delete an expense by ID
-    router.delete("/:id",[authJWT.verifyTokenExpense], expensesController.delete);
+    router.delete("/:id",[authJWT.verifyTokenWhitelist, authJWT.verifyTokenExpense], expensesController.delete);
 
     // Update an expense by ID
-    router.put("/:id",[authJWT.verifyTokenExpense], expensesController.update);
+    router.put("/:id",[authJWT.verifyTokenWhitelist, authJWT.verifyTokenExpense], expensesController.update);
 
     expensesRouter.use('/api/expenses', router);
 };
