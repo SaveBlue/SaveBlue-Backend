@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-let dbURI = 'mongodb://localhost/SaveBlue';
+let dbURI = process.env.DB_URI || 'mongodb://localhost/SaveBlue';
 if (process.env.NODE_ENV === 'production') {
     dbURI = process.env.MONGODB_CLOUD_URI;
 }
