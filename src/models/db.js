@@ -1,10 +1,7 @@
 const mongoose = require('mongoose');
 
-let dbURI = process.env.DB_URI || 'mongodb://localhost/SaveBlue';
-if (process.env.NODE_ENV === 'production') {
-    dbURI = process.env.MONGODB_CLOUD_URI;
-}
 
+let dbURI = process.env.MONGODB_CLOUD_URI || 'mongodb://localhost/SaveBlue';
 
 // Connect to the database
 mongoose.connect(dbURI, {

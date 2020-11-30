@@ -10,7 +10,7 @@ const url = process.env.URL || "http://localhost";
 
 // cors settings
 let corsOptions = {
-    origin: url +":"+ 8080
+    origin: url + ":" + 8080
 };
 server.use(cors(corsOptions));
 
