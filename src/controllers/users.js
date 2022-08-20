@@ -3,6 +3,26 @@ const User = mongoose.model('User');
 const deleteUserEntries = require('../services/deleteUserEntries');
 
 
+// Return calling user data
+exports.returnMe = (req, res) => {
+    User.findById(req.params.tokenId, 'username firstName lastName email')
+        .then(user => {
+            if (!user) {
+                return res.status(404).json({
+                    message: "No user with selected ID!"
+                });
+            }
+            res.status(200).json(user);
+        })
+        .catch(error => {
+            res.status(500).send({
+                message: error.message || "An error occurred while fetching user!"
+            });
+        });
+};
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Find a user with requested id
 exports.findByID = (req, res) => {
     User.findById(req.params.id, 'username email')

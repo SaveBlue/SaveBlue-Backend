@@ -3,14 +3,15 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const passport = require('passport');
 const server = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
 const url = process.env.URL || "http://localhost";
 //----------------------------------------------------------------------------------------------------------------------
 
 
 // cors settings
 let corsOptions = {
-    origin: url + ":" + 8080
+    //origin: url + ":" + 8080
+    origin: "*"
 };
 server.use(cors(corsOptions));
 
