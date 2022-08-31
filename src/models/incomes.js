@@ -6,13 +6,20 @@ const allowedCategory1 = ["Salary & Wage", "Assets", "Student Work", "Funds Tran
 
 
 const income = new Schema({
-    accountID: {type: String, required: true},
-    userID: {type: String, required: true},
-    description: {type: String, maxlength: 1024},
-    category1: { type: String, validate: {validator: validateCategory1, message: "Category does not exist."}, required: true },
-    date: {type: Date, default: Date.now},
-    amount: {type: Number, min : 0.01, max : 1000000, set: round ,required: true}
-});
+        accountID: {type: String, required: true},
+        userID: {type: String, required: true},
+        description: {type: String, maxlength: 1024},
+        category1: {
+            type: String,
+            validate: {validator: validateCategory1, message: "Category does not exist."},
+            required: true
+        },
+        date: {type: Date, default: Date.now},
+        amount: {type: Number, min: 0.01, max: 1000000, set: round, required: true}
+    },
+    {
+        timestamps: true
+    });
 
 
 // Validate category1 with array of allowed categories1

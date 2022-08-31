@@ -7,11 +7,12 @@ const updateAccountBalances = require('../services/updateAccountBalances');
 exports.findAllIncomesByAccountID = (req, res) => {
     Income.find({accountID: req.params.aid}, null, {sort: {date: -1}})
         .then(incomes => {
-            if (incomes.length === 0) {
+            // TODO: check, ce lahko damo stran
+            /*if (incomes.length === 0) {
                 return res.status(404).json({
                     message: "No incomes with selected account ID!"
                 });
-            }
+            }*/
             res.status(200).json(incomes);
         })
         .catch(error => {

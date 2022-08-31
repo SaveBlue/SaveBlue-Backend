@@ -6,47 +6,59 @@ let Schema = mongoose.Schema;
 
 
 const budget = new Schema({
-    category: {type: String, required: true},
-    // category: { type: String, enum: ['category1', 'category2', 'category3'], required: true },
-    budgetAmount: {type: Number, required: true},
-    startDate: {type: Date, required: true},
-    endDate: {type: Date, required: true,}
-});
+        category: {type: String, required: true},
+        // category: { type: String, enum: ['category1', 'category2', 'category3'], required: true },
+        budgetAmount: {type: Number, required: true},
+        startDate: {type: Date, required: true},
+        endDate: {type: Date, required: true,}
+    },
+    {
+        timestamps: true
+    });
 
 
 const goal = new Schema({
-    name: {type: String, maxlength: 32, required: true},
-    description: String,
-    goalAmount: {type: Number, required: true},
-    currentAmount: {type: Number, default: 0},
-    complete: {type: Boolean, default: false},
-});
+        name: {type: String, maxlength: 32, required: true},
+        description: String,
+        goalAmount: {type: Number, required: true},
+        currentAmount: {type: Number, default: 0},
+        complete: {type: Boolean, default: false},
+    },
+    {
+        timestamps: true
+    });
 
 
 const account = new Schema({
-    name: {type: String, maxlength: 32,required: true},
-    availableBalance: {type: Number, required: true},
-    totalBalance: {type: Number, required: true},
-    budgets: [budget],
-    goals: [goal],
-    startOfMonth: {type: Number, required: true}
+        name: {type: String, maxlength: 32, required: true},
+        availableBalance: {type: Number, required: true},
+        totalBalance: {type: Number, required: true},
+        budgets: [budget],
+        goals: [goal],
+        startOfMonth: {type: Number, required: true}
 
-});
+    },
+    {
+        timestamps: true
+    });
 
 
 const user = new Schema({
-    username: {type: String, maxlength: 32, required: true, unique:true},
-    email: {type: String, maxlength: 128, required: true, unique:true},
-    hashedPassword: {type: String, required: true},
-    salt: {type: String, required: true},
-    accounts: {type: [account], required: true},
-});
+        username: {type: String, maxlength: 32, required: true, unique: true},
+        email: {type: String, maxlength: 128, required: true, unique: true},
+        hashedPassword: {type: String, required: true},
+        salt: {type: String, required: true},
+        accounts: {type: [account], required: true},
+    },
+    {
+        timestamps: true
+    });
 
 
 // User functions
 
 // Create salt and hash password
-user.methods.hashPassword = function(password) {
+user.methods.hashPassword = function (password) {
     this.salt = crypto.randomBytes(16).toString('hex');
     this.hashedPassword = crypto
         .pbkdf2Sync(password, this.salt, 1000, 64, 'sha512')
@@ -55,7 +67,7 @@ user.methods.hashPassword = function(password) {
 
 
 // Hash received password and compare it
-user.methods.checkPassword = function(password) {
+user.methods.checkPassword = function (password) {
     let hashedPassword = crypto
         .pbkdf2Sync(password, this.salt, 1000, 64, 'sha512')
         .toString('hex');
@@ -64,9 +76,9 @@ user.methods.checkPassword = function(password) {
 
 
 // Generate and sign jwt for 24 hours
-user.methods.generateJWT = function() {
+user.methods.generateJWT = function () {
 
-    return jwt.sign({ id: this._id}, config.secret, {
+    return jwt.sign({id: this._id}, config.secret, {
         expiresIn: 86400 // 24 hours
     });
 };

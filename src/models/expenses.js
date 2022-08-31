@@ -13,14 +13,25 @@ const allowedCategory27 = ["Insurance", "Taxes", "Debts", "Funds Transfer"]
 
 
 let expense = new Schema({
-    accountID: {type: String, required: true},
-    userID: {type: String, required: true},
-    description: {type: String, maxlength: 1024},
-    category1: { type: String, validate: {validator: validateCategory1, message: "Category does not exist."}, required: true },
-    category2: { type: String, validate: {validator: validateCategory2, message: "Category does not exist."}, required: true },
-    date: {type: Date, default: Date.now},
-    amount: {type: Number, min : 0.01, max : 1000000, set: round, required: true}
-});
+        accountID: {type: String, required: true},
+        userID: {type: String, required: true},
+        description: {type: String, maxlength: 1024},
+        category1: {
+            type: String,
+            validate: {validator: validateCategory1, message: "Category does not exist."},
+            required: true
+        },
+        category2: {
+            type: String,
+            validate: {validator: validateCategory2, message: "Category does not exist."},
+            required: true
+        },
+        date: {type: Date, default: Date.now},
+        amount: {type: Number, min: 0.01, max: 1000000, set: round, required: true}
+    },
+    {
+        timestamps: true
+    });
 
 
 // validate category1 with array of allowed categories1
@@ -30,9 +41,9 @@ function validateCategory1(category1) {
 
 
 // validate category2 depending on category1 with array of allowed categories2x
-function validateCategory2(category2){
+function validateCategory2(category2) {
 
-    switch (this.category1){
+    switch (this.category1) {
         case "Personal":
             return allowedCategory21.includes(category2)
         case "Food & Drinks":

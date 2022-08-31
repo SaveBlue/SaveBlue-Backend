@@ -63,7 +63,7 @@ exports.createAccount = (req, res) => {
         goals: [],
         expenses: [],
         incomes: [],
-        startOfMonth: 1
+        startOfMonth: req.body.startOfMonth
     };
 
     // Finds user and appends newAccount to the accounts array, then returns the new list of all account names

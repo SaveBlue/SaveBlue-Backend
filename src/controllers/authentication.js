@@ -66,7 +66,7 @@ exports.login = (req, res) => {
             // Save jwt to whitelist
             newToken.save(newToken)
                 .then(() => {
-                    res.status(200).json({"JWT Token": JWT});
+                    res.status(200).json({"x-access-token": JWT});
                 })
                 .catch(error => {
                     res.status(500).send({
