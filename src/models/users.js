@@ -8,7 +8,7 @@ let Schema = mongoose.Schema;
 const budget = new Schema({
         category: {type: String, required: true},
         // category: { type: String, enum: ['category1', 'category2', 'category3'], required: true },
-        budgetAmount: {type: Number, required: true},
+        budgetAmount: {type: Number, set: round, required: true},
         startDate: {type: Date, required: true},
         endDate: {type: Date, required: true,}
     },
@@ -20,8 +20,8 @@ const budget = new Schema({
 const goal = new Schema({
         name: {type: String, maxlength: 32, required: true},
         description: String,
-        goalAmount: {type: Number, required: true},
-        currentAmount: {type: Number, default: 0},
+        goalAmount: {type: Number, set: round, required: true},
+        currentAmount: {type: Number, set: round, default: 0},
         complete: {type: Boolean, default: false},
     },
     {
@@ -31,11 +31,11 @@ const goal = new Schema({
 
 const account = new Schema({
         name: {type: String, maxlength: 32, required: true},
-        availableBalance: {type: Number, required: true},
-        totalBalance: {type: Number, required: true},
+        availableBalance: {type: Number, set: round, required: true},
+        totalBalance: {type: Number, set: round, required: true},
         budgets: [budget],
         goals: [goal],
-        startOfMonth: {type: Number, required: true}
+        startOfMonth: {type: Number, min: 1, max: 31, set:round, required: true}
 
     },
     {
@@ -82,5 +82,12 @@ user.methods.generateJWT = function () {
         expiresIn: 86400 // 24 hours
     });
 };
+
+
+// Round amount to 0 decimal places
+function round(value) {
+    return Math.ceil(value);
+}
+
 
 mongoose.model('User', user);

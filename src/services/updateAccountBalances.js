@@ -20,13 +20,13 @@ exports.updateAllAccountBalances = (accountID, amount, operation) => {
                 // Add or subtract from account balance
                 switch (operation) {
                     case "+":
-                        account.totalBalance += amount;
-                        account.availableBalance += amount;
+                        account.totalBalance += Math.ceil(amount);
+                        account.availableBalance += Math.ceil(amount);
                         break;
 
                     case "-":
-                        account.totalBalance -= amount;
-                        account.availableBalance -= amount;
+                        account.totalBalance -= Math.ceil(amount);
+                        account.availableBalance -= Math.ceil(amount);
                         break;
                 }
 
@@ -67,13 +67,13 @@ exports.updateGoalAmount = (goalID, amount, operation) => {
                 // Add or subtract from account balance & goal currentAmount
                 switch (operation) {
                     case "+":
-                        account.availableBalance -= amount;
-                        goal.currentAmount += amount;
+                        account.availableBalance -= Math.ceil(amount);
+                        goal.currentAmount += Math.ceil(amount);
                         break;
 
                     case "-":
-                        account.availableBalance += amount;
-                        goal.currentAmount -= amount;
+                        account.availableBalance += Math.ceil(amount);
+                        goal.currentAmount -= Math.ceil(amount);
                         break;
                 }
 

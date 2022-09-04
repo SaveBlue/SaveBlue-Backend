@@ -15,7 +15,7 @@ const income = new Schema({
             required: true
         },
         date: {type: Date, default: Date.now},
-        amount: {type: Number, min: 0.01, max: 1000000, set: round, required: true}
+        amount: {type: Number, min: 1, max: 100000000, set: round, required: true}
     },
     {
         timestamps: true
@@ -28,9 +28,9 @@ function validateCategory1(category1) {
 }
 
 
-// Round amount to 2 decimal places
+// Round amount to 0 decimal places
 function round(value) {
-    return value.toFixed(2);
+    return Math.ceil(value);
 }
 
 

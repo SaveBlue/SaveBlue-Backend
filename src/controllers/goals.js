@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const User = mongoose.model('User');
 const updateAccountBalances = require('../services/updateAccountBalances');
 
+// TODO: check controller for integer amount usage
+
 // Find all goals of account with requested id
 exports.findAllGoals = (req, res) => {
 
@@ -294,11 +296,18 @@ exports.create = (req, res) => {
         });
     }
 
+    // Check if amount is an integer
+    if (Number.isSafeInteger(req.body.goalAmount) && req.body.goalAmount > 0 && req.body.goalAmount <= 100000000) {
+        return res.status(400).json({
+            message: "Goal amount not a valid number."
+        });
+    }
+
     let newGoal = {
         name: req.body.name || "New Goal",
         description: req.body.description || "",
         currentAmount: 0,
-        goalAmount: req.body.goalAmount || 0,
+        goalAmount: req.body.goalAmount,
         complete: false
     };
 

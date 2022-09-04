@@ -7,11 +7,6 @@ const updateAccountBalances = require('../services/updateAccountBalances');
 exports.findAllExpensesByAccountID = (req, res) => {
     Expense.find({accountID: req.params.aid}, null, {sort: {date: -1}})
         .then(expenses => {
-            if (expenses.length === 0) {
-                return res.status(404).json({
-                    message: "No expenses with selected account ID!"
-                });
-            }
             res.status(200).json(expenses);
         })
         .catch(error => {
@@ -50,6 +45,13 @@ exports.create = (req, res) => {
     if (req.body.description && req.body.description.length > 1024) {
         return res.status(413).json({
             message: "Description too long."
+        });
+    }
+
+    // Check if amount is an integer
+    if (Number.isSafeInteger(req.body.amount) && req.body.amount > 0 && req.body.amount <= 100000000) {
+        return res.status(400).json({
+            message: "Amount not a valid number."
         });
     }
 
@@ -121,6 +123,13 @@ exports.update = (req, res) => {
     if (req.body.description && req.body.description.length > 1024) {
         return res.status(413).json({
             message: "Description too long."
+        });
+    }
+
+    // Check if amount is an integer
+    if (Number.isSafeInteger(req.body.amount) && req.body.amount > 0 && req.body.amount <= 100000000) {
+        return res.status(400).json({
+            message: "Amount not a valid number."
         });
     }
 
