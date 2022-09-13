@@ -127,7 +127,7 @@ exports.update = (req, res) => {
     }
 
     // Check if amount is an integer
-    if (Number.isSafeInteger(req.body.amount) && req.body.amount > 0 && req.body.amount <= 100000000) {
+    if (!Number.isSafeInteger(req.body.amount) && req.body.amount > 0 && req.body.amount <= 100000000) {
         return res.status(400).json({
             message: "Amount not a valid number."
         });
