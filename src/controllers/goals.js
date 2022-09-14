@@ -3,7 +3,6 @@ const User = mongoose.model('User');
 const updateAccountBalances = require('../services/updateAccountBalances');
 
 // TODO: check controller for integer amount usage
-
 // Find all goals of account with requested id
 exports.findAllGoals = (req, res) => {
 

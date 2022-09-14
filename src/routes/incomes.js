@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const authJWT = require("../middlewares/authJWT");
 const incomesController = require("../controllers/incomes");
+const categoriesIncomes = require("../models/incomes");
 
 
 module.exports = incomesRouter => {
@@ -13,6 +14,9 @@ module.exports = incomesRouter => {
         next();
     });
 
+
+    // Get list of all available income categories
+    router.get("/",[authJWT.verifyTokenWhitelist], (req, res) => {res.status(200).json(categoriesIncomes)});
 
     // Get all incomes of account by account ID
     // TODO: limit the number of returned incomes

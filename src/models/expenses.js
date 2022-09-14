@@ -2,14 +2,36 @@ const mongoose = require('mongoose');
 let Schema = mongoose.Schema;
 
 
-const allowedCategory1 = ["Personal", "Food & Drinks", "Home & Utilities", "Transport", "Leisure", "Health", "Finance"]
-const allowedCategory21 = ["Clothing & Footwear", "Personal Hygiene", "Personal Care Services", "Subscriptions", "Consumer Electronics", "Education"]
-const allowedCategory22 = ["Groceries", "Restaurants", "Coffee & Tea", "Alcohol"]
-const allowedCategory23 = ["Bills", "Rent", "Household", "Goods", "Maintenance"]
-const allowedCategory24 = ["Public transport", "Taxi", "Tolls", "Parking", "Personal vehicle", "Gas"]
-const allowedCategory25 = ["Sport", "Entertainment", "Culture", "Holidays"]
-const allowedCategory26 = ["Medicine & supplements", "Medical services & diagnostics"]
-const allowedCategory27 = ["Insurance", "Taxes", "Debts", "Funds Transfer"]
+const categoriesExpenses = [
+    {
+        category1: "Personal",
+        category2: ["Clothing & Footwear", "Personal Hygiene", "Personal Care Services", "Subscriptions", "Consumer Electronics", "Education"]
+    },
+    {
+        category1: "Food & Drinks",
+        category2: ["Groceries", "Restaurants", "Coffee & Tea", "Alcohol"]
+    },
+    {
+        category1: "Home & Utilities",
+        category2: ["Bills", "Rent", "Household", "Goods", "Maintenance"]
+    },
+    {
+        category1: "Transport",
+        category2: ["Public transport", "Taxi", "Tolls", "Parking", "Personal vehicle", "Gas"]
+    },
+    {
+        category1: "Leisure",
+        category2: ["Sport", "Entertainment", "Culture", "Holidays"]
+    },
+    {
+        category1: "Health",
+        category2: ["Medicine & supplements", "Medical services & diagnostics"]
+    },
+    {
+        category1: "Finance",
+        category2: ["Insurance", "Taxes", "Debts", "Funds Transfer"]
+    }
+]
 
 
 let expense = new Schema({
@@ -35,31 +57,14 @@ let expense = new Schema({
 
 
 // validate category1 with array of allowed categories1
-function validateCategory1(category1) {
-    return allowedCategory1.includes(category1)
+function validateCategory1(category) {
+    return !!categoriesExpenses.find(c => c.category1 === category)
 }
 
 
-// validate category2 depending on category1 with array of allowed categories2x
+// validate category2 depending on category1 with array of allowed categories2
 function validateCategory2(category2) {
-
-    switch (this.category1) {
-        case "Personal":
-            return allowedCategory21.includes(category2)
-        case "Food & Drinks":
-            return allowedCategory22.includes(category2)
-        case "Home & Utilities":
-            return allowedCategory23.includes(category2)
-        case "Transport":
-            return allowedCategory24.includes(category2)
-        case "Leisure":
-            return allowedCategory25.includes(category2)
-        case "Health":
-            return allowedCategory26.includes(category2)
-        case "Finance":
-            return allowedCategory27.includes(category2)
-
-    }
+    return !!categoriesExpenses.find(c => c.category1 === this.category1 && c.category2.includes(category2))
 }
 
 
@@ -70,3 +75,6 @@ function round(value) {
 
 
 mongoose.model('Expense', expense);
+
+
+module.exports = categoriesExpenses;

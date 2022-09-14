@@ -2,7 +2,13 @@ const mongoose = require('mongoose');
 let Schema = mongoose.Schema;
 
 
-const allowedCategory1 = ["Salary & Wage", "Assets", "Student Work", "Funds Transfer", "Other"]
+const categoriesIncomes = [
+    {category1: "Salary & Wage"},
+    {category1: "Assets"},
+    {category1: "Student Work"},
+    {category1: "Funds Transfer"},
+    {category1: "Other"},
+]
 
 
 const income = new Schema({
@@ -23,8 +29,8 @@ const income = new Schema({
 
 
 // Validate category1 with array of allowed categories1
-function validateCategory1(category1) {
-    return allowedCategory1.includes(category1)
+function validateCategory1(category) {
+    return !!categoriesIncomes.find(c => c.category1 === category)
 }
 
 
@@ -35,3 +41,6 @@ function round(value) {
 
 
 mongoose.model('Income', income);
+
+
+module.exports = categoriesIncomes;
