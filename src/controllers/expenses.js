@@ -208,3 +208,23 @@ exports.update = (req, res) => {
             });
         });
 };
+
+//----------------------------------------------------------------------------------------------------------------------
+
+// Return grouped expense categories
+exports.expensesBreakdown = (req, res) => {
+    Expense.aggregate()
+        .match({accountID: req.params.aid})
+        .group({ "_id": "$category1", "sum": { $sum: "$amount"  }})
+        .then(breakdown => {
+
+            console.log(breakdown)
+            res.status(200).json(breakdown);
+        })
+        .catch(error => {
+            res.status(500).send({
+                message: error.message || "An error occurred while fetching expenses!"
+            });
+        });
+}
+//{accountID: req.params.aid}, 'amount category1', {sort: {date: -1}}

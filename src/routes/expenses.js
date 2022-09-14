@@ -18,6 +18,9 @@ module.exports = expensesRouter => {
     // TODO: limit the number of returned incomes
     router.get("/find/:aid",[authJWT.verifyTokenWhitelist, authJWT.verifyTokenAccount], expensesController.findAllExpensesByAccountID);
 
+    // Get grouped expense categories
+    router.get("/breakdown/:aid",[authJWT.verifyTokenWhitelist, authJWT.verifyTokenAccount], expensesController.expensesBreakdown);
+
     // Get an expense by ID
     router.get("/:id",[authJWT.verifyTokenWhitelist, authJWT.verifyTokenExpense], expensesController.findExpenseByID);
 
