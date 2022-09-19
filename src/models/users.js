@@ -19,10 +19,11 @@ const budget = new Schema({
 
 const goal = new Schema({
         name: {type: String, maxlength: 32, required: true},
-        description: String,
+        description: {type: String, maxlength: 1024},
         goalAmount: {type: Number, set: round, required: true},
         currentAmount: {type: Number, set: round, default: 0},
         complete: {type: Boolean, default: false},
+        goalDate: {type: Date, default: new Date(0)}
     },
     {
         timestamps: true
