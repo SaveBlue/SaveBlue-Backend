@@ -213,12 +213,31 @@ exports.update = (req, res) => {
 
 // Return grouped expense categories
 exports.expensesBreakdown = (req, res) => {
+
+    if (!req.query.startDate) {
+        return res.status(400).json({
+            message: "Start date must be present!"
+        });
+    }
+
+    if (!req.query.endDate) {
+        return res.status(400).json({
+            message: "End date must be present!"
+        });
+    }
+
+    let filterObject = {
+        accountID: req.params.aid,
+        date: {
+            $gte: new Date(req.query.startDate),
+            $lte: new Date(req.query.endDate)
+        }
+    }
+
     Expense.aggregate()
-        .match({accountID: req.params.aid})
+        .match(filterObject)
         .group({ "_id": "$category1", "sum": { $sum: "$amount"  }})
         .then(breakdown => {
-
-            console.log(breakdown)
             res.status(200).json(breakdown);
         })
         .catch(error => {
@@ -227,4 +246,3 @@ exports.expensesBreakdown = (req, res) => {
             });
         });
 }
-//{accountID: req.params.aid}, 'amount category1', {sort: {date: -1}}
