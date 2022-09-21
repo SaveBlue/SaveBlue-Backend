@@ -208,10 +208,10 @@ exports.update = (req, res) => {
             });
         });
 };
-
 //----------------------------------------------------------------------------------------------------------------------
 
-// Return grouped expense categories
+
+// Return expense breakdown by primary categories
 exports.expensesBreakdown = (req, res) => {
 
     if (!req.query.startDate) {
@@ -242,7 +242,7 @@ exports.expensesBreakdown = (req, res) => {
         })
         .catch(error => {
             res.status(500).send({
-                message: error.message || "An error occurred while fetching expenses!"
+                message: error.message || "An error occurred while fetching expenses breakdown!"
             });
         });
 }

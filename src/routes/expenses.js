@@ -15,17 +15,14 @@ module.exports = expensesRouter => {
     });
 
 
-    // Get list of all available expense categories
+    // Return list of all available expense categories
     router.get("/",[authJWT.verifyTokenWhitelist], (req, res) => {res.status(200).json(categoriesExpenses)});
 
-    // Get all expenses of account by account ID
+    // Return all expenses of account by account ID
     // TODO: limit the number of returned incomes
     router.get("/find/:aid",[authJWT.verifyTokenWhitelist, authJWT.verifyTokenAccount], expensesController.findAllExpensesByAccountID);
 
-    // Get grouped expense categories
-    router.get("/breakdown/:aid",[authJWT.verifyTokenWhitelist, authJWT.verifyTokenAccount], expensesController.expensesBreakdown);
-
-    // Get an expense by ID
+    // Return an expense by ID
     router.get("/:id",[authJWT.verifyTokenWhitelist, authJWT.verifyTokenExpense], expensesController.findExpenseByID);
 
     // Create an expense
@@ -36,6 +33,9 @@ module.exports = expensesRouter => {
 
     // Update an expense by ID
     router.put("/:id",[authJWT.verifyTokenWhitelist, authJWT.verifyTokenExpense], expensesController.update);
+
+    // Return expense breakdown by primary categories
+    router.get("/breakdown/:aid",[authJWT.verifyTokenWhitelist, authJWT.verifyTokenAccount], expensesController.expensesBreakdown);
 
     expensesRouter.use('/api/expenses', router);
 };

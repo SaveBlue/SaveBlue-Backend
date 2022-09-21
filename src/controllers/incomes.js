@@ -204,3 +204,41 @@ exports.update = (req, res) => {
             });
         });
 };
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Return income breakdown by primary categories
+exports.incomesBreakdown = (req, res) => {
+
+    if (!req.query.startDate) {
+        return res.status(400).json({
+            message: "Start date must be present!"
+        });
+    }
+
+    if (!req.query.endDate) {
+        return res.status(400).json({
+            message: "End date must be present!"
+        });
+    }
+
+    let filterObject = {
+        accountID: req.params.aid,
+        date: {
+            $gte: new Date(req.query.startDate),
+            $lte: new Date(req.query.endDate)
+        }
+    }
+
+    Income.aggregate()
+        .match(filterObject)
+        .group({ "_id": "$category1", "sum": { $sum: "$amount"  }})
+        .then(breakdown => {
+            res.status(200).json(breakdown);
+        })
+        .catch(error => {
+            res.status(500).send({
+                message: error.message || "An error occurred while fetching incomes!"
+            });
+        });
+}
