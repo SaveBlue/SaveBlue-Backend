@@ -5,7 +5,10 @@ const updateAccountBalances = require('../services/updateAccountBalances');
 
 // Find all incomes of the account with requested id
 exports.findAllIncomesByAccountID = (req, res) => {
-    Income.find({accountID: req.params.aid}, null, {sort: {date: -1}})
+    Income.find({accountID: req.params.aid})
+        .sort({date: -1, _id: -1})
+        .skip(16 * (req.query.page || 0))
+        .limit(16)
         .then(incomes => {
             res.status(200).json(incomes);
         })

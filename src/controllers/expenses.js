@@ -5,7 +5,10 @@ const updateAccountBalances = require('../services/updateAccountBalances');
 
 // Find all expenses of the account with requested id
 exports.findAllExpensesByAccountID = (req, res) => {
-    Expense.find({accountID: req.params.aid}, null, {sort: {date: -1}})
+    Expense.find({accountID: req.params.aid})
+        .sort({date: -1, _id: -1})
+        .skip(16 * (req.query.page || 0))
+        .limit(16)
         .then(expenses => {
             res.status(200).json(expenses);
         })
