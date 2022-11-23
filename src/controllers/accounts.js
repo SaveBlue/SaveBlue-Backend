@@ -45,7 +45,7 @@ exports.findAccountByID = (req, res) => {
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Add a new account to an user with requested id
+// Add a new account to user with requested id
 exports.createAccount = (req, res) => {
 
     // Check account name length
@@ -66,16 +66,17 @@ exports.createAccount = (req, res) => {
         startOfMonth: req.body.startOfMonth
     };
 
-    // Finds user and appends newAccount to the accounts array, then returns the new list of all account names
+    // Finds user and appends newAccount to the accounts array, then returns the new account
     User.findByIdAndUpdate(req.params.uid,{$push: {accounts: newAccount}},{new:true, select:'accounts._id accounts.name accounts.totalBalance accounts.availableBalance accounts.startOfMonth'} )
-        .then(accounts => {
+        .then(user => {
 
-            if (!accounts) {
+            if (!user) {
                 return res.status(404).json({
                     message: "No user with selected ID!"
                 });
             }
-            res.status(200).json(accounts.accounts);
+            // TODO: change when you separate accounts from users
+            res.status(200).json(user.accounts.at(-1));
 
         })
         .catch(error => {
@@ -140,7 +141,7 @@ exports.deleteAccountByID = (req, res) => {
 
 // Update account with requested id
 exports.updateAccountByID = (req, res) => {
-
+    console.log(req.body)
 
     // Check account name length
     if (req.body.name && req.body.name.length > 128) {
@@ -150,7 +151,7 @@ exports.updateAccountByID = (req, res) => {
     }
 
     // Find the user with the requested account
-    User.findOne({'accounts._id': req.params.id}, 'accounts._id accounts.name accounts.startOfMonth')
+    User.findOne({'accounts._id': req.params.id}, 'accounts._id accounts.name accounts.startOfMonth accounts.totalBalance accounts.availableBalance')
         .then(user => {
 
             if (!user) {
