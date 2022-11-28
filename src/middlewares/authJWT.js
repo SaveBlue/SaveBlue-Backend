@@ -87,8 +87,37 @@ verifyTokenAccount = (req, res, next) => {
         }
 
         // Verification if the account id belongs to the same user id provided in JWT token
-        // Uses either id or aid from request parameters
-        verifyUsersCall(req, res, next, {'accounts._id': req.params.id || req.params.aid},decoded.id)
+        // Uses either id or aid from request parameters to search user's accounts
+        //verifyUsersCall(req, res, next, {'accounts._id': req.params.id || req.params.aid},decoded.id)
+        verifyUsersCall(req, res, next, [
+            {'accounts._id': req.params.id || req.params.aid},
+        ],decoded.id)
+
+    });
+};
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Verify Account or Drafts Account
+verifyTokenAccountOrDrafts = (req, res, next) => {
+
+    let token = req.headers["x-access-token"];
+
+    if (!token) {
+        return res.status(403).send({message: "No token provided!"});
+    }
+
+    jwt.verify(token, config.secret, (err, decoded) => {
+        if (err) {
+            return res.status(401).send({message: "Unauthorized!"});
+        }
+
+        // Verification if the regular account or drafts account id belongs to the same user id provided in JWT token
+        // Uses either id or aid from request parameters to search user's accounts and draft account
+        verifyUsersCall(req, res, next, [
+            {'accounts._id': req.params.id || req.params.aid},
+            {'draftsAccount._id': req.params.aid},
+        ],decoded.id)
 
     });
 };
@@ -197,7 +226,7 @@ verifyTokenExpenseIncomePost = (req, res, next) => {
             return res.status(401).send({message: "Unauthorized!"});
 
         // Verification if users account id in expense request belongs to the same user provided in JWT token
-        verifyUsersCall(req, res, next, {'accounts._id': req.body.accountID},decoded.id)
+        verifyUsersCall(req, res, next, [{'accounts._id': req.body.accountID}],decoded.id)
 
     });
 };
@@ -219,7 +248,7 @@ verifyTokenGoal = (req, res, next) => {
         }
 
         // Verification if the goal id belongs to the same user id provided in JWT token
-        verifyUsersCall(req, res, next, {'accounts.goals._id': req.params.id}, decoded.id)
+        verifyUsersCall(req, res, next, [{'accounts.goals._id': req.params.id}], decoded.id)
 
     });
 };
@@ -238,12 +267,12 @@ verifyTokenGoal = (req, res, next) => {
  */
 verifyUsersCall = (req, res, next, searchParam, decodedID) =>{
 
-    User.findOne(searchParam, '_id')
+    User.findOne({$or:searchParam}, '_id')
         .then(ID => {
 
             if (!ID) {
                 return res.status(404).json({
-                    message: "No user with selected ID!"
+                    message: "No account for selected user ID!"
                 });
             }
 
@@ -267,6 +296,7 @@ const authJwt = {
     verifyTokenWhitelist: verifyTokenWhitelist,
     verifyTokenUser: verifyTokenUser,
     verifyTokenAccount: verifyTokenAccount,
+    verifyTokenAccountOrDrafts: verifyTokenAccountOrDrafts,
     verifyTokenExpense: verifyTokenExpense,
     verifyTokenIncome: verifyTokenIncome,
     verifyTokenExpenseIncomePost: verifyTokenExpenseIncomePost,

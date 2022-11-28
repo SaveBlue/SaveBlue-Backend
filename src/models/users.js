@@ -50,6 +50,7 @@ const user = new Schema({
         hashedPassword: {type: String, required: true},
         salt: {type: String, required: true},
         accounts: {type: [account], required: true},
+        draftsAccount: {type: account},
     },
     {
         timestamps: true

@@ -1,11 +1,12 @@
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
 const deleteUserEntries = require('../services/deleteUserEntries');
+const draftsAccount = require("../services/draftsAccount");
 
 
 // Find all accounts of user with requested id
 exports.findAllAccountsByUserID = (req, res) => {
-    User.findById( req.params.uid, 'accounts._id accounts.name accounts.totalBalance accounts.availableBalance accounts.startOfMonth')
+    User.findById(req.params.uid, 'accounts._id accounts.name accounts.totalBalance accounts.availableBalance accounts.startOfMonth')
         .then(accounts => {
             if (!accounts) {
                 return res.status(404).json({
@@ -26,7 +27,7 @@ exports.findAllAccountsByUserID = (req, res) => {
 // Find account with requested id
 exports.findAccountByID = (req, res) => {
 
-    User.findOne({'accounts._id': req.params.id},{'accounts.$': 1} )
+    User.findOne({'accounts._id': req.params.id}, {'accounts.$': 1})
         .then(account => {
 
             if (!account) {
@@ -67,7 +68,10 @@ exports.createAccount = (req, res) => {
     };
 
     // Finds user and appends newAccount to the accounts array, then returns the new account
-    User.findByIdAndUpdate(req.params.uid,{$push: {accounts: newAccount}},{new:true, select:'accounts._id accounts.name accounts.totalBalance accounts.availableBalance accounts.startOfMonth'} )
+    User.findByIdAndUpdate(req.params.uid, {$push: {accounts: newAccount}}, {
+        new: true,
+        select: 'accounts._id accounts.name accounts.totalBalance accounts.availableBalance accounts.startOfMonth'
+    })
         .then(user => {
 
             if (!user) {
@@ -92,7 +96,7 @@ exports.createAccount = (req, res) => {
 exports.deleteAccountByID = (req, res) => {
 
     // Find the user with the requested account
-    User.findOne({'accounts._id': req.params.id},'accounts._id accounts.name')
+    User.findOne({'accounts._id': req.params.id}, 'accounts._id accounts.name')
         .then(user => {
 
             if (!user) {
@@ -111,14 +115,14 @@ exports.deleteAccountByID = (req, res) => {
                     // Delete account's incomes from db
                     try {
                         await deleteUserEntries.deleteIncomes("accountID", req.params.id);
-                    }catch (err){
+                    } catch (err) {
                         return res.status(500).send({message: err});
                     }
 
                     // Delete account's expenses from db
                     try {
                         await deleteUserEntries.deleteExpenses("accountID", req.params.id);
-                    }catch (err){
+                    } catch (err) {
                         return res.status(500).send({message: err});
                     }
 
@@ -164,18 +168,18 @@ exports.updateAccountByID = (req, res) => {
             let account = user.accounts.id(req.params.id);
 
             // Check if updating account name
-            if(req.body.name) {
+            if (req.body.name) {
                 account.name = req.body.name;
             }
 
             // Check if updating startOfMonth and format it correctly
-            if(req.body.startOfMonth) {
+            if (req.body.startOfMonth) {
                 account.startOfMonth = req.body.startOfMonth;
 
-                if(account.startOfMonth > 31)
+                if (account.startOfMonth > 31)
                     account.startOfMonth = 31
 
-                if(account.startOfMonth < 1)
+                if (account.startOfMonth < 1)
                     account.startOfMonth = 1
             }
 
@@ -195,4 +199,29 @@ exports.updateAccountByID = (req, res) => {
                 message: error.message || "An error occurred while fetching account!"
             });
         })
+};
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Find drafts account of user with requested id
+exports.findDraftsAccountByUserID = (req, res) => {
+    User.findById(req.params.uid)
+        .then(async user => {
+            if (!user) {
+                return res.status(404).json({
+                    message: "No user with selected ID!"
+                });
+            }
+
+            // Create a new drafts account if it does not exist - FOR OLDER ACCOUNTS
+            if (!user.draftsAccount){
+                user.draftsAccount = await draftsAccount.create(user._id)
+            }
+            res.status(200).json(user.draftsAccount);
+        })
+        .catch(error => {
+            res.status(500).send({
+                message: error.message || "An error occurred while fetching user!"
+            });
+        });
 };

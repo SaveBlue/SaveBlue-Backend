@@ -7,15 +7,14 @@ exports.updateAllAccountBalances = (accountID, amount, operation) => {
     return new Promise((resolve, reject) => {
 
         // Find the user with requested account
-        User.findOne({'accounts._id': accountID}, 'accounts._id accounts.totalBalance accounts.availableBalance')
+        User.findOne({$or:[{'accounts._id': accountID}, {'draftsAccount._id': accountID}]})
             .then(user => {
-
                 if (!user) {
                     reject("No account with selected ID!");
                 }
 
-                // Get requested account from the user
-                let account = user.accounts.id(accountID);
+                // Get requested account or drafts account from the user
+                let account = user.accounts.id(accountID) || user.draftsAccount;
 
                 // Add or subtract from account balance
                 switch (operation) {

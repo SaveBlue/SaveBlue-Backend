@@ -58,13 +58,16 @@ let expense = new Schema({
 
 // validate category1 with array of allowed categories1
 function validateCategory1(category) {
-    return !!categoriesExpenses.find(c => c.category1 === category)
+    return !!categoriesExpenses.find(c => (c.category1 === category || category === "Draft"))
 }
 
 
 // validate category2 depending on category1 with array of allowed categories2
 function validateCategory2(category2) {
-    return !!categoriesExpenses.find(c => c.category1 === this.category1 && c.category2.includes(category2))
+    if (this.category1 === "Draft" && category2 === "Draft"){
+        return true
+    }
+    return !!categoriesExpenses.find(c => (c.category1 === this.category1) && (c.category2.includes(category2)))
 }
 
 

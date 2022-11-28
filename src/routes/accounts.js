@@ -30,5 +30,8 @@ module.exports = accountsRouter => {
     // Create account of the user by user ID
     router.post("/:uid",[authJWT.verifyTokenWhitelist, authJWT.verifyTokenUser], accountsController.createAccount);
 
+    // Get drafts account data of user by user ID
+    router.get("/drafts/:uid",[authJWT.verifyTokenWhitelist, authJWT.verifyTokenUser], accountsController.findDraftsAccountByUserID);
+
     accountsRouter.use('/api/accounts', router);
 };

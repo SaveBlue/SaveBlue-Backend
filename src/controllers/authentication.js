@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const User = mongoose.model('User');
 const Token = mongoose.model('Token');
+const draftsAccount = require('../services/draftsAccount');
 
 
 // Register a new user
@@ -33,7 +34,10 @@ exports.register = (req, res) => {
     // Save new User in the database
     newUser
         .save(newUser)
-        .then(data => {
+        .then(async data => {
+            // Create drafts account
+            let createdDraftsAccount = await draftsAccount.create(data._id)
+            data.draftsAccount = createdDraftsAccount
             res.send(data);
         })
         .catch(error => {

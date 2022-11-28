@@ -30,7 +30,7 @@ const income = new Schema({
 
 // Validate category1 with array of allowed categories1
 function validateCategory1(category) {
-    return !!categoriesIncomes.find(c => c.category1 === category)
+    return !!categoriesIncomes.find(c => (c.category1 === category || category === "Draft"))
 }
 
 
