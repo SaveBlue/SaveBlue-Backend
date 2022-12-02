@@ -5,7 +5,7 @@ name: CI/CD Staging
 
 on:
   push:
-    branches: [ staging, master ]
+    branches: [ staging ]
   pull_request:
     branches: [ staging ]
 
