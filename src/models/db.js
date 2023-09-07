@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 
-let dbURI = process.env.MONGODB_CLOUD_URI || 'mongodb://localhost/SaveBlue';
+let dbURI = process.env.MONGODB_CLOUD_URI || 'mongodb://127.0.0.1/SaveBlue';
 
 // Connect to the database
 mongoose.connect(dbURI, {

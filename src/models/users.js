@@ -36,7 +36,8 @@ const account = new Schema({
         totalBalance: {type: Number, set: round, required: true},
         budgets: [budget],
         goals: [goal],
-        startOfMonth: {type: Number, min: 1, max: 31, set:round, required: true}
+        startOfMonth: {type: Number, min: 1, max: 31, set:round, required: true},
+        archived: {type: Boolean, default: false}
 
     },
     {

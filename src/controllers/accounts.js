@@ -6,14 +6,20 @@ const draftsAccount = require("../services/draftsAccount");
 
 // Find all accounts of user with requested id
 exports.findAllAccountsByUserID = (req, res) => {
-    User.findById(req.params.uid, 'accounts._id accounts.name accounts.totalBalance accounts.availableBalance accounts.startOfMonth')
-        .then(accounts => {
-            if (!accounts) {
+    const userId = req.params.uid;
+    const archived = !!req.query.archived;
+
+    User.findById(userId, 'accounts._id accounts.name accounts.totalBalance accounts.availableBalance accounts.startOfMonth accounts.archived')
+        .then(user => {
+            if (!user) {
                 return res.status(404).json({
                     message: "No user with selected ID!"
                 });
             }
-            res.status(200).json(accounts.accounts);
+            // Filter accounts based on the archived status
+            const filteredAccounts = user.accounts.filter(account => account.archived === archived);
+
+            res.status(200).json(filteredAccounts);
         })
         .catch(error => {
             res.status(500).send({
@@ -181,6 +187,10 @@ exports.updateAccountByID = (req, res) => {
 
                 if (account.startOfMonth < 1)
                     account.startOfMonth = 1
+            }
+
+            if (typeof req.body.archived === "boolean") {
+                account.archived = req.body.archived;
             }
 
             // Save updated user data (updated account)
