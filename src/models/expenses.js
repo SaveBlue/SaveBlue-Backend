@@ -21,7 +21,7 @@ const categoriesExpenses = [
     },
     {
         category1: "Leisure",
-        category2: ["Sport", "Entertainment", "Culture", "Holidays"]
+        category2: ["Gifts", "Sport", "Entertainment", "Culture", "Holidays"]
     },
     {
         category1: "Health",
