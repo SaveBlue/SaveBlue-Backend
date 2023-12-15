@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
+const openai = require("./openai");
 
 
 exports.createExpenseSMS = async (req, res, next) => {
@@ -27,10 +28,29 @@ exports.createExpenseSMS = async (req, res, next) => {
 
     try {
         if(sms.startsWith("POS NAKUP")){
-            smsData.description = sms.split("EUR, ")[1].split(". Info")[0].substring(0, 32)
-            let date = sms.split("POS NAKUP ")[1].split(" ")[0].split(".")
-            smsData.date = new Date(date[2],date[1]-1, date[0])
-            smsData.amount = parseInt(sms.split("znesek ")[1].split(" EUR")[0].replaceAll(",", "").replaceAll(".", ""))
+            if (req.body.ai){
+                try {
+                    const smsAI = await openai.createExpense(sms)
+                    smsData.description = smsAI.description
+                    smsData.date = new Date(smsAI.date)
+                    smsData.amount = parseInt(smsAI.amount)
+                    smsData.category1 = smsAI.category1
+                    smsData.category2 = smsAI.category2
+                }
+                catch (e){
+                    return res.status(400).json({
+                        message: "AI SMS parsing failed."
+                    });
+                }
+            }
+            else {
+                smsData.description = sms.split("EUR, ")[1].split(". Info")[0].substring(0, 32)
+                let date = sms.split("POS NAKUP ")[1].split(" ")[0].split(".")
+                smsData.date = new Date(date[2],date[1]-1, date[0])
+                smsData.amount = parseInt(sms.split("znesek ")[1].split(" EUR")[0].replaceAll(",", "").replaceAll(".", ""))
+                smsData.category1 = "Draft"
+                smsData.category2 = "Draft"
+            }
         }
     }
     catch (e){
@@ -44,8 +64,8 @@ exports.createExpenseSMS = async (req, res, next) => {
     req.body.description = smsData.description || ""
     req.body.date = smsData.date
     req.body.amount = smsData.amount || 0
-    req.body.category1 = "Draft"
-    req.body.category2 = "Draft"
+    req.body.category1 = smsData.category1 || "Draft"
+    req.body.category2 = smsData.category2 || "Draft"
 
     next();
 
