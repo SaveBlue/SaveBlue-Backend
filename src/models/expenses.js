@@ -13,7 +13,7 @@ const categoriesExpenses = [
     },
     {
         category1: "Home & Utilities",
-        category2: ["Bills", "Rent", "Household", "Goods", "Maintenance & Renovation, Pets"]
+        category2: ["Bills", "Rent", "Household", "Goods", "Maintenance & Renovation", "Pets"]
     },
     {
         category1: "Transport",
