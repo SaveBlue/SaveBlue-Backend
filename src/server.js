@@ -1,12 +1,16 @@
-const express = require('express');
-const bodyParser = require("body-parser");
-const cors = require("cors");
-const passport = require('passport');
+import express from 'express';
+import bodyParser from 'body-parser';
+import cors from 'cors';
+import passport from 'passport';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
 const server = express();
 const port = process.env.PORT || 5000;
 const url = process.env.URL || "http://localhost";
-//----------------------------------------------------------------------------------------------------------------------
 
+//----------------------------------------------------------------------------------------------------------------------
 
 // cors settings
 let corsOptions = {
@@ -20,21 +24,30 @@ server.use(bodyParser.json());
 
 // parse requests of content-type - application/x-www-form-urlencoded
 server.use(bodyParser.urlencoded({ extended: true }));
+
 //----------------------------------------------------------------------------------------------------------------------
 
+import './models/db.js';
+import authenticationRouter from './routes/authentication.js';
+import usersRouter from './routes/users.js';
+import accountsRouter from './routes/accounts.js';
+import incomesRouter from './routes/incomes.js';
+import expensesRouter from './routes/expenses.js';
+import goalsRouter from './routes/goals.js';
+import './config/passport.js';
 
-require("./models/db");
-require("./routes/authentication")(server);
-require("./routes/users")(server);
-require("./routes/accounts")(server);
-require("./routes/incomes")(server);
-require("./routes/expenses")(server);
-require("./routes/goals")(server);
-require("./config/passport.js");
+authenticationRouter(server);
+usersRouter(server);
+accountsRouter(server);
+incomesRouter(server);
+expensesRouter(server);
+goalsRouter(server);
 
+// To handle paths correctly when using ES6 modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
-const path = require('path');
-// Server static files from the Vue frontend app
+// Serve static files from the Vue frontend app
 server.use(express.static(path.join(__dirname, '/dist')));
 
 server.use(passport.initialize());
@@ -43,7 +56,6 @@ server.get("/", (req, res) => {
     res.json({ message: "Test server running!" });
 });
 
-
 /**
  * Start server
  */
@@ -51,4 +63,4 @@ server.listen(port, () => {
     console.log(`Server running on port ${port}!`);
 });
 
-module.exports = server;
+export default server;

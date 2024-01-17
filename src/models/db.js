@@ -1,7 +1,10 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+import './tokens.js';
+import './users.js';
+import './incomes.js';
+import './expenses.js';
 
-
-let dbURI = process.env.MONGODB_CLOUD_URI || 'mongodb://127.0.0.1/SaveBlue';
+const dbURI = process.env.MONGODB_CLOUD_URI || 'mongodb://127.0.0.1/SaveBlue';
 
 // Connect to the database
 mongoose.connect(dbURI, {
@@ -10,7 +13,6 @@ mongoose.connect(dbURI, {
     useUnifiedTopology: true,
     useFindAndModify: false
 });
-
 
 // Database state debug messages
 mongoose.connection.on('connected', () => {
@@ -25,7 +27,6 @@ mongoose.connection.on('disconnected', () => {
     console.log('Mongoose not connected.');
 });
 
-
 // Close connection to the database
 const safeExit = (message, callback) => {
     mongoose.connection.close(() => {
@@ -34,14 +35,12 @@ const safeExit = (message, callback) => {
     });
 };
 
-
 // Nodemon restart
 process.once('SIGUSR2', () => {
     safeExit('nodemon restart', () => {
         process.kill(process.pid, 'SIGUSR2');
     });
 });
-
 
 // Exit application
 process.on('SIGINT', () => {
@@ -50,16 +49,9 @@ process.on('SIGINT', () => {
     });
 });
 
-
 // Exit application Heroku
 process.on('SIGTERM', () => {
     safeExit('Exit application Heroku', () => {
         process.exit(0);
     });
 });
-
-
-require('./tokens');
-require('./users');
-require('./incomes');
-require('./expenses');

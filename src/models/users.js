@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 let crypto = require('crypto');
 let jwt = require('jsonwebtoken');
 let config = require('../config/auth');
@@ -56,7 +56,6 @@ const user = new Schema({
     {
         timestamps: true
     });
-
 
 // User functions
 
