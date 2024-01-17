@@ -19,9 +19,9 @@ exports.createExpense = async (sms) => {
                 role: "system",
                 content: JSON.stringify(categoriesExpenses)
             },
-            { role: "user", content: sms },
+            {role: "user", content: sms},
         ],
-        response_format: { type: "json_object" }
+        response_format: {type: "json_object"}
     });
 
     return JSON.parse(completion.choices[0].message.content);
