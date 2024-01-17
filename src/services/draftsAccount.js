@@ -2,37 +2,31 @@ const mongoose = require('mongoose');
 const User = mongoose.model('User');
 
 // Create drafts account
-exports.create = (userID) => {
+exports.create = async (userID) => {
+    const draftsAccount = {
+        name: "Drafts",
+        totalBalance: 0,
+        availableBalance: 0,
+        budgets: [],
+        goals: [],
+        expenses: [],
+        incomes: [],
+        startOfMonth: 1
+    };
 
-    return new Promise((resolve, reject) => {
+    try {
+        const user = await User.findByIdAndUpdate(
+            userID,
+            { $set: { draftsAccount: draftsAccount } },
+            { new: true, select: 'draftsAccount' }
+        );
 
-        let draftsAccount = {
-            name: "Drafts",
-            totalBalance: 0,
-            availableBalance: 0,
-            budgets: [],
-            goals: [],
-            expenses: [],
-            incomes: [],
-            startOfMonth: 1
-        };
+        if (!user) {
+            throw new Error("No user with selected ID!");
+        }
 
-        // Finds user and appends newAccount to the accounts array, then returns the new account
-        User.findByIdAndUpdate(userID, {$set: {draftsAccount: draftsAccount}}, {
-            new: true,
-            select: 'draftsAccount'
-        })
-            .then(user => {
-                console.log(user)
-
-                if (!user) {
-                    reject("No user with selected ID!")
-                }
-                resolve(user.draftsAccount)
-
-            })
-            .catch(error => {
-                reject("An error occurred while adding drafts account!")
-            });
-    })
-}
+        return user.draftsAccount;
+    } catch (error) {
+        throw new Error(error || "An error occurred while adding drafts account!");
+    }
+};

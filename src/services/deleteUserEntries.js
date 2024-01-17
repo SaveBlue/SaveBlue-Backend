@@ -4,39 +4,25 @@ const Expense = mongoose.model('Expense');
 
 
 // Delete all incomes with provided userID / accountID
-exports.deleteIncomes = (deleteField, ID) => {
+exports.deleteIncomes = async (deleteField, ID) => {
 
-    let pair = {};
-    pair[deleteField] = ID;
+    const query = { [deleteField]: ID };
 
-    return new Promise((resolve, reject) => {
-
-        Income.deleteMany(pair)
-            .then(() => {
-                resolve();
-            })
-            .catch(error => {
-                reject(error.message || "An error occurred while deleting incomes!");
-
-            })
-    })
+    try {
+        await Income.deleteMany(query);
+    } catch (error) {
+        throw new Error(error || "An error occurred while deleting incomes!");
+    }
 }
 
 // Delete all expenses with provided userID / accountID
-exports.deleteExpenses = (deleteField, ID) => {
+exports.deleteExpenses = async (deleteField, ID) => {
 
-    let pair = {};
-    pair[deleteField] = ID;
+    const query = { [deleteField]: ID };
 
-    return new Promise((resolve, reject) => {
-
-        Expense.deleteMany(pair)
-            .then(() => {
-                resolve();
-            })
-            .catch(error => {
-                reject(error.message || "An error occurred while deleting expenses!");
-
-            })
-    })
+    try {
+        await Expense.deleteMany(query);
+    } catch (error) {
+        throw new Error(error || "An error occurred while deleting expenses!");
+    }
 }
