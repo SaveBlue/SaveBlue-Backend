@@ -2,20 +2,20 @@ const mongoose = require('mongoose');
 const Token = mongoose.model('Token');
 
 // invalidates JWT from whitelist
-exports.deleteExpiredTokens = () => {
+exports.deleteExpiredTokens = async () => {
 
-    //query for clearing whitelist               hour min  sec  millis
-    Token.deleteMany({'date': {$lt: Date.now() - 24 * 60 * 60 * 1000}})
-        .then(token => {
-            if (token.deletedCount === 0) {
-                console.log("No tokens to delete!");
-                return;
-            }
+    try {
+        // Query for clearing expired tokens from the whitelist           hour min  sec  millis
+        const result = await Token.deleteMany({'date': {$lt: Date.now() - 24 * 60 * 60 * 1000}});
 
-            console.log("Whitelist cleared!")
-            console.log(token);
-        })
-        .catch(error => {
-            console.log(error.message || "An error occurred while clearing expired whitelist!");
-        });
+        if (result.deletedCount === 0) {
+            console.log("No tokens to delete!");
+            return;
+        }
+
+        console.log("Whitelist cleared!");
+        console.log(result);
+    } catch (error) {
+        console.log(error.message || "An error occurred while clearing expired whitelist!");
+    }
 };
