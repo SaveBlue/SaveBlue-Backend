@@ -4,55 +4,64 @@ const updateAccountBalances = require('../services/updateAccountBalances');
 
 
 // Find all expenses of the account with requested id
-exports.findAllExpensesByAccountID = (req, res) => {
-    Expense.find({accountID: req.params.aid})
-        .sort({date: -1, _id: -1})
-        .skip(16 * (req.query.page || 0))
-        .limit(16)
-        .then(expenses => {
-            res.status(200).json(expenses);
-        })
-        .catch(error => {
-            res.status(500).send({
-                message: error.message || "An error occurred while fetching expenses!"
-            });
-        });
-}
-//----------------------------------------------------------------------------------------------------------------------
+exports.findAllExpensesByAccountID = async (req, res) => {
+    try {
+        const page = req.query.page || 0;
+        const expensesPerPage = 16;
 
+        // Fetch expenses with specified conditions
+        const expenses = await Expense
+            .find({accountID: req.params.aid})
+            .sort({date: -1, _id: -1})
+            .skip(expensesPerPage * page)
+            .limit(expensesPerPage);
 
-// Find an expense with requested id
-exports.findExpenseByID = (req, res) => {
-    Expense.findById(req.params.id)
-        .then(expense => {
-            if (!expense) {
-                return res.status(404).json({
-                    message: "No expense with selected ID!"
-                });
-            }
-            res.status(200).json(expense);
-        })
-        .catch(error => {
-            res.status(500).send({
-                message: error.message || "An error occurred while fetching the expense!"
-            });
+        res.status(200).json(expenses);
+
+    } catch (error) {
+        res.status(500).send({
+            message: error.message || "An error occurred while fetching expenses!"
         });
+    }
 };
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Find an expense with requested id
+exports.findExpenseByID = async (req, res) => {
+    try {
+        const expense = await Expense.findById(req.params.id);
+
+        if (!expense) {
+            return res.status(404).json({
+                message: "No expense with selected ID!"
+            });
+        }
+
+        res.status(200).json(expense);
+
+    } catch (error) {
+        res.status(500).send({
+            message: error.message || "An error occurred while fetching the expense!"
+        });
+    }
+};
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Create an expense
-exports.create = (req, res) => {
+exports.create = async (req, res) => {
 
     // Check expense description length
-    if (req.body.description && req.body.description.length > 1024) {
-        return res.status(413).json({
+    if (req.body.description?.length > 1024) {
+        return res.status(400).json({
             message: "Description too long."
         });
     }
 
-    // Check if amount is an integer
-    if (!Number.isSafeInteger(req.body.amount) || req.body.amount <= 0 || !req.body.amount > 100000000) {
+    // Check if amount is a valid integer and within range
+    if (!Number.isSafeInteger(req.body.amount) || req.body.amount <= 0 || req.body.amount > 100000000) {
         return res.status(400).json({
             message: "Amount not a valid number."
         });
@@ -68,63 +77,55 @@ exports.create = (req, res) => {
         amount: req.body.amount
     });
 
-    // Save expense
-    newExpense
-        .save(newExpense)
-        .then(async data => {
+    try {
+        // Save expense
+        const data = await newExpense.save(newExpense);
 
-            // Update account balance
-            try {
-                await updateAccountBalances.updateAllAccountBalances(newExpense.accountID, newExpense.amount, "-");
-                res.send(data);
-            } catch (err) {
-                res.status(500).send({message: err});
-            }
-        })
-        .catch(error => {
-            res.status(500).send({
-                message: error.message || "An error occurred while creating new expense!"
-            });
+        // Update account balance
+        await updateAccountBalances.updateAllAccountBalances(newExpense.accountID, newExpense.amount, "-");
+
+        res.send(data);
+
+    } catch (error) {
+        res.status(500).send({
+            message: error.message || "An error occurred while creating new expense!"
         });
+    }
 
 };
 //----------------------------------------------------------------------------------------------------------------------
 
 
 // Delete expense with requested ID
-exports.delete = (req, res) => {
-    Expense.findByIdAndDelete(req.params.id)
-        .then(async expense => {
+exports.delete = async (req, res) => {
+    try {
+        const expense = await Expense.findByIdAndDelete(req.params.id);
 
-            if (!expense) {
-                return res.status(404).send({message: "No expense with selected ID!"});
-            }
+        if (!expense) {
+            return res.status(404).send({message: "No expense with selected ID!"});
+        }
 
-            // Update account balance
-            try {
-                await updateAccountBalances.updateAllAccountBalances(expense.accountID, expense.amount, "+");
-                res.send({message: "Expense deleted!"});
-            }
-            catch (err){
-                res.status(500).send({ message: err });
-            }
+        // Update account balance
+        await updateAccountBalances.updateAllAccountBalances(expense.accountID, expense.amount, "+");
 
-        })
-        .catch(error => {
-            res.status(500).send({
-                message: error.message || "An error occurred while deleting the expense!"
-            });
+        res.send({message: "Expense deleted!"});
+
+    } catch (error) {
+        res.status(500).send({
+            message: error.message || "An error occurred while deleting the expense!"
         });
+    }
 };
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
 // Update expense with requested ID
-exports.update = (req, res) => {
+exports.update = async (req, res) => {
 
     // Check expense description length
-    if (req.body.description && req.body.description.length > 1024) {
-        return res.status(413).json({
+    if (req.body.description?.length > 1024) {
+        return res.status(400).json({
             message: "Description too long."
         });
     }
@@ -136,86 +137,60 @@ exports.update = (req, res) => {
         });
     }
 
-    let editedExpense = {};
+    let editedExpense = {
+        // Add properties to the object
+        ...(req.body.category1 && {category1: req.body.category1}),
+        ...(req.body.category2 && {category2: req.body.category2}),
+        ...(req.body.accountID && {accountID: req.body.accountID}),
+        description: req.body.description || "",
+        ...(req.body.date && {date: req.body.date}),
+        ...(req.body.amount && {amount: req.body.amount}),
+    };
 
-    // Add properties to the object
-    if (req.body.category1) {
-        editedExpense["category1"] = req.body.category1;
-    }
-    if (req.body.category2) {
-        editedExpense["category2"] = req.body.category2;
-    }
-    if (req.body.accountID) {
-        editedExpense["accountID"] = req.body.accountID;
-    }
-    if (req.body.description) {
-        editedExpense["description"] = req.body.description;
-    }
-    else{
-        editedExpense["description"] = "";
-    }
-    if (req.body.date) {
-        editedExpense["date"] = req.body.date;
-    }
-    if (req.body.amount) {
-        editedExpense["amount"] = req.body.amount;
-    }
 
-    // Fetch the old expense and edit it
-    Expense.findByIdAndUpdate(req.params.id, {$set: editedExpense})
-        .then(async expense => {
-            if (!expense) {
-                return res.status(404).send({
-                    message: `No expense with selected ID!`
-                });
-            }
+    try {
+        // Fetch the old expense and edit it
+        const expense = await Expense.findByIdAndUpdate(req.params.id, {$set: editedExpense}, {new: true});
 
-            // Get expense amount difference and choose operation
-            let oldAmount = expense.amount;
-            let newAmount = editedExpense.amount;
-            let difference = Math.abs(oldAmount - newAmount);
-            let operation = oldAmount >= newAmount ? "+" : "-";
-
-            // Handle account change
-            if (expense.accountID !== editedExpense.accountID){
-
-                // Add back to old account
-                try {
-                    await updateAccountBalances.updateAllAccountBalances(expense.accountID, oldAmount, "+");
-                } catch (err) {
-                    return res.status(500).send({message: err});
-                }
-
-                // Subtract from new account
-                try {
-                    await updateAccountBalances.updateAllAccountBalances(editedExpense.accountID, newAmount, "-");
-                } catch (err) {
-                    return res.status(500).send({message: err});
-                }
-            }
-
-            // Only update account if there is a difference between amounts
-            else if(difference !== 0) {
-                try {
-                    await updateAccountBalances.updateAllAccountBalances(expense.accountID, difference, operation);
-                } catch (err) {
-                    return res.status(500).send({message: err});
-                }
-            }
-
-            res.send({message: "Expense updated!"});
-        })
-        .catch(error => {
-            res.status(500).send({
-                message: error.message || "An error occurred while updating the expense!"
+        if (!expense) {
+            return res.status(404).send({
+                message: `No expense with selected ID!`
             });
+        }
+
+        // Get expense amount difference and choose operation
+        let oldAmount = expense.amount;
+        let newAmount = editedExpense.amount;
+        let difference = Math.abs(oldAmount - newAmount);
+        let operation = oldAmount >= newAmount ? "+" : "-";
+
+        // Handle account change
+        if (expense.accountID !== editedExpense.accountID) {
+            // Add back to old account
+            await updateAccountBalances.updateAllAccountBalances(expense.accountID, oldAmount, "+");
+
+            // Subtract from new account
+            await updateAccountBalances.updateAllAccountBalances(editedExpense.accountID, newAmount, "-");
+        }
+
+        // Only update account if there is a difference between amounts
+        else if (difference !== 0) {
+            await updateAccountBalances.updateAllAccountBalances(expense.accountID, difference, operation);
+        }
+
+        res.send({message: "Expense updated!"});
+
+    } catch (error) {
+        res.status(500).send({
+            message: error.message || "An error occurred while updating the expense!"
         });
-};
+    }
+}
 //----------------------------------------------------------------------------------------------------------------------
 
 
 // Return expense breakdown by primary categories
-exports.expensesBreakdown = (req, res) => {
+exports.expensesBreakdown = async (req, res) => {
 
     if (!req.query.startDate) {
         return res.status(400).json({
@@ -235,17 +210,18 @@ exports.expensesBreakdown = (req, res) => {
             $gte: new Date(req.query.startDate),
             $lte: new Date(req.query.endDate)
         }
-    }
+    };
 
-    Expense.aggregate()
-        .match(filterObject)
-        .group({ "_id": "$category1", "sum": { $sum: "$amount"  }})
-        .then(breakdown => {
-            res.status(200).json(breakdown);
-        })
-        .catch(error => {
-            res.status(500).send({
-                message: error.message || "An error occurred while fetching expenses breakdown!"
-            });
+    try {
+        const breakdown = await Expense.aggregate()
+            .match(filterObject)
+            .group({"_id": "$category1", "sum": {$sum: "$amount"}});
+
+        res.status(200).json(breakdown);
+
+    } catch (error) {
+        res.status(500).send({
+            message: error.message || "An error occurred while fetching expenses breakdown!"
         });
-}
+    }
+};

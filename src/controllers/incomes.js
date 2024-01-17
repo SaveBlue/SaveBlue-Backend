@@ -4,49 +4,57 @@ const updateAccountBalances = require('../services/updateAccountBalances');
 
 
 // Find all incomes of the account with requested id
-exports.findAllIncomesByAccountID = (req, res) => {
-    Income.find({accountID: req.params.aid})
-        .sort({date: -1, _id: -1})
-        .skip(16 * (req.query.page || 0))
-        .limit(16)
-        .then(incomes => {
-            res.status(200).json(incomes);
-        })
-        .catch(error => {
-            res.status(500).send({
-                message: error.message || "An error occurred while fetching incomes!"
-            });
+exports.findAllIncomesByAccountID = async (req, res) => {
+    try {
+        const page = req.query.page || 0;
+        const incomePerPage = 16;
+
+        // Fetch income with specified conditions
+        const income = await Income
+            .find({accountID: req.params.aid})
+            .sort({date: -1, _id: -1})
+            .skip(incomePerPage * page)
+            .limit(incomePerPage);
+
+        res.status(200).json(income);
+
+    } catch (error) {
+        res.status(500).send({
+            message: error.message || "An error occurred while fetching incomes!"
         });
-}
+    }
+};
 //----------------------------------------------------------------------------------------------------------------------
 
 
 // Find an income with an id
-exports.findIncomeByID = (req, res) => {
-    Income.findById(req.params.id)
-        .then(income => {
-            if (!income) {
-                return res.status(404).json({
-                    message: "No income with selected ID!"
-                });
-            }
-            res.status(200).json(income);
-        })
-        .catch(error => {
-            res.status(500).send({
-                message: error.message || "An error occurred while fetching income!"
+exports.findIncomeByID = async (req, res) => {
+    try {
+        const income = await Income.findById(req.params.id);
+
+        if (!income) {
+            return res.status(404).json({
+                message: "No income with selected ID!"
             });
+        }
+
+        res.status(200).json(income);
+
+    } catch (error) {
+        res.status(500).send({
+            message: error.message || "An error occurred while fetching the income!"
         });
+    }
 };
 //----------------------------------------------------------------------------------------------------------------------
 
 
 // Create an income
-exports.create = (req, res) => {
+exports.create = async (req, res) => {
 
     // Check income description length
-    if (req.body.description && req.body.description.length > 1024) {
-        return res.status(413).json({
+    if (req.body.description?.length > 1024) {
+        return res.status(400).json({
             message: "Description too long."
         });
     }
@@ -67,63 +75,57 @@ exports.create = (req, res) => {
         amount: req.body.amount
     });
 
-    // Save income
-    newIncome
-        .save(newIncome)
-        .then(async data => {
 
-            // Update account balance
-            try {
-                await updateAccountBalances.updateAllAccountBalances(newIncome.accountID, newIncome.amount, "+");
-                res.send(data);
-            } catch (err) {
-                res.status(500).send({message: err});
-            }
-        })
-        .catch(error => {
-            res.status(500).send({
-                message: error.message || "An error occurred while creating new income!"
-            });
+    try {
+        // Save income
+        const data = await newIncome.save(newIncome);
+
+        // Update account balance
+        await updateAccountBalances.updateAllAccountBalances(newIncome.accountID, newIncome.amount, "+");
+
+        res.send(data);
+
+    } catch (error) {
+        res.status(500).send({
+            message: error.message || "An error occurred while creating new income!"
         });
-
+    }
 };
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
 // Delete income with requested ID
-exports.delete = (req, res) => {
-    Income.findByIdAndDelete(req.params.id)
-        .then(async income => {
+exports.delete = async (req, res) => {
 
-            if (!income) {
-                return res.status(404).send({message: `No income with selected ID!`});
-            }
+    try {
+        const income = await Income.findByIdAndDelete(req.params.id);
 
-            // Update account balance
-            try {
-                await updateAccountBalances.updateAllAccountBalances(income.accountID, income.amount, "-");
-                res.send({message: "Income deleted!"});
-            }
-            catch (err){
-                res.status(500).send({ message: err });
-            }
+        if (!income) {
+            return res.status(404).send({message: "No income with selected ID!"});
+        }
 
-        })
-        .catch(error => {
-            res.status(500).send({
-                message: error.message || "An error occurred while deleting the income!"
-            });
+        // Update account balance
+        await updateAccountBalances.updateAllAccountBalances(income.accountID, income.amount, "-");
+
+        res.send({message: "Income deleted!"});
+
+    } catch (error) {
+        res.status(500).send({
+            message: error.message || "An error occurred while deleting the income!"
         });
+    }
+
 };
 //----------------------------------------------------------------------------------------------------------------------
 
 
 // update income with the ID
-exports.update = (req, res) => {
+exports.update = async (req, res) => {
 
     // Check income description length
-    if (req.body.description && req.body.description.length > 1024) {
-        return res.status(413).json({
+    if (req.body.description?.length > 1024) {
+        return res.status(400).json({
             message: "Description too long."
         });
     }
@@ -135,83 +137,59 @@ exports.update = (req, res) => {
         });
     }
 
-    let editedIncome = {};
+    let editedIncome = {
+        // Add properties to the object
+        ...(req.body.category1 && {category1: req.body.category1}),
+        ...(req.body.accountID && {accountID: req.body.accountID}),
+        description: req.body.description || "",
+        ...(req.body.date && {date: req.body.date}),
+        ...(req.body.amount && {amount: req.body.amount}),
+    };
 
-    // Add properties to the object
-    if (req.body.category1) {
-        editedIncome["category1"] = req.body.category1;
-    }
-    if (req.body.description) {
-        editedIncome["description"] = req.body.description;
-    }
-    else{
-        editedIncome["description"] = "";
-    }
-    if (req.body.date) {
-        editedIncome["date"] = req.body.date;
-    }
-    if (req.body.amount) {
-        editedIncome["amount"] = req.body.amount;
-    }
-    if (req.body.accountID) {
-        editedIncome["accountID"] = req.body.accountID;
-    }
+    try {
+        // Fetch the old income and edit it
+        const income = await Income.findByIdAndUpdate(req.params.id, {$set: editedIncome}, {new: true});
 
-    Income.findByIdAndUpdate(req.params.id, {$set: editedIncome})
-        .then(async income => {
-            if (!income) {
-                return res.status(404).send({
-                    message: `No income with selected ID!`
-                });
-            }
-
-            // Get income amount difference and choose operation
-            let oldAmount = income.amount;
-            let newAmount = editedIncome.amount;
-            let difference = Math.abs(oldAmount - newAmount);
-            let operation = oldAmount >= newAmount ? "-" : "+";
-
-            // Handle account change
-            if (income.accountID !== editedIncome.accountID){
-
-                // Subtract from old account
-                try {
-                    await updateAccountBalances.updateAllAccountBalances(income.accountID, oldAmount, "-");
-                } catch (err) {
-                    return res.status(500).send({message: err});
-                }
-
-                // Add to new account
-                try {
-                    await updateAccountBalances.updateAllAccountBalances(editedIncome.accountID, newAmount, "+");
-                } catch (err) {
-                    return res.status(500).send({message: err});
-                }
-            }
-
-            // Only update account if there is a difference between amounts
-            else if(difference !== 0) {
-                try {
-                    await updateAccountBalances.updateAllAccountBalances(income.accountID, difference, operation);
-                } catch (err) {
-                    return res.status(500).send({message: err});
-                }
-            }
-
-            res.send({message: "Income updated!"});
-
-        })
-        .catch(error => {
-            res.status(500).send({
-                message: error.message || "An error occurred while updating the income!"
+        if (!income) {
+            return res.status(404).send({
+                message: `No income with selected ID!`
             });
+        }
+
+        // Get income amount difference and choose operation
+        let oldAmount = income.amount;
+        let newAmount = editedIncome.amount;
+        let difference = Math.abs(oldAmount - newAmount);
+        let operation = oldAmount >= newAmount ? "-" : "+";
+
+        // Handle account change
+        if (income.accountID !== editedIncome.accountID) {
+
+            // Subtract from old account
+            await updateAccountBalances.updateAllAccountBalances(income.accountID, oldAmount, "-");
+
+            // Add to new account
+            await updateAccountBalances.updateAllAccountBalances(editedIncome.accountID, newAmount, "+");
+        }
+
+        // Only update account if there is a difference between amounts
+        else if (difference !== 0) {
+            await updateAccountBalances.updateAllAccountBalances(income.accountID, difference, operation);
+        }
+
+        res.send({message: "Income updated!"});
+
+    } catch (error) {
+        res.status(500).send({
+            message: error.message || "An error occurred while updating the income!"
         });
+    }
 };
 //----------------------------------------------------------------------------------------------------------------------
 
 
 // Return income breakdown by primary categories
-exports.incomesBreakdown = (req, res) => {
+exports.incomesBreakdown = async (req, res) => {
 
     if (!req.query.startDate) {
         return res.status(400).json({
@@ -231,17 +209,18 @@ exports.incomesBreakdown = (req, res) => {
             $gte: new Date(req.query.startDate),
             $lte: new Date(req.query.endDate)
         }
-    }
+    };
 
-    Income.aggregate()
-        .match(filterObject)
-        .group({ "_id": "$category1", "sum": { $sum: "$amount"  }})
-        .then(breakdown => {
-            res.status(200).json(breakdown);
-        })
-        .catch(error => {
-            res.status(500).send({
-                message: error.message || "An error occurred while fetching incomes!"
-            });
+    try {
+        const breakdown = await Income.aggregate()
+            .match(filterObject)
+            .group({"_id": "$category1", "sum": {$sum: "$amount"}});
+
+        res.status(200).json(breakdown);
+
+    } catch (error) {
+        res.status(500).send({
+            message: error.message || "An error occurred while fetching incomes breakdown!"
         });
+    }
 }

@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const User = mongoose.model('User');
 const updateAccountBalances = require('../services/updateAccountBalances');
 
+// TODO: IMPLEMENT GOALS BEFORE UPDATING CONTROLLERS
+
 // TODO: check controller for integer amount usage
 // Find all goals of account with requested id
 exports.findAllGoals = (req, res) => {
