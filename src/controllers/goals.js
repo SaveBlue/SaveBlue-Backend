@@ -1,12 +1,13 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+import updateAccountBalances from '../services/updateAccountBalances.js';
+
 const User = mongoose.model('User');
-const updateAccountBalances = require('../services/updateAccountBalances');
 
 // TODO: IMPLEMENT GOALS BEFORE UPDATING CONTROLLERS
 
 // TODO: check controller for integer amount usage
 // Find all goals of account with requested id
-exports.findAllGoals = (req, res) => {
+const findAllGoals = (req, res) => {
 
     User.findOne({'accounts._id': req.params.aid}, 'accounts.goals')
         .then(account => {
@@ -30,7 +31,7 @@ exports.findAllGoals = (req, res) => {
 
 
 // Find goal with requested id
-exports.findGoalByID = (req, res) => {
+const findGoalByID = (req, res) => {
 
     User.findOne({'accounts.goals._id': req.params.id}, 'accounts.goals')
         .then(account => {
@@ -54,7 +55,7 @@ exports.findGoalByID = (req, res) => {
 
 
 // delete goal with requested id
-exports.delete = (req, res) => {
+const remove = (req, res) => {
 
     User.findOne({'accounts.goals._id': req.params.id}, 'accounts.goals')
         .then(async account => {
@@ -98,7 +99,7 @@ exports.delete = (req, res) => {
 
 
 // Update goal by ID
-exports.update = (req, res) => {
+const update = (req, res) => {
 
     // Check goal name & description length
     if (req.body.name && req.body.name.length > 64 && req.body.description && req.body.description.length > 1024) {
@@ -164,7 +165,7 @@ exports.update = (req, res) => {
 
 
 // Update goal amount
-exports.updateGoalCurrentAmount = (req, res) => {
+const updateGoalCurrentAmount = (req, res) => {
 
     // Find the user with the requested account
     User.findOne({'accounts.goals._id': req.params.id}, 'accounts.availableBalance accounts.goals')
@@ -244,7 +245,7 @@ exports.updateGoalCurrentAmount = (req, res) => {
 
 
 // Complete goal
-exports.completeGoal = (req, res) => {
+const completeGoal = (req, res) => {
 
     // Find the user with the requested account
     User.findOne({'accounts.goals._id': req.params.id}, 'accounts.availableBalance accounts.goals')
@@ -288,7 +289,7 @@ exports.completeGoal = (req, res) => {
 
 
 // Add a new goal to account with requested id
-exports.create = (req, res) => {
+const create = (req, res) => {
 
     // Check goal name & description length
     if (req.body.name && req.body.name.length > 64 && req.body.description && req.body.description.length > 1024) {
@@ -343,3 +344,13 @@ exports.create = (req, res) => {
 
 };
 //----------------------------------------------------------------------------------------------------------------------
+
+export default {
+    findAllGoals,
+    findGoalByID,
+    remove,
+    update,
+    updateGoalCurrentAmount,
+    completeGoal,
+    create
+}

@@ -35,12 +35,12 @@ import expensesRouter from './routes/expenses.js';
 import goalsRouter from './routes/goals.js';
 import './config/passport.js';
 
-authenticationRouter(server);
-usersRouter(server);
-accountsRouter(server);
-incomesRouter(server);
-expensesRouter(server);
-goalsRouter(server);
+server.use(authenticationRouter);
+server.use(usersRouter);
+server.use(accountsRouter);
+server.use(incomesRouter);
+server.use(expensesRouter);
+server.use(goalsRouter);
 
 // To handle paths correctly when using ES6 modules
 const __filename = fileURLToPath(import.meta.url);
@@ -49,7 +49,7 @@ const __dirname = dirname(__filename);
 // Serve static files from the Vue frontend app
 server.use(express.static(path.join(__dirname, '/dist')));
 
-server.use(passport.initialize());
+server.use(passport.initialize({}));
 
 server.get("/", (req, res) => {
     res.json({ message: "Test server running!" });

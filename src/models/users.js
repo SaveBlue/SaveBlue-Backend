@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
-import config from '../config/auth';
+import config from '../config/auth.js';
 
 let Schema = mongoose.Schema;
 

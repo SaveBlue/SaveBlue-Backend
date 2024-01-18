@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import updateAccountBalances from '../services/updateAccountBalances';
+import updateAccountBalances from '../services/updateAccountBalances.js';
 
 const Income = mongoose.model('Income');
 

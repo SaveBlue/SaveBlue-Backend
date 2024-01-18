@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import passport from 'passport';
-import draftsAccount from '../services/draftsAccount';
+import draftsAccount from '../services/draftsAccount.js';
 
 const User = mongoose.model('User');
 const Token = mongoose.model('Token');

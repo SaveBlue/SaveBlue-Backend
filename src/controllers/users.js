@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import deleteUserEntries from '../services/deleteUserEntries';
+import deleteUserEntries from '../services/deleteUserEntries.js';
 
 const User = mongoose.model('User');
 
