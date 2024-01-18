@@ -1,9 +1,9 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+import openai from "./openai";
+
 const User = mongoose.model('User');
-const openai = require("./openai");
 
-
-exports.createExpenseSMS = async (req, res, next) => {
+const createExpenseSMS = async (req, res, next) => {
 
     let user = {}
 
@@ -73,7 +73,7 @@ exports.createExpenseSMS = async (req, res, next) => {
 
 
 // Do not allow users to create drafts in regular accounts
-exports.block = (req, res, next) => {
+const block = (req, res, next) => {
     if(req.body.category1 === "Draft" || req.body.category2 && req.body.category2 === "Draft"){
         return res.status(400).json({
             message: "Cannot create draft in regular account."
@@ -83,3 +83,7 @@ exports.block = (req, res, next) => {
     next();
 }
 
+export default {
+    createExpenseSMS,
+    block
+}

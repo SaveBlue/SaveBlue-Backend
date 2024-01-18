@@ -1,12 +1,12 @@
-const mongoose = require('mongoose');
-const passport = require('passport');
+import mongoose from 'mongoose';
+import passport from 'passport';
+import draftsAccount from '../services/draftsAccount';
+
 const User = mongoose.model('User');
 const Token = mongoose.model('Token');
-const draftsAccount = require('../services/draftsAccount');
-
 
 // Register a new user
-exports.register = async (req, res) => {
+const register = async (req, res) => {
 
     // Validate request
     if (!req.body.username || !req.body.password || !req.body.email) {
@@ -49,7 +49,7 @@ exports.register = async (req, res) => {
 
 
 // Login to user account
-exports.login = async (req, res) => {
+const login = async (req, res) => {
 
     // Validate request
     if (!req.body.username || !req.body.password) {
@@ -101,7 +101,7 @@ function authenticateUser(req, res) {
 //----------------------------------------------------------------------------------------------------------------------
 
 // Invalidates JWT from whitelist
-exports.logout = async (req, res) => {
+const logout = async (req, res) => {
     try {
         // Clear expired jwt from whitelist for housekeeping
         const deleteTokens = require('../CRON/clearExpiredTokens');
@@ -126,3 +126,9 @@ exports.logout = async (req, res) => {
         });
     }
 };
+
+export default {
+    register,
+    login,
+    logout
+}

@@ -1,8 +1,8 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+
 const User = mongoose.model('User');
 
-
-exports.checkUniqueUsernameEmail = async (req, res, next) => {
+const checkUniqueUsernameEmail = async (req, res, next) => {
     try {
         // Check username duplicates
         const usernameExists = await User.findOne({ 'username': req.body.username }, 'username');
@@ -32,3 +32,6 @@ exports.checkUniqueUsernameEmail = async (req, res, next) => {
     }
 };
 
+export default {
+    checkUniqueUsernameEmail
+};

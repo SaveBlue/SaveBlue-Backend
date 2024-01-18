@@ -1,8 +1,9 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+
 const User = mongoose.model('User');
 
 // Update both totalAmount and availableAmount
-exports.updateAllAccountBalances = async (accountID, amount, operation) => {
+const updateAllAccountBalances = async (accountID, amount, operation) => {
 
     try {
         const user = await User.findOne({ $or: [{ 'accounts._id': accountID }, { 'draftsAccount._id': accountID }] });
@@ -41,7 +42,7 @@ exports.updateAllAccountBalances = async (accountID, amount, operation) => {
 // TODO: IMPLEMENT GOALS BEFORE REFACTORING
 
 // Update both availableAmount & goal currentAmount
-exports.updateGoalAmount = (goalID, amount, operation) => {
+const updateGoalAmount = (goalID, amount, operation) => {
 
     return new Promise((resolve, reject) => {
 
@@ -87,3 +88,5 @@ exports.updateGoalAmount = (goalID, amount, operation) => {
             })
     })
 }
+
+export default {updateAllAccountBalances, updateGoalAmount}

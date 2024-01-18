@@ -1,6 +1,7 @@
-const jwt = require("jsonwebtoken");
-const config = require("../config/auth");
-const mongoose = require('mongoose');
+import jwt from "jsonwebtoken";
+import config from "../config/auth";
+import mongoose from 'mongoose';
+
 const User = mongoose.model('User');
 const Expense = mongoose.model('Expense');
 const Income = mongoose.model('Income');
@@ -8,7 +9,7 @@ const Token = mongoose.model('Token');
 
 
 // Verify token in whitelist
-verifyTokenWhitelist = async (req, res, next) => {
+const verifyTokenWhitelist = async (req, res, next) => {
 
     let token = req.headers["x-access-token"];
 
@@ -47,7 +48,7 @@ verifyTokenWhitelist = async (req, res, next) => {
 
 
 // Verify User
-verifyTokenUser = (req, res, next) => {
+const verifyTokenUser = (req, res, next) => {
 
     let token = req.headers["x-access-token"];
 
@@ -71,7 +72,7 @@ verifyTokenUser = (req, res, next) => {
 
 
 // Verify Account
-verifyTokenAccount = (req, res, next) => {
+const verifyTokenAccount = (req, res, next) => {
 
     let token = req.headers["x-access-token"];
 
@@ -97,7 +98,7 @@ verifyTokenAccount = (req, res, next) => {
 
 
 // Verify Account or Drafts Account
-verifyTokenAccountOrDrafts = (req, res, next) => {
+const verifyTokenAccountOrDrafts = (req, res, next) => {
 
     let token = req.headers["x-access-token"];
 
@@ -123,7 +124,7 @@ verifyTokenAccountOrDrafts = (req, res, next) => {
 
 
 // Verify Expenses
-verifyTokenExpense = (req, res, next) => {
+const verifyTokenExpense = (req, res, next) => {
     let token = req.headers["x-access-token"];
 
     if (!token) {
@@ -162,7 +163,7 @@ verifyTokenExpense = (req, res, next) => {
 
 
 // Verify Incomes
-verifyTokenIncome = (req, res, next) => {
+const verifyTokenIncome = (req, res, next) => {
     let token = req.headers["x-access-token"];
 
     if (!token) {
@@ -199,7 +200,7 @@ verifyTokenIncome = (req, res, next) => {
 //----------------------------------------------------------------------------------------------------------------------
 
 
-verifyTokenExpenseIncomePost = (req, res, next) => {
+const verifyTokenExpenseIncomePost = (req, res, next) => {
 
     let token = req.headers["x-access-token"];
 
@@ -225,7 +226,7 @@ verifyTokenExpenseIncomePost = (req, res, next) => {
 
 
 // Verify Goal
-verifyTokenGoal = (req, res, next) => {
+const verifyTokenGoal = (req, res, next) => {
 
     let token = req.headers["x-access-token"];
 
@@ -256,7 +257,7 @@ verifyTokenGoal = (req, res, next) => {
  *
  * Function checks users permission if his JWT token allows access to requested data
  */
-verifyUsersCall = (req, res, next, searchParam, decodedID) => {
+const verifyUsersCall = (req, res, next, searchParam, decodedID) => {
 
     User.findOne({$or: searchParam}, '_id')
         .then(ID => {
@@ -282,15 +283,13 @@ verifyUsersCall = (req, res, next, searchParam, decodedID) => {
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-
-const authJwt = {
-    verifyTokenWhitelist: verifyTokenWhitelist,
-    verifyTokenUser: verifyTokenUser,
-    verifyTokenAccount: verifyTokenAccount,
-    verifyTokenAccountOrDrafts: verifyTokenAccountOrDrafts,
-    verifyTokenExpense: verifyTokenExpense,
-    verifyTokenIncome: verifyTokenIncome,
-    verifyTokenExpenseIncomePost: verifyTokenExpenseIncomePost,
-    verifyTokenGoal: verifyTokenGoal
+export default {
+    verifyTokenWhitelist,
+    verifyTokenUser,
+    verifyTokenAccount,
+    verifyTokenAccountOrDrafts,
+    verifyTokenExpense,
+    verifyTokenIncome,
+    verifyTokenExpenseIncomePost,
+    verifyTokenGoal
 };
-module.exports = authJwt;

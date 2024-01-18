@@ -1,10 +1,10 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+
 const Income = mongoose.model('Income');
 const Expense = mongoose.model('Expense');
 
-
 // Delete all incomes with provided userID / accountID
-exports.deleteIncomes = async (deleteField, ID) => {
+const deleteIncomes = async (deleteField, ID) => {
 
     const query = { [deleteField]: ID };
 
@@ -16,7 +16,7 @@ exports.deleteIncomes = async (deleteField, ID) => {
 }
 
 // Delete all expenses with provided userID / accountID
-exports.deleteExpenses = async (deleteField, ID) => {
+const deleteExpenses = async (deleteField, ID) => {
 
     const query = { [deleteField]: ID };
 
@@ -26,3 +26,8 @@ exports.deleteExpenses = async (deleteField, ID) => {
         throw new Error(error || "An error occurred while deleting expenses!");
     }
 }
+
+export default {
+    deleteIncomes,
+    deleteExpenses
+};

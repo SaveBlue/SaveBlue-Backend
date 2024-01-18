@@ -1,11 +1,11 @@
-const mongoose = require('mongoose');
-const User = mongoose.model('User');
-const deleteUserEntries = require('../services/deleteUserEntries');
-const draftsAccount = require("../services/draftsAccount");
+import mongoose from 'mongoose';
+import deleteUserEntries from '../services/deleteUserEntries.js';
+import draftsAccount from '../services/draftsAccount.js';
 
+const User = mongoose.model('User');
 
 // Find all accounts of user with requested id
-exports.findAllAccountsByUserID = async (req, res) => {
+const findAllAccountsByUserID = async (req, res) => {
     try {
         const userId = req.params.uid;
         const archived = !!req.query.archived;
@@ -34,7 +34,7 @@ exports.findAllAccountsByUserID = async (req, res) => {
 
 
 // Find account with requested id
-exports.findAccountByID = async (req, res) => {
+const findAccountByID = async (req, res) => {
     try {
         const account = await User.findOne({'accounts._id': req.params.id}, {'accounts.$': 1});
 
@@ -56,7 +56,7 @@ exports.findAccountByID = async (req, res) => {
 
 
 // Add a new account to user with requested id
-exports.createAccount = async (req, res) => {
+const createAccount = async (req, res) => {
 
     // Check account name length
     if (req.body.name?.length > 128) {
@@ -103,7 +103,7 @@ exports.createAccount = async (req, res) => {
 
 
 // Delete account with requested id
-exports.deleteAccountByID = async (req, res) => {
+const deleteAccountByID = async (req, res) => {
     try {
         // Find the user with the requested account
         const user = await User.findOne({'accounts._id': req.params.id}, 'accounts._id accounts.name');
@@ -138,7 +138,7 @@ exports.deleteAccountByID = async (req, res) => {
 
 
 // Update account with requested id
-exports.updateAccountByID = async (req, res) => {
+const updateAccountByID = async (req, res) => {
 
     // Check account name length
     if (req.body.name?.length > 128) {
@@ -190,7 +190,7 @@ exports.updateAccountByID = async (req, res) => {
 
 
 // Find drafts account of user with requested id
-exports.findDraftsAccountByUserID = async (req, res) => {
+const findDraftsAccountByUserID = async (req, res) => {
     try {
         const user = await User.findById(req.params.uid);
 
@@ -213,3 +213,11 @@ exports.findDraftsAccountByUserID = async (req, res) => {
     }
 };
 
+export default {
+    findAllAccountsByUserID,
+    findAccountByID,
+    createAccount,
+    deleteAccountByID,
+    updateAccountByID,
+    findDraftsAccountByUserID
+}

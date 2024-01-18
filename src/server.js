@@ -1,5 +1,4 @@
 import express from 'express';
-import bodyParser from 'body-parser';
 import cors from 'cors';
 import passport from 'passport';
 import path from 'path';
@@ -20,10 +19,10 @@ let corsOptions = {
 server.use(cors(corsOptions));
 
 // parse requests of content-type - application/json
-server.use(bodyParser.json());
+server.use(express.json());
 
 // parse requests of content-type - application/x-www-form-urlencoded
-server.use(bodyParser.urlencoded({ extended: true }));
+server.use(express.urlencoded({ extended: true }));
 
 //----------------------------------------------------------------------------------------------------------------------
 

@@ -1,10 +1,10 @@
-const mongoose = require('mongoose');
-const Expense = mongoose.model('Expense');
-const updateAccountBalances = require('../services/updateAccountBalances');
+import mongoose from 'mongoose';
+import updateAccountBalances from '../services/updateAccountBalances';
 
+const Expense = mongoose.model('Expense');
 
 // Find all expenses of the account with requested id
-exports.findAllExpensesByAccountID = async (req, res) => {
+const findAllExpensesByAccountID = async (req, res) => {
     try {
         const page = req.query.page || 0;
         const expensesPerPage = 16;
@@ -28,7 +28,7 @@ exports.findAllExpensesByAccountID = async (req, res) => {
 
 
 // Find an expense with requested id
-exports.findExpenseByID = async (req, res) => {
+const findExpenseByID = async (req, res) => {
     try {
         const expense = await Expense.findById(req.params.id);
 
@@ -51,7 +51,7 @@ exports.findExpenseByID = async (req, res) => {
 
 
 // Create an expense
-exports.create = async (req, res) => {
+const create = async (req, res) => {
 
     // Check expense description length
     if (req.body.description?.length > 1024) {
@@ -97,7 +97,7 @@ exports.create = async (req, res) => {
 
 
 // Delete expense with requested ID
-exports.delete = async (req, res) => {
+const remove = async (req, res) => {
     try {
         const expense = await Expense.findByIdAndDelete(req.params.id);
 
@@ -121,7 +121,7 @@ exports.delete = async (req, res) => {
 
 
 // Update expense with requested ID
-exports.update = async (req, res) => {
+const update = async (req, res) => {
 
     // Check expense description length
     if (req.body.description?.length > 1024) {
@@ -190,7 +190,7 @@ exports.update = async (req, res) => {
 
 
 // Return expense breakdown by primary categories
-exports.expensesBreakdown = async (req, res) => {
+const expensesBreakdown = async (req, res) => {
 
     if (!req.query.startDate) {
         return res.status(400).json({
@@ -225,3 +225,12 @@ exports.expensesBreakdown = async (req, res) => {
         });
     }
 };
+
+export default {
+    findAllExpensesByAccountID,
+    findExpenseByID,
+    create,
+    remove,
+    update,
+    expensesBreakdown
+}

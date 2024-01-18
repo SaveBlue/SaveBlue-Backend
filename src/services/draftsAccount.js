@@ -1,8 +1,9 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+
 const User = mongoose.model('User');
 
 // Create drafts account
-exports.create = async (userID) => {
+const create = async (userID) => {
     const draftsAccount = {
         name: "Drafts",
         totalBalance: 0,
@@ -30,3 +31,7 @@ exports.create = async (userID) => {
         throw new Error(error || "An error occurred while adding drafts account!");
     }
 };
+
+export default {
+    create
+}

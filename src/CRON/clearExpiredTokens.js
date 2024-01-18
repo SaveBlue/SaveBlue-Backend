@@ -1,4 +1,5 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+
 const Token = mongoose.model('Token');
 
 // invalidates JWT from whitelist

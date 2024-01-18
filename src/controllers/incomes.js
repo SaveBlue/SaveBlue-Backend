@@ -1,10 +1,10 @@
-const mongoose = require('mongoose');
-const Income = mongoose.model('Income');
-const updateAccountBalances = require('../services/updateAccountBalances');
+import mongoose from 'mongoose';
+import updateAccountBalances from '../services/updateAccountBalances';
 
+const Income = mongoose.model('Income');
 
 // Find all incomes of the account with requested id
-exports.findAllIncomesByAccountID = async (req, res) => {
+const findAllIncomesByAccountID = async (req, res) => {
     try {
         const page = req.query.page || 0;
         const incomePerPage = 16;
@@ -28,7 +28,7 @@ exports.findAllIncomesByAccountID = async (req, res) => {
 
 
 // Find an income with an id
-exports.findIncomeByID = async (req, res) => {
+const findIncomeByID = async (req, res) => {
     try {
         const income = await Income.findById(req.params.id);
 
@@ -50,7 +50,7 @@ exports.findIncomeByID = async (req, res) => {
 
 
 // Create an income
-exports.create = async (req, res) => {
+const create = async (req, res) => {
 
     // Check income description length
     if (req.body.description?.length > 1024) {
@@ -96,7 +96,7 @@ exports.create = async (req, res) => {
 
 
 // Delete income with requested ID
-exports.delete = async (req, res) => {
+const remove = async (req, res) => {
 
     try {
         const income = await Income.findByIdAndDelete(req.params.id);
@@ -121,7 +121,7 @@ exports.delete = async (req, res) => {
 
 
 // update income with the ID
-exports.update = async (req, res) => {
+const update = async (req, res) => {
 
     // Check income description length
     if (req.body.description?.length > 1024) {
@@ -189,7 +189,7 @@ exports.update = async (req, res) => {
 
 
 // Return income breakdown by primary categories
-exports.incomesBreakdown = async (req, res) => {
+const incomesBreakdown = async (req, res) => {
 
     if (!req.query.startDate) {
         return res.status(400).json({
@@ -223,4 +223,13 @@ exports.incomesBreakdown = async (req, res) => {
             message: error.message || "An error occurred while fetching incomes breakdown!"
         });
     }
+}
+
+export default {
+    findAllIncomesByAccountID,
+    findIncomeByID,
+    create,
+    remove,
+    update,
+    incomesBreakdown
 }

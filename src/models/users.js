@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
-let crypto = require('crypto');
-let jwt = require('jsonwebtoken');
-let config = require('../config/auth');
-let Schema = mongoose.Schema;
+import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
+import config from '../config/auth';
 
+let Schema = mongoose.Schema;
 
 const budget = new Schema({
         category: {type: String, required: true},

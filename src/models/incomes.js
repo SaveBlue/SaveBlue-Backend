@@ -43,4 +43,4 @@ function round(value) {
 mongoose.model('Income', income);
 
 
-module.exports = categoriesIncomes;
+export default {categoriesIncomes};

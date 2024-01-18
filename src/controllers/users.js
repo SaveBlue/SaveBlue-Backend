@@ -1,10 +1,10 @@
-const mongoose = require('mongoose');
-const User = mongoose.model('User');
-const deleteUserEntries = require('../services/deleteUserEntries');
+import mongoose from 'mongoose';
+import deleteUserEntries from '../services/deleteUserEntries';
 
+const User = mongoose.model('User');
 
 // Return calling user data
-exports.returnMe = async (req, res) => {
+const returnMe = async (req, res) => {
     try {
         const user = await User.findById(req.params.tokenId, 'username firstName lastName email');
 
@@ -27,7 +27,7 @@ exports.returnMe = async (req, res) => {
 
 
 // Find a user by ID and return username and email
-exports.findByID = async (req, res) => {
+const findByID = async (req, res) => {
     try {
         const user = await User.findById(req.params.id, 'username email');
 
@@ -49,7 +49,7 @@ exports.findByID = async (req, res) => {
 
 
 // Delete user's account with the requested id in the request
-exports.delete = async (req, res) => {
+const remove = async (req, res) => {
     try {
         const user = await User.findByIdAndDelete(req.params.id);
 
@@ -77,7 +77,7 @@ exports.delete = async (req, res) => {
 
 
 // Update user data of the user with requested id
-exports.update = async (req, res) => {
+const update = async (req, res) => {
 
     // Check lengths of fields
     if (req.body.username?.length > 32 || req.body.password?.length > 128 || req.body.email?.length > 128) {
@@ -120,3 +120,10 @@ exports.update = async (req, res) => {
         });
     }
 };
+
+export default {
+    returnMe,
+    findByID,
+    remove,
+    update
+}
