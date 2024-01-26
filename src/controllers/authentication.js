@@ -89,11 +89,11 @@ exports.login = (req, res) => {
 
 
 // invalidates JWT from whitelist
-exports.logout = (req, res) => {
+exports.logout = async (req, res) => {
 
     //clear expired jwt from whitelist for heroku ciganjenje
     const deleteTokens = require('../CRON/clearExpiredTokens')
-    deleteTokens.deleteExpiredTokens();
+    await deleteTokens.deleteExpiredTokens();
 
     Token.deleteOne({'token': req.headers["x-access-token"]})
         .then(token => {

@@ -23,7 +23,7 @@ exports.create = (userID) => {
             select: 'draftsAccount'
         })
             .then(user => {
-                console.log(user)
+                //console.log(user)
 
                 if (!user) {
                     reject("No user with selected ID!")

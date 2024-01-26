@@ -1,7 +1,9 @@
 const mongoose = require('mongoose');
 
-
-let dbURI = process.env.MONGODB_CLOUD_URI || 'mongodb://127.0.0.1/SaveBlue';
+// When testing connect to test database, otherwise connect to the main database
+const dbURI = process.env.NODE_ENV === 'test'
+    ? 'mongodb://127.0.0.1/SaveBlue_test'
+    : process.env.MONGODB_CLOUD_URI || 'mongodb://127.0.0.1/SaveBlue';
 
 // Connect to the database
 mongoose.connect(dbURI, {
@@ -9,8 +11,7 @@ mongoose.connect(dbURI, {
     useCreateIndex: true,
     useUnifiedTopology: true,
     useFindAndModify: false
-});
-
+})
 
 // Database state debug messages
 mongoose.connection.on('connected', () => {
@@ -63,3 +64,11 @@ require('./tokens');
 require('./users');
 require('./incomes');
 require('./expenses');
+
+module.exports = {
+    close_db: () => {
+        return safeExit('Exit application', () => {
+            process.exit(0);
+        });
+    }
+}

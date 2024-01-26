@@ -43,12 +43,15 @@ server.get("/", (req, res) => {
     res.json({ message: "Test server running!" });
 });
 
-
 /**
  * Start server
  */
-server.listen(port, () => {
-    console.log(`Server running on port ${port}!`);
-});
+module.exports = {
+    server,
+    start: function() {
+        return server.listen(port, () => {
+            console.log(`Server running on port ${port}!`);
+        });
 
-module.exports = server;
+    }
+};

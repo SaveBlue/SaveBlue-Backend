@@ -13,6 +13,10 @@ const config: Config = {
   // Indicates whether the coverage information should be collected while executing the test
   collectCoverage: true,
 
+  collectCoverageFrom: [
+    "./src/**/*.js", // Adjust the path according to your source files
+  ],
+
   // The directory where Jest should output its coverage files
   coverageDirectory: "coverage",
 
@@ -24,8 +28,11 @@ const config: Config = {
     "enableGlobally": false
   },
 
+  globalSetup: '<rootDir>/jest.global-setup.js',
+  globalTeardown: '<rootDir>/jest.global-teardown.js',
+
   // The maximum time that is spent on running a test
-  testTimeout: 30000,
+  testTimeout: 3000,
 
   // All imported modules in your tests should be mocked automatically
   // automock: false,
