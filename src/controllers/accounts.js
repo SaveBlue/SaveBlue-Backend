@@ -68,8 +68,6 @@ exports.createAccount = (req, res) => {
         availableBalance: 0,
         budgets: [],
         goals: [],
-        expenses: [],
-        incomes: [],
         startOfMonth: req.body.startOfMonth
     };
 

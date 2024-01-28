@@ -59,16 +59,9 @@ process.on('SIGTERM', () => {
     });
 });
 
-
 require('./tokens');
 require('./users');
 require('./incomes');
 require('./expenses');
 
-module.exports = {
-    close_db: () => {
-        return safeExit('Exit application', () => {
-            process.exit(0);
-        });
-    }
-}
+module.exports = mongoose
