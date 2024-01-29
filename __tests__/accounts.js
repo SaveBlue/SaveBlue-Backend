@@ -239,8 +239,6 @@ describe('GET /api/accounts/drafts/:uid', () => {
             .get(`/api/accounts/drafts/${testUserId}`) // Replace with a valid user ID
             .set('x-access-token', userToken);
 
-        console.log(response.body)
-
         expect(response.statusCode).toBe(200);
         expect(response.body).toHaveProperty('name', 'Drafts');
     });
