@@ -37,3 +37,14 @@ exports.accountDataToDelete = {
     expenses: [],
     incomes: [],
 }
+
+exports.accountDataToUpdate = {
+    name: 'Update this Wallet',
+    availableBalance: 1000,
+    totalBalance: 1000,
+    startOfMonth: 1,
+    budgets: [],
+    goals: [],
+    expenses: [],
+    incomes: [],
+}

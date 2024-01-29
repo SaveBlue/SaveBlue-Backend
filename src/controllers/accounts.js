@@ -56,7 +56,7 @@ exports.findAccountByID = (req, res) => {
 exports.createAccount = (req, res) => {
 
     // Check account name length
-    if (req.body.name && req.body.name.length > 128) {
+    if (req.body.name && req.body.name.length > 32) {
         return res.status(413).json({
             message: "Account name too long."
         });
@@ -68,7 +68,7 @@ exports.createAccount = (req, res) => {
         availableBalance: 0,
         budgets: [],
         goals: [],
-        startOfMonth: req.body.startOfMonth
+        startOfMonth: req.body.startOfMonth || 1
     };
 
     // Finds user and appends newAccount to the accounts array, then returns the new account
@@ -98,61 +98,51 @@ exports.createAccount = (req, res) => {
 
 // Delete account with requested id
 exports.deleteAccountByID = (req, res) => {
-
-    // Find the user with the requested account
-    User.findOne({'accounts._id': req.params.id}, 'accounts._id accounts.name')
+    // Step 1: Find the User with the specified Account ID
+    User.findOne({'accounts._id': req.params.id})
         .then(user => {
-
             if (!user) {
                 return res.status(404).json({
                     message: "No account with selected ID!"
                 });
             }
 
-            // Remove the selected account
-            user.accounts.pull({'_id': req.params.id})
+            // Step 2: Remove the account from the user's accounts array
+            user.accounts.pull({_id: req.params.id});
 
-            // Save updated user data (deleted account)
+            // Save the updated user document
             user.save()
                 .then(async () => {
-
-                    // Delete account's incomes from db
+                    // Delete account's incomes and expenses from db
                     try {
                         await deleteUserEntries.deleteIncomes("accountID", req.params.id);
-                    } catch (err) {
-                        return res.status(500).send({message: err});
-                    }
-
-                    // Delete account's expenses from db
-                    try {
                         await deleteUserEntries.deleteExpenses("accountID", req.params.id);
-                    } catch (err) {
-                        return res.status(500).send({message: err});
-                    }
 
-                    res.status(200).json(user)
+                        res.status(200).json(user)
+                    } catch (err) {
+                        res.status(500).send({ message: err.message || "An error occurred while deleting account entries!" });
+                    }
                 })
                 .catch(error => {
                     res.status(500).send({
-                        message: error.message || "An error occurred while deleting account!"
+                        message: error.message || "An error occurred while deleting the account!"
                     });
                 });
         })
         .catch(error => {
             res.status(500).send({
-                message: error.message || "An error occurred while fetching account!"
+                message: error.message || "An error occurred while fetching the account!"
             });
-        })
+        });
 };
 //----------------------------------------------------------------------------------------------------------------------
 
 
 // Update account with requested id
 exports.updateAccountByID = (req, res) => {
-    console.log(req.body)
 
     // Check account name length
-    if (req.body.name && req.body.name.length > 128) {
+    if (req.body.name && req.body.name.length > 32) {
         return res.status(413).json({
             message: "Account name too long."
         });
@@ -222,7 +212,7 @@ exports.findDraftsAccountByUserID = (req, res) => {
             }
 
             // Create a new drafts account if it does not exist - FOR OLDER ACCOUNTS
-            if (!user.draftsAccount){
+            if (!user.draftsAccount) {
                 user.draftsAccount = await draftsAccount.create(user._id)
             }
             res.status(200).json(user.draftsAccount);

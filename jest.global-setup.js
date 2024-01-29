@@ -1,4 +1,4 @@
-const { start } = require('./src/server'); // Your Express app
+const {start} = require('./src/server'); // Your Express app
 const mongoose = require('./src/models/db');
 
 module.exports = async () => {
@@ -27,7 +27,7 @@ const request = require('supertest');
 
 async function populateTestData() {
     // add user data to db
-    const testUser = await saveUserToDB({...mockData.testUserData, accounts: [mockData.testAccountData, mockData.accountDataToDelete]});
+    const testUser = await saveUserToDB({...mockData.testUserData, accounts: [mockData.testAccountData, mockData.accountDataToDelete, mockData.accountDataToUpdate]});
     const userToDelete = await saveUserToDB({...mockData.userToDelete, accounts: [mockData.accountDataToDelete]});
     const userToUpdate = await saveUserToDB({...mockData.userToUpdate, accounts: []});
     global.testUserId = testUser._id;
@@ -36,6 +36,7 @@ async function populateTestData() {
 
     global.testAccountId = testUser.accounts[0]._id;
     global.deleteAccountId = testUser.accounts[1]._id;
+    global.updateAccountId = testUser.accounts[2]._id;
 
     // add expense data to db
 
@@ -52,8 +53,11 @@ const saveUserToDB = async (userData) => {
         // Hash the password
         testUser.hashPassword(userData.password);
 
+        await testUser.populate({path: 'accounts'}).execPopulate()
+
         // Save the test user
         await testUser.save();
+
 
         return testUser;
     } catch (error) {
@@ -69,7 +73,7 @@ const getJWTtoLogut = async () => {
             password: mockData.testUserData.password
         })
 
-        global.JWTtoLogout = response.body['x-access-token']
+    global.JWTtoLogout = response.body['x-access-token']
 }
 
 
