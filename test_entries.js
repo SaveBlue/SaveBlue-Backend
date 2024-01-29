@@ -48,3 +48,31 @@ exports.accountDataToUpdate = {
     expenses: [],
     incomes: [],
 }
+
+exports.testIncomeData = {
+    amount: 1000,
+    category1: "Salary & Wage",
+    description: "Test Income",
+    date: "2024-04-09"
+}
+
+exports.draftIncomeData = {
+    amount: 1000,
+    category1: "Draft",
+    description: "Draft Income",
+    date: "2024-04-09"
+}
+
+exports.incomeDataToDelete = {
+    amount: 2000,
+    category1: "Salary & Wage",
+    description: 'Delete this Income',
+    date: "2024-04-09"
+}
+
+exports.incomeDataToUpdate = {
+    amount: 3000,
+    category1: "Salary & Wage",
+    description: 'Delete this Income',
+    date: "2024-04-09"
+}

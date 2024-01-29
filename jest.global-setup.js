@@ -30,6 +30,7 @@ async function populateTestData() {
     const testUser = await saveUserToDB({...mockData.testUserData, accounts: [mockData.testAccountData, mockData.accountDataToDelete, mockData.accountDataToUpdate]});
     const userToDelete = await saveUserToDB({...mockData.userToDelete, accounts: [mockData.accountDataToDelete]});
     const userToUpdate = await saveUserToDB({...mockData.userToUpdate, accounts: []});
+
     global.testUserId = testUser._id;
     global.deleteUserId = userToDelete._id;
     global.updateUserId = userToUpdate._id;
@@ -41,6 +42,13 @@ async function populateTestData() {
     // add expense data to db
 
     // add income data to db
+    const testIncome = await saveIncomeToDB({...mockData.testIncomeData, userID: testUser._id, accountID: testUser.accounts[0]._id});
+    const incomeToDelete = await saveIncomeToDB({...mockData.incomeDataToDelete, userID: testUser._id, accountID: testUser.accounts[0]._id});
+    const incomeToUpdate = await saveIncomeToDB({...mockData.incomeDataToUpdate, userID: testUser._id, accountID: testUser.accounts[0]._id});
+
+    global.testIncomeId = testIncome._id;
+    global.deleteIncomeId = incomeToDelete._id;
+    global.updateIncomeId = incomeToUpdate._id;
 }
 
 const saveUserToDB = async (userData) => {
@@ -74,6 +82,23 @@ const getJWTtoLogut = async () => {
         })
 
     global.JWTtoLogout = response.body['x-access-token']
+}
+
+const saveIncomeToDB = async (incomeData) => {
+    try {
+        const Income = mongoose.model('Income');
+
+        // Create a new income instance
+        let testIncome = new Income(incomeData);
+
+        // Save the test income
+        await testIncome.save();
+
+
+        return testIncome;
+    } catch (error) {
+        console.error('Error creating test income:', error);
+    }
 }
 
 

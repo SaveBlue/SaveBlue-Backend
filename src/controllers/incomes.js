@@ -45,14 +45,14 @@ exports.findIncomeByID = (req, res) => {
 exports.create = (req, res) => {
 
     // Check income description length
-    if (req.body.description && req.body.description.length > 1024) {
+    if (req.body.description && req.body.description.length > 32) {
         return res.status(413).json({
             message: "Description too long."
         });
     }
 
     // Check if amount is an integer
-    if (!Number.isSafeInteger(req.body.amount) || req.body.amount <= 0 || !req.body.amount > 100000000) {
+    if (!Number.isSafeInteger(req.body.amount) || req.body.amount <= 0 || req.body.amount > 100000000) {
         return res.status(400).json({
             message: "Amount not a valid number."
         });
@@ -122,14 +122,14 @@ exports.delete = (req, res) => {
 exports.update = (req, res) => {
 
     // Check income description length
-    if (req.body.description && req.body.description.length > 1024) {
+    if (req.body.description && req.body.description.length > 32) {
         return res.status(413).json({
             message: "Description too long."
         });
     }
 
     // Check if amount is an integer
-    if (!Number.isSafeInteger(req.body.amount) && req.body.amount > 0 && req.body.amount <= 100000000) {
+    if (!Number.isSafeInteger(req.body.amount) || req.body.amount <= 0 || req.body.amount > 100000000) {
         return res.status(400).json({
             message: "Amount not a valid number."
         });
@@ -138,6 +138,7 @@ exports.update = (req, res) => {
     let editedIncome = {};
 
     // Add properties to the object
+    // TODO: maybe useless
     if (req.body.category1) {
         editedIncome["category1"] = req.body.category1;
     }
@@ -172,7 +173,7 @@ exports.update = (req, res) => {
             let operation = oldAmount >= newAmount ? "-" : "+";
 
             // Handle account change
-            if (income.accountID !== editedIncome.accountID){
+            if (editedIncome.accountID && (income.accountID !== editedIncome.accountID)){
 
                 // Subtract from old account
                 try {

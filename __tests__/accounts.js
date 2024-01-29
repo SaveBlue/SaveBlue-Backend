@@ -165,7 +165,7 @@ describe('PUT /api/accounts/:id', () => {
 
 
 describe('POST /api/accounts/:uid', () => {
-    it('should fail account update of user with non-whitelist token', async () => {
+    it('should fail account create of user with non-whitelist token', async () => {
         const response = await request(global.__SERVER__)
             .post(`/api/accounts/${testUserId}`)
             .set('x-access-token', 'non-whitelist-token'); // Assuming you have a valid token
@@ -174,7 +174,7 @@ describe('POST /api/accounts/:uid', () => {
         expect(response.body).toHaveProperty('message', 'Unauthorized!');
     });
 
-    it('should fail account update of user with wrong token', async () => {
+    it('should fail account create of user with wrong token', async () => {
         const response = await request(global.__SERVER__)
             .post(`/api/accounts/${testUserId}`)
             .set('x-access-token', deleteUserToken); // Assuming you have a valid token
@@ -183,7 +183,7 @@ describe('POST /api/accounts/:uid', () => {
         expect(response.body).toHaveProperty('message', 'Unauthorized!');
     });
 
-    it('should fail account update of user with too long input', async () => {
+    it('should fail account create of user with too long input', async () => {
 
         const badUpdatedAccountData = {
             name: "VeryMuchTooLongAccountNameWeWillNotAcceptItVeryMuchTooLongAccountNameWeWillNotAcceptIt",
