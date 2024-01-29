@@ -10,6 +10,12 @@ exports.userToDelete = {
     email: 'delete@me.com'
 };
 
+exports.userToUpdate = {
+    username: 'updateMe',
+    password: 'updateMe',
+    email: 'update@me.com'
+};
+
 exports.testAccountData = {
     name: 'Test Wallet',
     availableBalance: 1000,

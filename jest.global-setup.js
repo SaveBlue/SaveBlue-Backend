@@ -29,7 +29,12 @@ async function populateTestData() {
     // add user data to db
     const testUser = await saveUserToDB({...mockData.testUserData, accounts: [mockData.testAccountData, mockData.accountDataToDelete]});
     const userToDelete = await saveUserToDB({...mockData.userToDelete, accounts: [mockData.accountDataToDelete]});
+    const userToUpdate = await saveUserToDB({...mockData.userToUpdate, accounts: []});
+    global.testUserId = testUser._id;
     global.deleteUserId = userToDelete._id;
+    global.updateUserId = userToUpdate._id;
+
+    global.testAccountId = testUser.accounts[0]._id;
     global.deleteAccountId = testUser.accounts[1]._id;
 
     // add expense data to db

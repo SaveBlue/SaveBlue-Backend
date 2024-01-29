@@ -4,7 +4,7 @@
   "description": "Finance manager for tracking expenses, incomes and budgets.",
   "main": "src/server.js",
   "scripts": {
-    "test": "jest --runInBand"
+    "test": "jest"
   },
   "repository": {
     "type": "git",

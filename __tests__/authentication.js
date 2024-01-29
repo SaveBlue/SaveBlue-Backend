@@ -2,7 +2,7 @@ const request = require('supertest');
 const {testUserData} = require('../test_entries')
 
 describe('POST /api/auth/register', () => {
-    it('should create a new user and return 200 status', async () => {
+    it('should create a new user', async () => {
 
         const userData = {
             username: 'sampleuser',
@@ -66,7 +66,7 @@ describe('POST /api/auth/register', () => {
         expect(response.body).toHaveProperty('message', 'Field too long.');
     });
 
-    it('should fail creating a new user with the same username and return 409 status', async () => {
+    it('should fail creating a new user with the same username', async () => {
 
         const badUserData = {
             username: testUserData.username,
@@ -82,7 +82,7 @@ describe('POST /api/auth/register', () => {
         expect(response.body).toHaveProperty('message', 'Duplicate username!');
     });
 
-    it('should fail creating a new user with the same email and return 409 status', async () => {
+    it('should fail creating a new user with the same email', async () => {
 
         const badUserData = {
             username: 'newtestuser',
@@ -111,13 +111,11 @@ describe('POST /api/auth/login', () => {
             .post('/api/auth/login')
             .send(loginData);
 
-        console.log(response.body)
-
         expect(response.statusCode).toBe(400);
         expect(response.body).toHaveProperty('message', 'All data required!');
     });
 
-    it('should fail authentication of user with wrong data and return 401', async () => {
+    it('should fail authentication of user with wrong data', async () => {
         const loginData = {
             username: 'wrong_username',
             password: 'wrong_password'
@@ -126,8 +124,6 @@ describe('POST /api/auth/login', () => {
         const response = await request(global.__SERVER__)
             .post('/api/auth/login')
             .send(loginData);
-
-        console.log(response.body)
 
         expect(response.statusCode).toBe(401);
         expect(response.body).toHaveProperty('message', 'Wrong username or password!');
@@ -150,7 +146,7 @@ describe('POST /api/auth/login', () => {
 });
 
 describe('POST /api/auth/logout', () => {
-    it('should fail log out of a user with non-whitelist token and return 200 status', async () => {
+    it('should fail log out of a user with non-whitelist token', async () => {
         const response = await request(global.__SERVER__)
             .post('/api/auth/logout')
             .set('x-access-token', 'non-whitelist-token');
