@@ -57,12 +57,16 @@ server.get("/", (req, res) => {
 /**
  * Start server
  */
-export default {
-    server,
-    start: function() {
-        return server.listen(port, () => {
-            console.log(`Server running on port ${port}!`);
-        });
 
-    }
+const start = () => {
+    return server.listen(port, () => {
+        console.log(`Server running on port ${port}!`);
+    });
+}
+
+if (process.env.NODE_ENV !== 'test')
+    await start();
+
+export {
+    server, start
 };

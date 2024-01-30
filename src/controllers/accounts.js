@@ -59,7 +59,7 @@ const findAccountByID = async (req, res) => {
 const createAccount = async (req, res) => {
 
     // Check account name length
-    if (req.body.name?.length > 128) {
+    if (req.body.name?.length > 32) {
         return res.status(400).json({
             message: "Account name too long."
         });
@@ -73,7 +73,7 @@ const createAccount = async (req, res) => {
         goals: [],
         expenses: [],
         incomes: [],
-        startOfMonth: req.body.startOfMonth
+        startOfMonth: req.body.startOfMonth || 1,
     };
 
     try {
@@ -106,7 +106,7 @@ const createAccount = async (req, res) => {
 const deleteAccountByID = async (req, res) => {
     try {
         // Find the user with the requested account
-        const user = await User.findOne({'accounts._id': req.params.id}, 'accounts._id accounts.name');
+        const user = await User.findOne({'accounts._id': req.params.id});
 
         if (!user) {
             return res.status(404).json({
@@ -141,7 +141,7 @@ const deleteAccountByID = async (req, res) => {
 const updateAccountByID = async (req, res) => {
 
     // Check account name length
-    if (req.body.name?.length > 128) {
+    if (req.body.name?.length > 32) {
         return res.status(400).json({
             message: "Account name too long."
         });

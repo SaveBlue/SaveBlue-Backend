@@ -1,8 +1,11 @@
-const {start} = require('./src/server'); // Your Express app
-const mongoose = require('./src/models/db');
+import mongoose from './src/models/db.js'
+import request from 'supertest';
+import mockData from './test_entries.js'; // Assuming this is a module you can import
+import {server, start as start_server} from './src/server.js';
 
-module.exports = async () => {
-    global.__SERVER__ = await start();
+export default async () => {
+
+    await start_server();
 
     const dbURI = 'mongodb://127.0.0.1/SaveBlue_test';
     await mongoose.connect(dbURI, {
@@ -22,12 +25,12 @@ module.exports = async () => {
     await getJWTtoLogut();
 };
 
-const mockData = require('./test_entries')
-const request = require('supertest');
-
 async function populateTestData() {
     // add user data to db
-    const testUser = await saveUserToDB({...mockData.testUserData, accounts: [mockData.testAccountData, mockData.accountDataToDelete, mockData.accountDataToUpdate]});
+    const testUser = await saveUserToDB({
+        ...mockData.testUserData,
+        accounts: [mockData.testAccountData, mockData.accountDataToDelete, mockData.accountDataToUpdate]
+    });
     const userToDelete = await saveUserToDB({...mockData.userToDelete, accounts: [mockData.accountDataToDelete]});
     const userToUpdate = await saveUserToDB({...mockData.userToUpdate, accounts: []});
 
@@ -40,18 +43,42 @@ async function populateTestData() {
     global.updateAccountId = testUser.accounts[2]._id;
 
     // add expense data to db
-    const testExpense = await saveExpenseToDB({...mockData.testExpenseData, userID: testUser._id, accountID: testUser.accounts[0]._id});
-    const expenseToDelete = await saveExpenseToDB({...mockData.expenseDataToDelete, userID: testUser._id, accountID: testUser.accounts[0]._id});
-    const expenseToUpdate = await saveExpenseToDB({...mockData.expenseDataToUpdate, userID: testUser._id, accountID: testUser.accounts[0]._id});
+    const testExpense = await saveExpenseToDB({
+        ...mockData.testExpenseData,
+        userID: testUser._id,
+        accountID: testUser.accounts[0]._id
+    });
+    const expenseToDelete = await saveExpenseToDB({
+        ...mockData.expenseDataToDelete,
+        userID: testUser._id,
+        accountID: testUser.accounts[0]._id
+    });
+    const expenseToUpdate = await saveExpenseToDB({
+        ...mockData.expenseDataToUpdate,
+        userID: testUser._id,
+        accountID: testUser.accounts[0]._id
+    });
 
     global.testExpenseId = testExpense._id;
     global.deleteExpenseId = expenseToDelete._id;
     global.updateExpenseId = expenseToUpdate._id;
 
     // add income data to db
-    const testIncome = await saveIncomeToDB({...mockData.testIncomeData, userID: testUser._id, accountID: testUser.accounts[0]._id});
-    const incomeToDelete = await saveIncomeToDB({...mockData.incomeDataToDelete, userID: testUser._id, accountID: testUser.accounts[0]._id});
-    const incomeToUpdate = await saveIncomeToDB({...mockData.incomeDataToUpdate, userID: testUser._id, accountID: testUser.accounts[0]._id});
+    const testIncome = await saveIncomeToDB({
+        ...mockData.testIncomeData,
+        userID: testUser._id,
+        accountID: testUser.accounts[0]._id
+    });
+    const incomeToDelete = await saveIncomeToDB({
+        ...mockData.incomeDataToDelete,
+        userID: testUser._id,
+        accountID: testUser.accounts[0]._id
+    });
+    const incomeToUpdate = await saveIncomeToDB({
+        ...mockData.incomeDataToUpdate,
+        userID: testUser._id,
+        accountID: testUser.accounts[0]._id
+    });
 
     global.testIncomeId = testIncome._id;
     global.deleteIncomeId = incomeToDelete._id;
@@ -81,7 +108,7 @@ const saveUserToDB = async (userData) => {
 }
 
 const getJWTtoLogut = async () => {
-    const response = await request(global.__SERVER__)
+    const response = await request(server)
         .post('/api/auth/login')
         .send({
             username: mockData.testUserData.username,
