@@ -4,7 +4,10 @@ import './users.js';
 import './incomes.js';
 import './expenses.js';
 
-const dbURI = process.env.MONGODB_CLOUD_URI || 'mongodb://127.0.0.1/SaveBlue';
+// When testing connect to test database, otherwise connect to the main database
+const dbURI = process.env.NODE_ENV === 'test'
+    ? 'mongodb://127.0.0.1/SaveBlue_test'
+    : process.env.MONGODB_CLOUD_URI || 'mongodb://127.0.0.1/SaveBlue';
 
 // Connect to the database
 mongoose.connect(dbURI, {
@@ -24,7 +27,7 @@ mongoose.connection.on('error', error => {
 });
 
 mongoose.connection.on('disconnected', () => {
-    console.log('Mongoose not connected.');
+    console.log('Mongoose disconnected.');
 });
 
 // Close connection to the database
@@ -55,3 +58,5 @@ process.on('SIGTERM', () => {
         process.exit(0);
     });
 });
+
+export default mongoose

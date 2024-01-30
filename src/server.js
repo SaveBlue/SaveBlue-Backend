@@ -8,7 +8,6 @@ import { dirname } from 'path';
 const server = express();
 const port = process.env.PORT || 5000;
 const url = process.env.URL || "http://localhost";
-
 //----------------------------------------------------------------------------------------------------------------------
 
 // cors settings
@@ -58,8 +57,12 @@ server.get("/", (req, res) => {
 /**
  * Start server
  */
-server.listen(port, () => {
-    console.log(`Server running on port ${port}!`);
-});
+export default {
+    server,
+    start: function() {
+        return server.listen(port, () => {
+            console.log(`Server running on port ${port}!`);
+        });
 
-export default server;
+    }
+};
