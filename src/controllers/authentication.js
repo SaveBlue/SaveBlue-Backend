@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import passport from 'passport';
 import draftsAccount from '../services/draftsAccount.js';
+import {deleteExpiredTokens} from '../CRON/clearExpiredTokens.js';
 
 const User = mongoose.model('User');
 const Token = mongoose.model('Token');
@@ -65,7 +66,7 @@ const login = async (req, res) => {
         }
 
         if (!user) {
-            res.status(401).json(info);
+            return res.status(401).json(info);
         }
 
         let JWT = user.generateJWT();
@@ -103,9 +104,9 @@ function authenticateUser(req, res) {
 // Invalidates JWT from whitelist
 const logout = async (req, res) => {
     try {
+
         // Clear expired jwt from whitelist for housekeeping
-        const deleteTokens = require('../CRON/clearExpiredTokens');
-        deleteTokens.deleteExpiredTokens();
+        await deleteExpiredTokens();
 
         // Delete the specific token
         const token = await Token.deleteOne({'token': req.headers["x-access-token"]});

@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const Token = mongoose.model('Token');
 
 // invalidates JWT from whitelist
-exports.deleteExpiredTokens = async () => {
+export const deleteExpiredTokens = async () => {
 
     try {
         // Query for clearing expired tokens from the whitelist           hour min  sec  millis

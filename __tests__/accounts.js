@@ -6,6 +6,7 @@ const api = supertest(server);
 
 let userToken, deleteUserToken, updateUserToken;
 
+
 async function loginUserAndGetToken(userData) {
 
     const response = await api
@@ -19,6 +20,7 @@ beforeAll(async () => {
     userToken = await loginUserAndGetToken(testUserData);
     deleteUserToken = await loginUserAndGetToken(userToDelete);
     updateUserToken = await loginUserAndGetToken(userToUpdate);
+
 });
 
 describe('GET /api/accounts/:uid', () => {
@@ -66,6 +68,8 @@ describe('GET /api/accounts/find/:id', () => {
         const response = await api
             .get(`/api/accounts/find/${global.testAccountId}`) // Replace with a valid user ID
             .set('x-access-token', deleteUserToken);
+
+        console.log(response.body)
 
         expect(response.statusCode).toBe(401);
         expect(response.body).toHaveProperty('message', 'Unauthorized!');

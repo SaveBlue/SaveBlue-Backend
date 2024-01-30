@@ -1,5 +1,4 @@
 import mongoose from './src/models/db.js'
-import request from 'supertest';
 import mockData from './test_entries.js'; // Assuming this is a module you can import
 import {server, start as start_server} from './src/server.js';
 
@@ -22,8 +21,22 @@ export default async () => {
     }
 
     await populateTestData();
-    await getJWTtoLogut();
 };
+
+const testIds ={
+    testUserId: '',
+    deleteUserId: '',
+    updateUserId: '',
+    testAccountId: '',
+    deleteAccountId: '',
+    updateAccountId: '',
+    testExpenseId: '',
+    deleteExpenseId: '',
+    updateExpenseId: '',
+    testIncomeId: '',
+    deleteIncomeId: '',
+    updateIncomeId: ''
+}
 
 async function populateTestData() {
     // add user data to db
@@ -107,16 +120,7 @@ const saveUserToDB = async (userData) => {
     }
 }
 
-const getJWTtoLogut = async () => {
-    const response = await request(server)
-        .post('/api/auth/login')
-        .send({
-            username: mockData.testUserData.username,
-            password: mockData.testUserData.password
-        })
 
-    global.JWTtoLogout = response.body['x-access-token']
-}
 
 const saveIncomeToDB = async (incomeData) => {
     try {
@@ -151,6 +155,13 @@ const saveExpenseToDB = async (expenseData) => {
         console.error('Error creating test expense:', error);
     }
 }
+
+export const returnTestIds = async () => {
+    console.log(testIds)
+    return testIds;
+}
+
+
 
 
 
