@@ -37,7 +37,7 @@ const categoriesExpenses = [
 let expense = new Schema({
         accountID: {type: String, required: true},
         userID: {type: String, required: true},
-        description: {type: String, maxlength: 1024},
+        description: {type: String, maxlength: 32},
         category1: {
             type: String,
             validate: {validator: validateCategory1, message: "Category does not exist."},

@@ -40,6 +40,13 @@ async function populateTestData() {
     global.updateAccountId = testUser.accounts[2]._id;
 
     // add expense data to db
+    const testExpense = await saveExpenseToDB({...mockData.testExpenseData, userID: testUser._id, accountID: testUser.accounts[0]._id});
+    const expenseToDelete = await saveExpenseToDB({...mockData.expenseDataToDelete, userID: testUser._id, accountID: testUser.accounts[0]._id});
+    const expenseToUpdate = await saveExpenseToDB({...mockData.expenseDataToUpdate, userID: testUser._id, accountID: testUser.accounts[0]._id});
+
+    global.testExpenseId = testExpense._id;
+    global.deleteExpenseId = expenseToDelete._id;
+    global.updateExpenseId = expenseToUpdate._id;
 
     // add income data to db
     const testIncome = await saveIncomeToDB({...mockData.testIncomeData, userID: testUser._id, accountID: testUser.accounts[0]._id});
@@ -98,6 +105,23 @@ const saveIncomeToDB = async (incomeData) => {
         return testIncome;
     } catch (error) {
         console.error('Error creating test income:', error);
+    }
+}
+
+const saveExpenseToDB = async (expenseData) => {
+    try {
+        const Expense = mongoose.model('Expense');
+
+        // Create a new expense instance
+        let testExpense = new Expense(expenseData);
+
+        // Save the test expense
+        await testExpense.save();
+
+
+        return testExpense;
+    } catch (error) {
+        console.error('Error creating test expense:', error);
     }
 }
 

@@ -20,11 +20,11 @@ beforeAll(async () => {
     updateUserToken = await loginUserAndGetToken(userToUpdate);
 });
 
-describe('GET /api/incomes/find/:aid', () => {
+describe('GET /api/expenses/find/:aid', () => {
 
     it('should fail to return data with non-whitelist token', async () => {
         const response = await request(global.__SERVER__)
-            .get(`/api/incomes/find/${global.testAccountId}`)
+            .get(`/api/expenses/find/${global.testAccountId}`)
             .set('x-access-token', 'non-whitelist-token'); // Assuming you have a valid token
 
         expect(response.statusCode).toBe(401);
@@ -33,16 +33,16 @@ describe('GET /api/incomes/find/:aid', () => {
 
     it('should fail to return data with wrong token', async () => {
         const response = await request(global.__SERVER__)
-            .get(`/api/incomes/find/${global.testAccountId}`)
+            .get(`/api/expenses/find/${global.testAccountId}`)
             .set('x-access-token', updateUserToken); // Assuming you have a valid token
 
         expect(response.statusCode).toBe(401);
         expect(response.body).toHaveProperty('message', 'Unauthorized!');
     });
 
-    it('should return all incomes of an account', async () => {
+    it('should return all expenses of an account', async () => {
         const response = await request(global.__SERVER__)
-            .get(`/api/incomes/find/${global.testAccountId}`)
+            .get(`/api/expenses/find/${global.testAccountId}`)
             .set('x-access-token', userToken);
 
         expect(response.statusCode).toBe(200);
@@ -51,52 +51,51 @@ describe('GET /api/incomes/find/:aid', () => {
 
 });
 
-describe('GET /api/incomes/:id', () => {
+describe('GET /api/expenses/:id', () => {
 
-    it('should fail to return income with non-whitelist token', async () => {
+    it('should fail to return expense with non-whitelist token', async () => {
         const response = await request(global.__SERVER__)
-            .get(`/api/incomes/${global.testIncomeId}`)
+            .get(`/api/expenses/${global.testExpenseId}`)
             .set('x-access-token', 'non-whitelist-token');
 
         expect(response.statusCode).toBe(401);
         expect(response.body).toHaveProperty('message', 'Unauthorized!');
     });
 
-    it('should fail to return income with wrong token', async () => {
+    it('should fail to return expense with wrong token', async () => {
         const response = await request(global.__SERVER__)
-            .get(`/api/incomes/${global.testIncomeId}`)
+            .get(`/api/expenses/${global.testExpenseId}`)
             .set('x-access-token', updateUserToken);
 
         expect(response.statusCode).toBe(401);
         expect(response.body).toHaveProperty('message', 'Unauthorized!');
     });
 
-    it('should return specific income by ID', async () => {
+    it('should return specific expense by ID', async () => {
         const response = await request(global.__SERVER__)
-            .get(`/api/incomes/${global.testIncomeId}`)
+            .get(`/api/expenses/${global.testExpenseId}`)
             .set('x-access-token', userToken);
 
         expect(response.statusCode).toBe(200);
-        expect(response.body).toHaveProperty('description', 'Test Income');
+        expect(response.body).toHaveProperty('description', 'Test Expense');
     });
 
 });
 
+describe('DELETE /api/expenses/:id', () => {
 
-describe('DELETE /api/incomes/:id', () => {
-
-    it('should fail to delete income with non-whitelist token', async () => {
+    it('should fail to delete expense with non-whitelist token', async () => {
         const response = await request(global.__SERVER__)
-            .delete(`/api/incomes/${global.deleteIncomeId}`)
+            .delete(`/api/expenses/${global.deleteExpenseId}`)
             .set('x-access-token', 'non-whitelist-token');
 
         expect(response.statusCode).toBe(401);
         expect(response.body).toHaveProperty('message', 'Unauthorized!');
     });
 
-    it('should fail to return income with wrong token', async () => {
+    it('should fail to return expense with wrong token', async () => {
         const response = await request(global.__SERVER__)
-            .delete(`/api/incomes/${global.deleteIncomeId}`)
+            .delete(`/api/expenses/${global.deleteExpenseId}`)
             .set('x-access-token', updateUserToken);
 
         expect(response.statusCode).toBe(401);
@@ -104,44 +103,45 @@ describe('DELETE /api/incomes/:id', () => {
     });
 
 
-    it('should delete a specific income by ID', async () => {
+    it('should delete a specific expense by ID', async () => {
         const response = await request(global.__SERVER__)
-            .delete(`/api/incomes/${global.deleteIncomeId}`)
+            .delete(`/api/expenses/${global.deleteExpenseId}`)
             .set('x-access-token', userToken);
 
         expect(response.statusCode).toBe(200);
-        expect(response.body).toHaveProperty("message", "Income deleted!");
+        expect(response.body).toHaveProperty("message", "Expense deleted!");
     });
 });
 
-describe('PUT /api/incomes/:id', () => {
+describe('PUT /api/expenses/:id', () => {
 
-    it('should fail to update income with non-whitelist token', async () => {
+    it('should fail to update expense with non-whitelist token', async () => {
         const response = await request(global.__SERVER__)
-            .put(`/api/incomes/${global.updateIncomeId}`)
+            .put(`/api/expenses/${global.updateExpenseId}`)
             .set('x-access-token', 'non-whitelist-token');
 
         expect(response.statusCode).toBe(401);
         expect(response.body).toHaveProperty('message', 'Unauthorized!');
     });
 
-    it('should fail to update income with wrong token', async () => {
+    it('should fail to update expense with wrong token', async () => {
         const response = await request(global.__SERVER__)
-            .put(`/api/incomes/${global.updateIncomeId}`)
-            .set('x-access-token', updateUserToken)
+            .put(`/api/expenses/${global.updateExpenseId}`)
+            .set('x-access-token', deleteUserToken)
 
         expect(response.statusCode).toBe(401);
         expect(response.body).toHaveProperty('message', 'Unauthorized!');
     });
 
-    it('should fail to update income as draft', async () => {
+    it('should fail to update expense as draft', async () => {
 
         const draftUpdateData = {
             category1: "Draft",
+            category2: "Draft",
         };
 
         const response = await request(global.__SERVER__)
-            .put(`/api/incomes/${global.updateIncomeId}`)
+            .put(`/api/expenses/${global.updateExpenseId}`)
             .set('x-access-token', userToken)
             .send(draftUpdateData);
 
@@ -149,14 +149,15 @@ describe('PUT /api/incomes/:id', () => {
         expect(response.body).toHaveProperty('message', 'Cannot use draft in regular account.');
     });
 
-    it('should fail to update income with too long input', async () => {
+    it('should fail to update expense with too long input', async () => {
 
         const tooLongDescriptionData = {
-            description: "VeryMuchTooLongIncomeDescriptionWeWillNotAcceptItVeryMuchTooLongIncomeDescriptionWeWillNotAcceptIt",
+            description: "VeryMuchTooLongExpenseDescriptionWeWillNotAcceptItVeryMuchTooLongExpenseDescriptionWeWillNotAcceptIt",
         };
 
         const response = await request(global.__SERVER__)
-            .put(`/api/incomes/${global.updateIncomeId}`)
+            .put(`/api/expenses/${global.updateExpenseId}`)
+            .set('x-access-token', userToken)
             .set('x-access-token', userToken)
             .send(tooLongDescriptionData);
 
@@ -164,14 +165,14 @@ describe('PUT /api/incomes/:id', () => {
         expect(response.body).toHaveProperty('message', 'Description too long.');
     });
 
-    it('should fail to update income with unsafe integer amount', async () => {
+    it('should fail to update expense with unsafe integer amount', async () => {
 
         const unsafeIntegerAmountData = {
             amount: Math.pow(2, 53),
         };
 
         const response = await request(global.__SERVER__)
-            .put(`/api/incomes/${global.updateIncomeId}`)
+            .put(`/api/expenses/${global.updateExpenseId}`)
             .set('x-access-token', userToken)
             .send(unsafeIntegerAmountData);
 
@@ -179,14 +180,14 @@ describe('PUT /api/incomes/:id', () => {
         expect(response.body).toHaveProperty('message', 'Amount not a valid number.');
     });
 
-    it('should fail to update income with negative integer amount', async () => {
+    it('should fail to update expense with negative integer amount', async () => {
 
         const negativeIntegerAmountData = {
             amount: -1,
         };
 
         const response = await request(global.__SERVER__)
-            .put(`/api/incomes/${global.updateIncomeId}`)
+            .put(`/api/expenses/${global.updateExpenseId}`)
             .set('x-access-token', userToken)
             .send(negativeIntegerAmountData);
 
@@ -194,14 +195,14 @@ describe('PUT /api/incomes/:id', () => {
         expect(response.body).toHaveProperty('message', 'Amount not a valid number.');
     });
 
-    it('should fail to update income with too big integer amount', async () => {
+    it('should fail to update expense with too big integer amount', async () => {
 
         const tooBigIntegerAmountData = {
             amount: 100000001,
         };
 
         const response = await request(global.__SERVER__)
-            .put(`/api/incomes/${global.updateIncomeId}`)
+            .put(`/api/expenses/${global.updateExpenseId}`)
             .set('x-access-token', userToken)
             .send(tooBigIntegerAmountData);
 
@@ -209,53 +210,53 @@ describe('PUT /api/incomes/:id', () => {
         expect(response.body).toHaveProperty('message', 'Amount not a valid number.');
     });
 
-    it('should update specific income by ID', async () => {
-        const incomeData = {
+    it('should update specific expense by ID', async () => {
+        const expenseData = {
             amount: 3333,
             description: "Updated",
         };
 
         const response = await request(global.__SERVER__)
-            .put(`/api/incomes/${global.updateIncomeId}`)
+            .put(`/api/expenses/${global.updateExpenseId}`)
             .set('x-access-token', userToken)
-            .send(incomeData);
+            .send(expenseData);
 
         expect(response.statusCode).toBe(200);
-        expect(response.body).toHaveProperty('message', 'Income updated!');
+        expect(response.body).toHaveProperty('message', 'Expense updated!');
     });
 });
 
-
-describe('POST /api/incomes/:id', () => {
-    it('should fail to create income with non-whitelist token', async () => {
+describe('POST /api/expenses/:id', () => {
+    it('should fail to create expense with non-whitelist token', async () => {
         const response = await request(global.__SERVER__)
-            .post('/api/incomes/')
+            .post('/api/expenses/')
             .set('x-access-token', 'non-whitelist-token');
 
         expect(response.statusCode).toBe(401);
         expect(response.body).toHaveProperty('message', 'Unauthorized!');
     });
 
-    it('should fail to create income with wrong token', async () => {
+    it('should fail to create expense with wrong token', async () => {
         const response = await request(global.__SERVER__)
-            .post('/api/incomes/')
+            .post('/api/expenses/')
             .set('x-access-token', updateUserToken)
 
         expect(response.statusCode).toBe(401);
         expect(response.body).toHaveProperty('message', 'Unauthorized!');
     });
 
-    it('should fail to create income as draft', async () => {
+    it('should fail to create expense as draft', async () => {
 
         const draftCreateData = {
             category1: "Draft",
+            category2: "Draft",
             amount: 10000,
             userID: testUserId,
             accountID: global.testAccountId,
         };
 
         const response = await request(global.__SERVER__)
-            .post(`/api/incomes/`)
+            .put(`/api/expenses/${global.updateExpenseId}`)
             .set('x-access-token', userToken)
             .send(draftCreateData);
 
@@ -263,16 +264,16 @@ describe('POST /api/incomes/:id', () => {
         expect(response.body).toHaveProperty('message', 'Cannot use draft in regular account.');
     });
 
-    it('should fail to create income with too long input', async () => {
+    it('should fail to create expense with too long input', async () => {
 
         const tooLongDescriptionData = {
-            description: "VeryMuchTooLongIncomeDescriptionWeWillNotAcceptItVeryMuchTooLongIncomeDescriptionWeWillNotAcceptIt",
+            description: "VeryMuchTooLongExpenseDescriptionWeWillNotAcceptItVeryMuchTooLongExpenseDescriptionWeWillNotAcceptIt",
             userID: testUserId,
             accountID: global.testAccountId,
         };
 
         const response = await request(global.__SERVER__)
-            .post('/api/incomes/')
+            .post('/api/expenses/')
             .set('x-access-token', userToken)
             .send(tooLongDescriptionData);
 
@@ -280,7 +281,7 @@ describe('POST /api/incomes/:id', () => {
         expect(response.body).toHaveProperty('message', 'Description too long.');
     });
 
-    it('should fail to create income with unsafe integer amount', async () => {
+    it('should fail to create expense with unsafe integer amount', async () => {
 
         const unsafeIntegerAmountData = {
             amount: Math.pow(2, 53),
@@ -289,7 +290,7 @@ describe('POST /api/incomes/:id', () => {
         };
 
         const response = await request(global.__SERVER__)
-            .post('/api/incomes/')
+            .post('/api/expenses/')
             .set('x-access-token', userToken)
             .send(unsafeIntegerAmountData);
 
@@ -297,7 +298,7 @@ describe('POST /api/incomes/:id', () => {
         expect(response.body).toHaveProperty('message', 'Amount not a valid number.');
     });
 
-    it('should fail to create income with negative integer amount', async () => {
+    it('should fail to create expense with negative integer amount', async () => {
 
         const negativeIntegerAmountData = {
             amount: -1,
@@ -306,7 +307,7 @@ describe('POST /api/incomes/:id', () => {
         };
 
         const response = await request(global.__SERVER__)
-            .post('/api/incomes/')
+            .post('/api/expenses/')
             .set('x-access-token', userToken)
             .send(negativeIntegerAmountData);
 
@@ -314,7 +315,7 @@ describe('POST /api/incomes/:id', () => {
         expect(response.body).toHaveProperty('message', 'Amount not a valid number.');
     });
 
-    it('should fail to create income with too big integer amount', async () => {
+    it('should fail to create expense with too big integer amount', async () => {
 
         const tooBigIntegerAmountData = {
             amount: 100000001,
@@ -323,7 +324,7 @@ describe('POST /api/incomes/:id', () => {
         };
 
         const response = await request(global.__SERVER__)
-            .post('/api/incomes/')
+            .post('/api/expenses/')
             .set('x-access-token', userToken)
             .send(tooBigIntegerAmountData);
 
@@ -331,31 +332,32 @@ describe('POST /api/incomes/:id', () => {
         expect(response.body).toHaveProperty('message', 'Amount not a valid number.');
     });
 
-    it('should create income', async () => {
-        const newIncomeData = {
-            category1: "Salary & Wage",
+    it('should create expense', async () => {
+        const newExpenseData = {
+            category1: "Food & Drinks",
+            category2: "Alcohol",
             amount: 10000,
             userID: testUserId,
             accountID: global.testAccountId,
         };
 
         const response = await request(global.__SERVER__)
-            .post('/api/incomes')
+            .post('/api/expenses')
             .set('x-access-token', userToken)
-            .send(newIncomeData);
+            .send(newExpenseData);
 
         expect(response.statusCode).toBe(200);
         expect(response.body).toHaveProperty('amount', 10000);
-        expect(response.body).toHaveProperty('category1', "Salary & Wage");
+        expect(response.body).toHaveProperty('category1', "Food & Drinks");
+        expect(response.body).toHaveProperty('category2', "Alcohol");
     });
 });
 
-
-describe('GET /api/incomes/breakdown/:aid', () => {
+describe('GET /api/expenses/breakdown/:aid', () => {
 
     it('should fail to return breakdown with non-whitelist token', async () => {
         const response = await request(global.__SERVER__)
-            .get(`/api/incomes/breakdown/${global.testAccountId}`)
+            .get(`/api/expenses/breakdown/${global.testAccountId}`)
             .set('x-access-token', 'non-whitelist-token');
 
         expect(response.statusCode).toBe(401);
@@ -364,7 +366,7 @@ describe('GET /api/incomes/breakdown/:aid', () => {
 
     it('should fail to return breakdown with wrong token', async () => {
         const response = await request(global.__SERVER__)
-            .get(`/api/incomes/breakdown/${global.testAccountId}`)
+            .get(`/api/expenses/breakdown/${global.testAccountId}`)
             .set('x-access-token', updateUserToken);
 
         expect(response.statusCode).toBe(401);
@@ -373,7 +375,7 @@ describe('GET /api/incomes/breakdown/:aid', () => {
 
     it('should fail to return breakdown without a start date', async () => {
         const response = await request(global.__SERVER__)
-            .get(`/api/incomes/breakdown/${global.testAccountId}`)
+            .get(`/api/expenses/breakdown/${global.testAccountId}`)
             .set('x-access-token', userToken);
 
         expect(response.statusCode).toBe(400);
@@ -382,17 +384,17 @@ describe('GET /api/incomes/breakdown/:aid', () => {
 
     it('should fail to return breakdown without an end date', async () => {
         const response = await request(global.__SERVER__)
-            .get(`/api/incomes/breakdown/${global.testAccountId}`)
+            .get(`/api/expenses/breakdown/${global.testAccountId}`)
             .set('x-access-token', userToken)
-        .query({ startDate: '1234' });
+            .query({startDate: '1234'});
 
         expect(response.statusCode).toBe(400);
         expect(response.body).toHaveProperty('message', 'End date must be present!');
     });
 
-    it('should return incomes breakdown', async () => {
+    it('should return expenses breakdown', async () => {
         const response = await request(global.__SERVER__)
-            .get(`/api/incomes/breakdown/${global.testAccountId}`)
+            .get(`/api/expenses/breakdown/${global.testAccountId}`)
             .set('x-access-token', userToken)
             .query({
                 startDate: "2000-12-31",
@@ -410,8 +412,3 @@ describe('GET /api/incomes/breakdown/:aid', () => {
     });
 
 });
-
-
-
-
-

@@ -138,7 +138,6 @@ exports.update = (req, res) => {
     let editedIncome = {};
 
     // Add properties to the object
-    // TODO: maybe useless
     if (req.body.category1) {
         editedIncome["category1"] = req.body.category1;
     }

@@ -45,14 +45,14 @@ exports.findExpenseByID = (req, res) => {
 exports.create = (req, res) => {
 
     // Check expense description length
-    if (req.body.description && req.body.description.length > 1024) {
+    if (req.body.description && req.body.description.length > 32) {
         return res.status(413).json({
             message: "Description too long."
         });
     }
 
     // Check if amount is an integer
-    if (!Number.isSafeInteger(req.body.amount) || req.body.amount <= 0 || !req.body.amount > 100000000) {
+    if (!Number.isSafeInteger(req.body.amount) || req.body.amount <= 0 || req.body.amount > 100000000) {
         return res.status(400).json({
             message: "Amount not a valid number."
         });
@@ -123,14 +123,14 @@ exports.delete = (req, res) => {
 exports.update = (req, res) => {
 
     // Check expense description length
-    if (req.body.description && req.body.description.length > 1024) {
+    if (req.body.description && req.body.description.length > 32) {
         return res.status(413).json({
             message: "Description too long."
         });
     }
 
     // Check if amount is an integer
-    if (!Number.isSafeInteger(req.body.amount) && req.body.amount > 0 && req.body.amount <= 100000000) {
+    if (!Number.isSafeInteger(req.body.amount) || req.body.amount <= 0 || req.body.amount > 100000000) {
         return res.status(400).json({
             message: "Amount not a valid number."
         });
@@ -177,8 +177,7 @@ exports.update = (req, res) => {
             let operation = oldAmount >= newAmount ? "+" : "-";
 
             // Handle account change
-            if (expense.accountID !== editedExpense.accountID){
-
+            if (editedExpense.accountID && (expense.accountID !== editedExpense.accountID)){
                 // Add back to old account
                 try {
                     await updateAccountBalances.updateAllAccountBalances(expense.accountID, oldAmount, "+");

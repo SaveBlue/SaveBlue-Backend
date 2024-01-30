@@ -76,7 +76,7 @@ exports.createExpenseSMS = async (req, res, next) => {
 exports.block = (req, res, next) => {
     if(req.body.category1 === "Draft" || req.body.category2 && req.body.category2 === "Draft"){
         return res.status(400).json({
-            message: "Cannot create draft in regular account."
+            message: "Cannot use draft in regular account."
         });
     }
 
