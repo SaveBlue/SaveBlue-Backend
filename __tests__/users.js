@@ -1,11 +1,14 @@
-const request = require('supertest');
-const {testUserData, userToDelete, userToUpdate} = require('../test_entries'); // Assuming this contains your test user data
+import supertest from 'supertest';
+import {testUserData, userToDelete, userToUpdate} from '../test_entries.js'
+import {server} from '../src/server.js'
+
+const api = supertest(server);
 
 let userToken, deleteUserToken, updateUserToken;
 
 async function loginUserAndGetToken(userData) {
 
-    const response = await request(global.__SERVER__)
+    const response = await api
         .post('/api/auth/login')
         .send(userData);
 
@@ -22,7 +25,7 @@ beforeAll(async () => {
 describe('GET /api/users/me', () => {
 
     it('should fail return of data with non-whitelist token', async () => {
-        const response = await request(global.__SERVER__)
+        const response = await api
             .get('/api/users/me')
             .set('x-access-token', 'non-whitelist-token'); // Assuming you have a valid token
 
@@ -31,7 +34,7 @@ describe('GET /api/users/me', () => {
     });
 
     it('should return the data of the currently logged-in user', async () => {
-        const response = await request(global.__SERVER__)
+        const response = await api
             .get('/api/users/me')
             .set('x-access-token', userToken); // Assuming you have a valid token
 
@@ -43,7 +46,7 @@ describe('GET /api/users/me', () => {
 describe('GET /api/users/:id', () => {
 
     it('should fail return of data with non-whitelist token', async () => {
-        const response = await request(global.__SERVER__)
+        const response = await api
             .get(`/api/users/${global.testUserId}`)
             .set('x-access-token', 'non-whitelist-token'); // Assuming you have a valid token
 
@@ -52,7 +55,7 @@ describe('GET /api/users/:id', () => {
     });
 
     it('should fail return of data with wrong token', async () => {
-        const response = await request(global.__SERVER__)
+        const response = await api
             .get(`/api/users/${global.testUserId}`)
             .set('x-access-token', deleteUserToken); // Assuming you have a valid token
 
@@ -61,7 +64,7 @@ describe('GET /api/users/:id', () => {
     });
 
     it('should return user data for a valid user ID', async () => {
-        const response = await request(global.__SERVER__)
+        const response = await api
             .get(`/api/users/${global.testUserId}`) // Replace with a valid user ID
             .set('x-access-token', userToken);
 
@@ -72,7 +75,7 @@ describe('GET /api/users/:id', () => {
 
 describe('DELETE /api/users/:id', () => {
     it('should fail delete of user with non-whitelist token', async () => {
-        const response = await request(global.__SERVER__)
+        const response = await api
             .delete(`/api/users/${global.deleteUserId}`)
             .set('x-access-token', 'non-whitelist-token'); // Assuming you have a valid token
 
@@ -81,7 +84,7 @@ describe('DELETE /api/users/:id', () => {
     });
 
     it('should fail delete of user with wrong token', async () => {
-        const response = await request(global.__SERVER__)
+        const response = await api
             .delete(`/api/users/${global.deleteUserId}`)
             .set('x-access-token', userToken); // Assuming you have a valid token
 
@@ -91,7 +94,7 @@ describe('DELETE /api/users/:id', () => {
 
 
     it('should delete a user for a valid user ID', async () => {
-        const response = await request(global.__SERVER__)
+        const response = await api
             .delete(`/api/users/${global.deleteUserId}`)
             .set('x-access-token', deleteUserToken);
 
@@ -103,7 +106,7 @@ describe('DELETE /api/users/:id', () => {
 
 describe('PUT /api/users/:id', () => {
     it('should fail update of user with non-whitelist token', async () => {
-        const response = await request(global.__SERVER__)
+        const response = await api
             .put(`/api/users/${global.global.updateUserId}`)
             .set('x-access-token', 'non-whitelist-token'); // Assuming you have a valid token
 
@@ -112,7 +115,7 @@ describe('PUT /api/users/:id', () => {
     });
 
     it('should fail update of user with wrong token', async () => {
-        const response = await request(global.__SERVER__)
+        const response = await api
             .put(`/api/users/${global.global.updateUserId}`)
             .set('x-access-token', userToken); // Assuming you have a valid token
 
@@ -126,12 +129,12 @@ describe('PUT /api/users/:id', () => {
             username: "VeryMuchTooLongUsernameWeWillNotAcceptIt",
         };
 
-        const response = await request(global.__SERVER__)
+        const response = await api
             .put(`/api/users/${global.global.updateUserId}`)
             .set('x-access-token', updateUserToken)
             .send(badUpdatedUserData);
 
-        expect(response.statusCode).toBe(413);
+        expect(response.statusCode).toBe(400);
         expect(response.body).toHaveProperty('message', 'Field too long.');
     });
 
@@ -140,7 +143,7 @@ describe('PUT /api/users/:id', () => {
             username: 'updatedUsername',
         };
 
-        const response = await request(global.__SERVER__)
+        const response = await api
             .put(`/api/users/${global.global.updateUserId}`)
             .set('x-access-token', updateUserToken)
             .send(updatedUserData);

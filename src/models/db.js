@@ -1,4 +1,8 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+import './tokens.js';
+import './users.js';
+import './incomes.js';
+import './expenses.js';
 
 // When testing connect to test database, otherwise connect to the main database
 const dbURI = process.env.NODE_ENV === 'test'
@@ -11,7 +15,7 @@ mongoose.connect(dbURI, {
     useCreateIndex: true,
     useUnifiedTopology: true,
     useFindAndModify: false
-})
+});
 
 // Database state debug messages
 mongoose.connection.on('connected', () => {
@@ -26,7 +30,6 @@ mongoose.connection.on('disconnected', () => {
     console.log('Mongoose disconnected.');
 });
 
-
 // Close connection to the database
 const safeExit = (message, callback) => {
     mongoose.connection.close(() => {
@@ -35,14 +38,12 @@ const safeExit = (message, callback) => {
     });
 };
 
-
 // Nodemon restart
 process.once('SIGUSR2', () => {
     safeExit('nodemon restart', () => {
         process.kill(process.pid, 'SIGUSR2');
     });
 });
-
 
 // Exit application
 process.on('SIGINT', () => {
@@ -51,7 +52,6 @@ process.on('SIGINT', () => {
     });
 });
 
-
 // Exit application Heroku
 process.on('SIGTERM', () => {
     safeExit('Exit application Heroku', () => {
@@ -59,9 +59,4 @@ process.on('SIGTERM', () => {
     });
 });
 
-require('./tokens');
-require('./users');
-require('./incomes');
-require('./expenses');
-
-module.exports = mongoose
+export default mongoose

@@ -1,39 +1,38 @@
-const router = require("express").Router();
-const authJWT = require("../middlewares/authJWT");
-const goalsController = require("../controllers/goals");
+import {Router} from "express";
+import authJWT from "../middlewares/authJWT.js";
+import goalsController from "../controllers/goals.js";
 
+const router = Router();
 
-module.exports = goalsRouter => {
+router.use(function (req, res, next) {
+    res.header(
+        "Access-Control-Allow-Headers",
+        "x-access-token, Origin, Content-Type, Accept"
+    );
+    next();
+});
 
-    goalsRouter.use(function (req, res, next) {
-        res.header(
-            "Access-Control-Allow-Headers",
-            "x-access-token, Origin, Content-Type, Accept"
-        );
-        next();
-    });
+// Find all account goals
+router.get("/:aid", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenAccount], goalsController.findAllGoals);
 
+// Find account goal by ID
+router.get("/find/:id", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenGoal], goalsController.findGoalByID);
 
-    // Find all account goals
-    router.get("/:aid", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenAccount], goalsController.findAllGoals);
+// Create account goal
+router.post("/:aid", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenAccount], goalsController.create);
 
-    // Find account goal by ID
-    router.get("/find/:id", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenGoal], goalsController.findGoalByID);
+// Delete account goal by ID
+router.delete("/:id", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenGoal], goalsController.remove);
 
-    // Create account goal
-    router.post("/:aid", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenAccount], goalsController.create);
+// Update account goal by ID
+router.put("/:id", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenGoal], goalsController.update);
 
-    // Delete account goal by ID
-    router.delete("/:id", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenGoal], goalsController.delete);
+// Add to goal currentAmount
+router.put("/currentAmountChange/:id", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenGoal], goalsController.updateGoalCurrentAmount);
 
-    // Update account goal by ID
-    router.put("/:id", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenGoal], goalsController.update);
+// Complete goal
+router.put("/complete/:id", [authJWT.verifyTokenGoal], goalsController.completeGoal);
 
-    // Add to goal currentAmount
-    router.put("/currentAmountChange/:id", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenGoal], goalsController.updateGoalCurrentAmount);
+router.use('/api/goals', router);
 
-    // Complete goal
-    router.put("/complete/:id", [authJWT.verifyTokenGoal], goalsController.completeGoal);
-
-    goalsRouter.use('/api/goals', router);
-};
+export default router;

@@ -1,4 +1,5 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+
 let Schema = mongoose.Schema;
 
 const token = new Schema({
@@ -7,6 +8,7 @@ const token = new Schema({
     },
     {
         timestamps: true
-    });
+    }
+);
 
 mongoose.model('Token', token);

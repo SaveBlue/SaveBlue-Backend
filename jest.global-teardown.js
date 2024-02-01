@@ -1,18 +1,6 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
-module.exports = async () => {
-
-    if (global.__SERVER__) {
-        await new Promise((resolve, reject) => {
-            global.__SERVER__.close((err) => {
-                if (err) {
-                    reject(err);
-                    return;
-                }
-                resolve();
-            });
-        });
-    }
+export default async () => {
 
     // close mongoose connection
     mongoose.connection.close(function(){

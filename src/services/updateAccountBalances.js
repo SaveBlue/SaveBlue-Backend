@@ -1,53 +1,48 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+
 const User = mongoose.model('User');
 
 // Update both totalAmount and availableAmount
-exports.updateAllAccountBalances = (accountID, amount, operation) => {
+const updateAllAccountBalances = async (accountID, amount, operation) => {
 
-    return new Promise((resolve, reject) => {
+    try {
+        const user = await User.findOne({ $or: [{ 'accounts._id': accountID }, { 'draftsAccount._id': accountID }] });
 
-        // Find the user with requested account
-        User.findOne({$or:[{'accounts._id': accountID}, {'draftsAccount._id': accountID}]})
-            .then(user => {
-                if (!user) {
-                    reject("No account with selected ID!");
-                }
+        if (!user) {
+            throw new Error("No account with selected ID!");
+        }
 
-                // Get requested account or drafts account from the user
-                let account = user.accounts.id(accountID) || user.draftsAccount;
+        // Get requested account or drafts account from the user
+        let account = user.accounts.id(accountID) || user.draftsAccount;
 
-                // Add or subtract from account balance
-                switch (operation) {
-                    case "+":
-                        account.totalBalance += Math.ceil(amount);
-                        account.availableBalance += Math.ceil(amount);
-                        break;
+        // Add or subtract from account balance
+        const roundedAmount = Math.ceil(amount);
 
-                    case "-":
-                        account.totalBalance -= Math.ceil(amount);
-                        account.availableBalance -= Math.ceil(amount);
-                        break;
-                }
+        // Add or subtract from account balance
+        switch (operation) {
+            case "+":
+                account.totalBalance += roundedAmount;
+                account.availableBalance += roundedAmount;
+                break;
 
-                // Save updated user data (updated account)
-                user.save()
-                    .then(() => {
-                        resolve();
-                    })
-                    .catch(error => {
-                        reject(error.message || "An error occurred while updating account!");
+            case "-":
+                account.totalBalance -= roundedAmount;
+                account.availableBalance -= roundedAmount;
+                break;
+        }
 
-                    });
-            })
-            .catch(error => {
-                reject(error.message || "An error occurred while fetching account!");
+        await user.save();
 
-            })
-    })
+    } catch (error) {
+        // Propagate the error message, with a fallback default message
+        throw new Error(error || "An error occurred while updating account!");
+    }
+
 }
+// TODO: IMPLEMENT GOALS BEFORE REFACTORING
 
 // Update both availableAmount & goal currentAmount
-exports.updateGoalAmount = (goalID, amount, operation) => {
+const updateGoalAmount = (goalID, amount, operation) => {
 
     return new Promise((resolve, reject) => {
 
@@ -93,3 +88,5 @@ exports.updateGoalAmount = (goalID, amount, operation) => {
             })
     })
 }
+
+export default {updateAllAccountBalances, updateGoalAmount}

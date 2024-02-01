@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 let Schema = mongoose.Schema;
 
 
@@ -43,4 +43,4 @@ function round(value) {
 mongoose.model('Income', income);
 
 
-module.exports = categoriesIncomes;
+export default {categoriesIncomes};

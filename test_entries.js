@@ -1,22 +1,22 @@
-exports.testUserData = {
+export const testUserData = {
     username: 'testuser',
     password: 'testpassword',
     email: 'test@test.com'
 };
 
-exports.userToDelete = {
+export const userToDelete = {
     username: 'deleteMe',
     password: 'deleteMe',
     email: 'delete@me.com'
 };
 
-exports.userToUpdate = {
+export const userToUpdate = {
     username: 'updateMe',
     password: 'updateMe',
     email: 'update@me.com'
 };
 
-exports.testAccountData = {
+export const testAccountData = {
     name: 'Test Wallet',
     availableBalance: 0,
     totalBalance: 0,
@@ -27,7 +27,7 @@ exports.testAccountData = {
     incomes: [],
 }
 
-exports.accountDataToDelete = {
+export const accountDataToDelete = {
     name: 'Delete this Wallet',
     availableBalance: 0,
     totalBalance: 0,
@@ -38,7 +38,7 @@ exports.accountDataToDelete = {
     incomes: [],
 }
 
-exports.accountDataToUpdate = {
+export const accountDataToUpdate = {
     name: 'Update this Wallet',
     availableBalance: 0,
     totalBalance: 0,
@@ -49,7 +49,7 @@ exports.accountDataToUpdate = {
     incomes: [],
 }
 
-exports.testExpenseData = {
+export const testExpenseData = {
     amount: 1000,
     category1: "Food & Drinks",
     category2: "Alcohol",
@@ -57,7 +57,7 @@ exports.testExpenseData = {
     date: "2024-04-09"
 }
 
-exports.expenseDataToDelete = {
+export const expenseDataToDelete = {
     amount: 2000,
     category1: "Food & Drinks",
     category2: "Alcohol",
@@ -65,7 +65,7 @@ exports.expenseDataToDelete = {
     date: "2024-04-09"
 }
 
-exports.expenseDataToUpdate = {
+export const expenseDataToUpdate = {
     amount: 3000,
     category1: "Food & Drinks",
     category2: "Alcohol",
@@ -73,23 +73,40 @@ exports.expenseDataToUpdate = {
     date: "2024-04-09"
 }
 
-exports.testIncomeData = {
+export const testIncomeData = {
     amount: 1000,
     category1: "Salary & Wage",
     description: "Test Income",
     date: "2024-04-09"
 }
 
-exports.incomeDataToDelete = {
+export const incomeDataToDelete = {
     amount: 2000,
     category1: "Salary & Wage",
     description: 'Delete this Income',
     date: "2024-04-09"
 }
 
-exports.incomeDataToUpdate = {
+export const incomeDataToUpdate = {
     amount: 3000,
     category1: "Salary & Wage",
     description: 'Update this Income',
     date: "2024-04-09"
 }
+
+const mockData = {
+    testUserData,
+    userToDelete,
+    userToUpdate,
+    testAccountData,
+    accountDataToDelete,
+    accountDataToUpdate,
+    testExpenseData,
+    expenseDataToDelete,
+    expenseDataToUpdate,
+    testIncomeData,
+    incomeDataToDelete,
+    incomeDataToUpdate
+};
+
+export default mockData;

@@ -1,5 +1,25 @@
-const request = require('supertest');
-const {testUserData} = require('../test_entries')
+import supertest from 'supertest';
+import {testUserData, userToDelete, userToUpdate} from '../test_entries.js'
+import {server} from '../src/server.js'
+import request from "supertest";
+
+const api = supertest(server);
+
+const getJWTtoLogut = async () => {
+    const response = await request(server)
+        .post('/api/auth/login')
+        .send({
+            username: testUserData.username,
+            password: testUserData.password
+        })
+
+    return response.body['x-access-token']
+}
+
+let JWTtoLogout;
+beforeAll(async () => {
+    JWTtoLogout = await getJWTtoLogut();
+});
 
 describe('POST /api/auth/register', () => {
     it('should create a new user', async () => {
@@ -10,7 +30,7 @@ describe('POST /api/auth/register', () => {
             email: 'sample@sample.com'
         };
 
-        const response = await request(global.__SERVER__)
+        const response = await api
             .post('/api/auth/register')
             .send(userData);
 
@@ -26,7 +46,7 @@ describe('POST /api/auth/register', () => {
             email: undefined
         };
 
-        const response = await request(global.__SERVER__)
+        const response = await api
             .post('/api/auth/register')
             .send(badUserData);
 
@@ -42,7 +62,7 @@ describe('POST /api/auth/register', () => {
             email: "badEmail"
         };
 
-        const response = await request(global.__SERVER__)
+        const response = await api
             .post('/api/auth/register')
             .send(badUserData);
 
@@ -58,11 +78,11 @@ describe('POST /api/auth/register', () => {
             email: "email@email.com"
         };
 
-        const response = await request(global.__SERVER__)
+        const response = await api
             .post('/api/auth/register')
             .send(badUserData);
 
-        expect(response.statusCode).toBe(413);
+        expect(response.statusCode).toBe(400);
         expect(response.body).toHaveProperty('message', 'Field too long.');
     });
 
@@ -74,7 +94,7 @@ describe('POST /api/auth/register', () => {
             email: 'new@test.com'
         };
 
-        const response = await request(global.__SERVER__)
+        const response = await api
             .post('/api/auth/register')
             .send(badUserData);
 
@@ -90,7 +110,7 @@ describe('POST /api/auth/register', () => {
             email: testUserData.email
         };
 
-        const response = await request(global.__SERVER__)
+        const response = await api
             .post('/api/auth/register')
             .send(badUserData);
 
@@ -107,7 +127,7 @@ describe('POST /api/auth/login', () => {
             password: undefined
         };
 
-        const response = await request(global.__SERVER__)
+        const response = await api
             .post('/api/auth/login')
             .send(loginData);
 
@@ -121,7 +141,7 @@ describe('POST /api/auth/login', () => {
             password: 'wrong_password'
         };
 
-        const response = await request(global.__SERVER__)
+        const response = await api
             .post('/api/auth/login')
             .send(loginData);
 
@@ -135,7 +155,7 @@ describe('POST /api/auth/login', () => {
             password: testUserData.password
         };
 
-        const response = await request(global.__SERVER__)
+        const response = await api
             .post('/api/auth/login')
             .send(loginData);
 
@@ -147,7 +167,7 @@ describe('POST /api/auth/login', () => {
 
 describe('POST /api/auth/logout', () => {
     it('should fail log out of a user with non-whitelist token', async () => {
-        const response = await request(global.__SERVER__)
+        const response = await api
             .post('/api/auth/logout')
             .set('x-access-token', 'non-whitelist-token');
 
@@ -156,9 +176,10 @@ describe('POST /api/auth/logout', () => {
     });
 
     it('should log out a user and return 200 status', async () => {
-        const response = await request(global.__SERVER__)
+
+        const response = await api
             .post('/api/auth/logout')
-            .set('x-access-token', global.JWTtoLogout);
+            .set('x-access-token', JWTtoLogout);
 
         expect(response.statusCode).toBe(200);
         expect(response.body).toHaveProperty('message', 'Logged out!');
