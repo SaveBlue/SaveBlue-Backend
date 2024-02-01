@@ -115,7 +115,7 @@ const deleteAccountByID = async (req, res) => {
         }
 
         // Remove the selected account
-        user.accounts.pull({'_id': req.params.id});
+        user.accounts.pull({_id: req.params.id});
 
         // Save updated user data (deleted account)
         await user.save();
@@ -130,7 +130,7 @@ const deleteAccountByID = async (req, res) => {
 
     } catch (error) {
         res.status(500).send({
-            message: error.message || "An error occurred while deleting the Account!"
+            message: err.message || "An error occurred while deleting account entries!"
         });
     }
 };

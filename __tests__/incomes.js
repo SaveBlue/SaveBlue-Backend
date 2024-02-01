@@ -1,11 +1,14 @@
-import request from 'supertest';
+import supertest from 'supertest';
 import {testUserData, userToDelete, userToUpdate} from '../test_entries.js'
+import {server} from '../src/server.js'
+
+const api = supertest(server);
 
 let userToken, deleteUserToken, updateUserToken;
 
 async function loginUserAndGetToken(userData) {
 
-    const response = await request(global.__SERVER__)
+    const response = await api
         .post('/api/auth/login')
         .send(userData);
 
@@ -23,7 +26,7 @@ beforeAll(async () => {
 describe('GET /api/incomes/find/:aid', () => {
 
     it('should fail to return data with non-whitelist token', async () => {
-        const response = await request(global.__SERVER__)
+        const response = await api
             .get(`/api/incomes/find/${global.testAccountId}`)
             .set('x-access-token', 'non-whitelist-token'); // Assuming you have a valid token
 
@@ -32,7 +35,7 @@ describe('GET /api/incomes/find/:aid', () => {
     });
 
     it('should fail to return data with wrong token', async () => {
-        const response = await request(global.__SERVER__)
+        const response = await api
             .get(`/api/incomes/find/${global.testAccountId}`)
             .set('x-access-token', updateUserToken); // Assuming you have a valid token
 
@@ -41,7 +44,7 @@ describe('GET /api/incomes/find/:aid', () => {
     });
 
     it('should return all incomes of an account', async () => {
-        const response = await request(global.__SERVER__)
+        const response = await api
             .get(`/api/incomes/find/${global.testAccountId}`)
             .set('x-access-token', userToken);
 
@@ -54,7 +57,7 @@ describe('GET /api/incomes/find/:aid', () => {
 describe('GET /api/incomes/:id', () => {
 
     it('should fail to return income with non-whitelist token', async () => {
-        const response = await request(global.__SERVER__)
+        const response = await api
             .get(`/api/incomes/${global.testIncomeId}`)
             .set('x-access-token', 'non-whitelist-token');
 
@@ -63,7 +66,7 @@ describe('GET /api/incomes/:id', () => {
     });
 
     it('should fail to return income with wrong token', async () => {
-        const response = await request(global.__SERVER__)
+        const response = await api
             .get(`/api/incomes/${global.testIncomeId}`)
             .set('x-access-token', updateUserToken);
 
@@ -72,7 +75,7 @@ describe('GET /api/incomes/:id', () => {
     });
 
     it('should return specific income by ID', async () => {
-        const response = await request(global.__SERVER__)
+        const response = await api
             .get(`/api/incomes/${global.testIncomeId}`)
             .set('x-access-token', userToken);
 
@@ -86,7 +89,7 @@ describe('GET /api/incomes/:id', () => {
 describe('DELETE /api/incomes/:id', () => {
 
     it('should fail to delete income with non-whitelist token', async () => {
-        const response = await request(global.__SERVER__)
+        const response = await api
             .delete(`/api/incomes/${global.deleteIncomeId}`)
             .set('x-access-token', 'non-whitelist-token');
 
@@ -95,7 +98,7 @@ describe('DELETE /api/incomes/:id', () => {
     });
 
     it('should fail to return income with wrong token', async () => {
-        const response = await request(global.__SERVER__)
+        const response = await api
             .delete(`/api/incomes/${global.deleteIncomeId}`)
             .set('x-access-token', updateUserToken);
 
@@ -105,7 +108,7 @@ describe('DELETE /api/incomes/:id', () => {
 
 
     it('should delete a specific income by ID', async () => {
-        const response = await request(global.__SERVER__)
+        const response = await api
             .delete(`/api/incomes/${global.deleteIncomeId}`)
             .set('x-access-token', userToken);
 
@@ -117,7 +120,7 @@ describe('DELETE /api/incomes/:id', () => {
 describe('PUT /api/incomes/:id', () => {
 
     it('should fail to update income with non-whitelist token', async () => {
-        const response = await request(global.__SERVER__)
+        const response = await api
             .put(`/api/incomes/${global.updateIncomeId}`)
             .set('x-access-token', 'non-whitelist-token');
 
@@ -126,7 +129,7 @@ describe('PUT /api/incomes/:id', () => {
     });
 
     it('should fail to update income with wrong token', async () => {
-        const response = await request(global.__SERVER__)
+        const response = await api
             .put(`/api/incomes/${global.updateIncomeId}`)
             .set('x-access-token', updateUserToken)
 
@@ -140,7 +143,7 @@ describe('PUT /api/incomes/:id', () => {
             category1: "Draft",
         };
 
-        const response = await request(global.__SERVER__)
+        const response = await api
             .put(`/api/incomes/${global.updateIncomeId}`)
             .set('x-access-token', userToken)
             .send(draftUpdateData);
@@ -155,12 +158,12 @@ describe('PUT /api/incomes/:id', () => {
             description: "VeryMuchTooLongIncomeDescriptionWeWillNotAcceptItVeryMuchTooLongIncomeDescriptionWeWillNotAcceptIt",
         };
 
-        const response = await request(global.__SERVER__)
+        const response = await api
             .put(`/api/incomes/${global.updateIncomeId}`)
             .set('x-access-token', userToken)
             .send(tooLongDescriptionData);
 
-        expect(response.statusCode).toBe(413);
+        expect(response.statusCode).toBe(400);
         expect(response.body).toHaveProperty('message', 'Description too long.');
     });
 
@@ -170,7 +173,7 @@ describe('PUT /api/incomes/:id', () => {
             amount: Math.pow(2, 53),
         };
 
-        const response = await request(global.__SERVER__)
+        const response = await api
             .put(`/api/incomes/${global.updateIncomeId}`)
             .set('x-access-token', userToken)
             .send(unsafeIntegerAmountData);
@@ -185,7 +188,7 @@ describe('PUT /api/incomes/:id', () => {
             amount: -1,
         };
 
-        const response = await request(global.__SERVER__)
+        const response = await api
             .put(`/api/incomes/${global.updateIncomeId}`)
             .set('x-access-token', userToken)
             .send(negativeIntegerAmountData);
@@ -200,7 +203,7 @@ describe('PUT /api/incomes/:id', () => {
             amount: 100000001,
         };
 
-        const response = await request(global.__SERVER__)
+        const response = await api
             .put(`/api/incomes/${global.updateIncomeId}`)
             .set('x-access-token', userToken)
             .send(tooBigIntegerAmountData);
@@ -215,7 +218,7 @@ describe('PUT /api/incomes/:id', () => {
             description: "Updated",
         };
 
-        const response = await request(global.__SERVER__)
+        const response = await api
             .put(`/api/incomes/${global.updateIncomeId}`)
             .set('x-access-token', userToken)
             .send(incomeData);
@@ -228,7 +231,7 @@ describe('PUT /api/incomes/:id', () => {
 
 describe('POST /api/incomes/:id', () => {
     it('should fail to create income with non-whitelist token', async () => {
-        const response = await request(global.__SERVER__)
+        const response = await api
             .post('/api/incomes/')
             .set('x-access-token', 'non-whitelist-token');
 
@@ -237,7 +240,7 @@ describe('POST /api/incomes/:id', () => {
     });
 
     it('should fail to create income with wrong token', async () => {
-        const response = await request(global.__SERVER__)
+        const response = await api
             .post('/api/incomes/')
             .set('x-access-token', updateUserToken)
 
@@ -254,7 +257,7 @@ describe('POST /api/incomes/:id', () => {
             accountID: global.testAccountId,
         };
 
-        const response = await request(global.__SERVER__)
+        const response = await api
             .post(`/api/incomes/`)
             .set('x-access-token', userToken)
             .send(draftCreateData);
@@ -271,12 +274,12 @@ describe('POST /api/incomes/:id', () => {
             accountID: global.testAccountId,
         };
 
-        const response = await request(global.__SERVER__)
+        const response = await api
             .post('/api/incomes/')
             .set('x-access-token', userToken)
             .send(tooLongDescriptionData);
 
-        expect(response.statusCode).toBe(413);
+        expect(response.statusCode).toBe(400);
         expect(response.body).toHaveProperty('message', 'Description too long.');
     });
 
@@ -288,7 +291,7 @@ describe('POST /api/incomes/:id', () => {
             accountID: global.testAccountId,
         };
 
-        const response = await request(global.__SERVER__)
+        const response = await api
             .post('/api/incomes/')
             .set('x-access-token', userToken)
             .send(unsafeIntegerAmountData);
@@ -305,7 +308,7 @@ describe('POST /api/incomes/:id', () => {
             accountID: global.testAccountId,
         };
 
-        const response = await request(global.__SERVER__)
+        const response = await api
             .post('/api/incomes/')
             .set('x-access-token', userToken)
             .send(negativeIntegerAmountData);
@@ -322,7 +325,7 @@ describe('POST /api/incomes/:id', () => {
             accountID: global.testAccountId,
         };
 
-        const response = await request(global.__SERVER__)
+        const response = await api
             .post('/api/incomes/')
             .set('x-access-token', userToken)
             .send(tooBigIntegerAmountData);
@@ -339,7 +342,7 @@ describe('POST /api/incomes/:id', () => {
             accountID: global.testAccountId,
         };
 
-        const response = await request(global.__SERVER__)
+        const response = await api
             .post('/api/incomes')
             .set('x-access-token', userToken)
             .send(newIncomeData);
@@ -354,7 +357,7 @@ describe('POST /api/incomes/:id', () => {
 describe('GET /api/incomes/breakdown/:aid', () => {
 
     it('should fail to return breakdown with non-whitelist token', async () => {
-        const response = await request(global.__SERVER__)
+        const response = await api
             .get(`/api/incomes/breakdown/${global.testAccountId}`)
             .set('x-access-token', 'non-whitelist-token');
 
@@ -363,7 +366,7 @@ describe('GET /api/incomes/breakdown/:aid', () => {
     });
 
     it('should fail to return breakdown with wrong token', async () => {
-        const response = await request(global.__SERVER__)
+        const response = await api
             .get(`/api/incomes/breakdown/${global.testAccountId}`)
             .set('x-access-token', updateUserToken);
 
@@ -372,7 +375,7 @@ describe('GET /api/incomes/breakdown/:aid', () => {
     });
 
     it('should fail to return breakdown without a start date', async () => {
-        const response = await request(global.__SERVER__)
+        const response = await api
             .get(`/api/incomes/breakdown/${global.testAccountId}`)
             .set('x-access-token', userToken);
 
@@ -381,7 +384,7 @@ describe('GET /api/incomes/breakdown/:aid', () => {
     });
 
     it('should fail to return breakdown without an end date', async () => {
-        const response = await request(global.__SERVER__)
+        const response = await api
             .get(`/api/incomes/breakdown/${global.testAccountId}`)
             .set('x-access-token', userToken)
         .query({ startDate: '1234' });
@@ -391,7 +394,7 @@ describe('GET /api/incomes/breakdown/:aid', () => {
     });
 
     it('should return incomes breakdown', async () => {
-        const response = await request(global.__SERVER__)
+        const response = await api
             .get(`/api/incomes/breakdown/${global.testAccountId}`)
             .set('x-access-token', userToken)
             .query({

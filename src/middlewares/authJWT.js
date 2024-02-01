@@ -213,7 +213,7 @@ const verifyTokenExpenseIncomePost = (req, res, next) => {
             return res.status(401).send({message: "Unauthorized!"});
         }
 
-        // Verification if user id in expense request belongs to the same user id provided in JWT token
+        // Verification if user id in income/expense request belongs to the same user id provided in JWT token
         if (req.body.userID !== decoded.id)
             return res.status(401).send({message: "Unauthorized!"});
 

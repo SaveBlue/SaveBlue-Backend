@@ -53,14 +53,14 @@ const findIncomeByID = async (req, res) => {
 const create = async (req, res) => {
 
     // Check income description length
-    if (req.body.description?.length > 1024) {
+    if (req.body.description?.length > 32) {
         return res.status(400).json({
             message: "Description too long."
         });
     }
 
     // Check if amount is an integer
-    if (!Number.isSafeInteger(req.body.amount) || req.body.amount <= 0 || !req.body.amount > 100000000) {
+    if (!Number.isSafeInteger(req.body.amount) || req.body.amount <= 0 || req.body.amount > 100000000) {
         return res.status(400).json({
             message: "Amount not a valid number."
         });
@@ -124,14 +124,14 @@ const remove = async (req, res) => {
 const update = async (req, res) => {
 
     // Check income description length
-    if (req.body.description?.length > 1024) {
+    if (req.body.description?.length > 32) {
         return res.status(400).json({
             message: "Description too long."
         });
     }
 
     // Check if amount is an integer
-    if (!Number.isSafeInteger(req.body.amount) && req.body.amount > 0 && req.body.amount <= 100000000) {
+    if (!Number.isSafeInteger(req.body.amount) || req.body.amount <= 0 || req.body.amount > 100000000) {
         return res.status(400).json({
             message: "Amount not a valid number."
         });
@@ -163,7 +163,7 @@ const update = async (req, res) => {
         let operation = oldAmount >= newAmount ? "-" : "+";
 
         // Handle account change
-        if (income.accountID !== editedIncome.accountID) {
+        if (editedIncome.accountID && (income.accountID !== editedIncome.accountID)){
 
             // Subtract from old account
             await updateAccountBalances.updateAllAccountBalances(income.accountID, oldAmount, "-");
