@@ -1,7 +1,9 @@
 import mongoose from 'mongoose';
 import updateAccountBalances from '../services/updateAccountBalances.js';
+import mongodb from 'mongodb';
 
 const Expense = mongoose.model('Expense');
+const Image = mongoose.model('Image');
 
 // Find all expenses of the account with requested id
 const findAllExpensesByAccountID = async (req, res) => {
@@ -16,7 +18,16 @@ const findAllExpensesByAccountID = async (req, res) => {
             .skip(expensesPerPage * page)
             .limit(expensesPerPage);
 
-        res.status(200).json(expenses);
+        const response = expenses.map(expense => {
+
+            // Remove image from response
+            expense = expense.toObject();
+            delete expense.image;
+
+            return expense;
+        })
+
+        res.status(200).json(response);
 
     } catch (error) {
         res.status(500).send({
@@ -30,6 +41,30 @@ const findAllExpensesByAccountID = async (req, res) => {
 // Find an expense with requested id
 const findExpenseByID = async (req, res) => {
     try {
+        let expense = await Expense.findById(req.params.id);
+
+        if (!expense) {
+            return res.status(404).json({
+                message: "No expense with selected ID!"
+            });
+        }
+
+        // Remove image from response
+        const expenseObject = expense.toObject();
+        delete expenseObject.image;
+
+        res.status(200).json(expenseObject);
+
+    } catch (error) {
+        res.status(500).send({
+            message: error.message || "An error occurred while fetching the expense!"
+        });
+    }
+};
+
+// Find an expense with requested id
+const findExpenseImageByID = async (req, res) => {
+    try {
         const expense = await Expense.findById(req.params.id);
 
         if (!expense) {
@@ -38,7 +73,21 @@ const findExpenseByID = async (req, res) => {
             });
         }
 
-        res.status(200).json(expense);
+        const image = expense.image;
+
+        if (!image) {
+            return res.status(404).json({
+                message: "No image with selected expense ID!"
+            });
+        }
+
+        /*const dataUrl = `data:${image.contentType};base64,${image.data}`;
+        res.json({ filename: image.filename, dataUrl });*/
+
+        //const imgBuffer = Buffer.from(image.data, 'base64');
+
+        res.set('Content-Type', image.contentType);
+        res.send(image.data);
 
     } catch (error) {
         res.status(500).send({
@@ -53,38 +102,57 @@ const findExpenseByID = async (req, res) => {
 // Create an expense
 const create = async (req, res) => {
 
+    // TODO make controller work properly
+
+    const { userID, accountID, category1, category2, description, date, amount, image } = req.body;
+
     // Check expense description length
-    if (req.body.description?.length > 32) {
+    if (description?.length > 32) {
         return res.status(400).json({
             message: "Description too long."
         });
     }
 
     // Check if amount is a valid integer and within range
-    if (!Number.isSafeInteger(req.body.amount) || req.body.amount <= 0 || req.body.amount > 100000000) {
+    if (!Number.isSafeInteger(amount) || amount <= 0 || amount > 100000000) {
         return res.status(400).json({
             message: "Amount not a valid number."
         });
     }
 
+    let newImage = null;
+
+    if (image) {
+        console.log("Image found")
+        newImage = new Image({
+            contentType: image.contentType,
+            data: image.data
+        })
+    }
+
     const newExpense = new Expense({
-        userID: req.body.userID,
-        accountID: req.body.accountID,
-        category1: req.body.category1,
-        category2: req.body.category2,
-        description: req.body.description,
-        date: req.body.date,
-        amount: req.body.amount
+        userID: userID,
+        accountID: accountID,
+        category1: category1,
+        category2: category2,
+        description: description,
+        date: date,
+        amount: amount,
+        image: newImage
     });
 
     try {
         // Save expense
-        const data = await newExpense.save(newExpense);
+        const savedExpense = await newExpense.save(newExpense);
 
         // Update account balance
-        await updateAccountBalances.updateAllAccountBalances(newExpense.accountID, newExpense.amount, "-");
+        await updateAccountBalances.updateAllAccountBalances(accountID, amount, "-");
 
-        res.send(data);
+        // Prepare response data (exclude image data)
+        const responseData = savedExpense.toObject();
+        delete responseData.image; // Remove image from response
+
+        res.json(responseData);
 
     } catch (error) {
         res.status(500).send({
@@ -229,6 +297,7 @@ const expensesBreakdown = async (req, res) => {
 export default {
     findAllExpensesByAccountID,
     findExpenseByID,
+    findExpenseImageByID,
     create,
     remove,
     update,

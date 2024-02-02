@@ -69,8 +69,6 @@ describe('GET /api/accounts/find/:id', () => {
             .get(`/api/accounts/find/${global.testAccountId}`) // Replace with a valid user ID
             .set('x-access-token', deleteUserToken);
 
-        console.log(response.body)
-
         expect(response.statusCode).toBe(401);
         expect(response.body).toHaveProperty('message', 'Unauthorized!');
     });

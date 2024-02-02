@@ -3,6 +3,7 @@ import authJWT from "../middlewares/authJWT.js";
 import drafts from "../middlewares/drafts.js";
 import expensesController from "../controllers/expenses.js";
 import categoriesExpenses from "../models/expenses.js";
+import {checkImageValidity} from "../middlewares/images.js";
 
 const router = Router();
 
@@ -26,8 +27,11 @@ router.get("/find/:aid", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenAccou
 // Return an expense by ID
 router.get("/:id", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenExpense], expensesController.findExpenseByID);
 
+// Return an expense image by ID
+router.get("/image/:id", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenExpense], expensesController.findExpenseImageByID);
+
 // Create an expense
-router.post("/", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenExpenseIncomePost, drafts.block], expensesController.create);
+router.post("/", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenExpenseIncomePost, drafts.block, checkImageValidity ], expensesController.create);
 
 // Delete an expense by ID
 router.delete("/:id", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenExpense], expensesController.remove);
@@ -40,6 +44,11 @@ router.get("/breakdown/:aid", [authJWT.verifyTokenWhitelist, authJWT.verifyToken
 
 // Create sms expense draft
 router.post("/sms", [authJWT.verifyTokenWhitelist, drafts.createExpenseSMS], expensesController.create);
+
+// Upload image to expense
+
+
+router.post('/image', [], );
 
 router.use('/api/expenses', router);
 
