@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 import updateAccountBalances from '../services/updateAccountBalances.js';
-import mongodb from 'mongodb';
 
 const Expense = mongoose.model('Expense');
 const Image = mongoose.model('Image');
@@ -102,9 +101,7 @@ const findExpenseImageByID = async (req, res) => {
 // Create an expense
 const create = async (req, res) => {
 
-    // TODO make controller work properly
-
-    const { userID, accountID, category1, category2, description, date, amount, image } = req.body;
+    const {userID, accountID, category1, category2, description, date, amount, image} = req.body;
 
     // Check expense description length
     if (description?.length > 32) {
@@ -123,7 +120,6 @@ const create = async (req, res) => {
     let newImage = null;
 
     if (image) {
-        console.log("Image found")
         newImage = new Image({
             contentType: image.contentType,
             data: image.data
@@ -191,15 +187,17 @@ const remove = async (req, res) => {
 // Update expense with requested ID
 const update = async (req, res) => {
 
+    const {accountID, category1, category2, description, date, amount, image} = req.body;
+
     // Check expense description length
-    if (req.body.description?.length > 32) {
+    if (description?.length > 32) {
         return res.status(400).json({
             message: "Description too long."
         });
     }
 
     // Check if amount is an integer
-    if (!Number.isSafeInteger(req.body.amount) || req.body.amount <= 0 || req.body.amount > 100000000) {
+    if (!Number.isSafeInteger(amount) || amount <= 0 || amount > 100000000) {
         return res.status(400).json({
             message: "Amount not a valid number."
         });
@@ -207,13 +205,22 @@ const update = async (req, res) => {
 
     let editedExpense = {
         // Add properties to the object
-        ...(req.body.category1 && {category1: req.body.category1}),
-        ...(req.body.category2 && {category2: req.body.category2}),
-        ...(req.body.accountID && {accountID: req.body.accountID}),
-        description: req.body.description || "",
-        ...(req.body.date && {date: req.body.date}),
-        ...(req.body.amount && {amount: req.body.amount}),
+        ...(category1 && {category1: category1}),
+        ...(category2 && {category2: category2}),
+        ...(accountID && {accountID: accountID}),
+        description: description || "",
+        ...(date && {date: date}),
+        ...(amount && {amount: amount}),
     };
+
+    if (image) {
+        editedExpense.image = new Image({
+            contentType: image.contentType,
+            data: image.data
+        })
+    } else if (image === false) {
+        editedExpense.image = null;
+    }
 
 
     try {
@@ -233,7 +240,7 @@ const update = async (req, res) => {
         let operation = oldAmount >= newAmount ? "+" : "-";
 
         // Handle account change
-        if (editedExpense.accountID && (expense.accountID !== editedExpense.accountID)){
+        if (editedExpense.accountID && (expense.accountID !== editedExpense.accountID)) {
             // Add back to old account
             await updateAccountBalances.updateAllAccountBalances(expense.accountID, oldAmount, "+");
 
