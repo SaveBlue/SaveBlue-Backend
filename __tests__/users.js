@@ -1,6 +1,7 @@
 import supertest from 'supertest';
 import {testUserData, userToDelete, userToUpdate} from '../test_entries.js'
 import {server} from '../src/server.js'
+import idData from '../test_ids.json';
 
 const api = supertest(server);
 
@@ -47,7 +48,7 @@ describe('GET /api/users/:id', () => {
 
     it('should fail return of data with non-whitelist token', async () => {
         const response = await api
-            .get(`/api/users/${global.testUserId}`)
+            .get(`/api/users/${idData.testUserId}`)
             .set('x-access-token', 'non-whitelist-token'); // Assuming you have a valid token
 
         expect(response.statusCode).toBe(401);
@@ -56,7 +57,7 @@ describe('GET /api/users/:id', () => {
 
     it('should fail return of data with wrong token', async () => {
         const response = await api
-            .get(`/api/users/${global.testUserId}`)
+            .get(`/api/users/${idData.testUserId}`)
             .set('x-access-token', deleteUserToken); // Assuming you have a valid token
 
         expect(response.statusCode).toBe(401);
@@ -65,7 +66,7 @@ describe('GET /api/users/:id', () => {
 
     it('should return user data for a valid user ID', async () => {
         const response = await api
-            .get(`/api/users/${global.testUserId}`) // Replace with a valid user ID
+            .get(`/api/users/${idData.testUserId}`) // Replace with a valid user ID
             .set('x-access-token', userToken);
 
         expect(response.statusCode).toBe(200);
@@ -76,7 +77,7 @@ describe('GET /api/users/:id', () => {
 describe('DELETE /api/users/:id', () => {
     it('should fail delete of user with non-whitelist token', async () => {
         const response = await api
-            .delete(`/api/users/${global.deleteUserId}`)
+            .delete(`/api/users/${idData.deleteUserId}`)
             .set('x-access-token', 'non-whitelist-token'); // Assuming you have a valid token
 
         expect(response.statusCode).toBe(401);
@@ -85,7 +86,7 @@ describe('DELETE /api/users/:id', () => {
 
     it('should fail delete of user with wrong token', async () => {
         const response = await api
-            .delete(`/api/users/${global.deleteUserId}`)
+            .delete(`/api/users/${idData.deleteUserId}`)
             .set('x-access-token', userToken); // Assuming you have a valid token
 
         expect(response.statusCode).toBe(401);
@@ -95,7 +96,7 @@ describe('DELETE /api/users/:id', () => {
 
     it('should delete a user for a valid user ID', async () => {
         const response = await api
-            .delete(`/api/users/${global.deleteUserId}`)
+            .delete(`/api/users/${idData.deleteUserId}`)
             .set('x-access-token', deleteUserToken);
 
         expect(response.statusCode).toBe(200);
@@ -107,7 +108,7 @@ describe('DELETE /api/users/:id', () => {
 describe('PUT /api/users/:id', () => {
     it('should fail update of user with non-whitelist token', async () => {
         const response = await api
-            .put(`/api/users/${global.global.updateUserId}`)
+            .put(`/api/users/${idData.updateUserId}`)
             .set('x-access-token', 'non-whitelist-token'); // Assuming you have a valid token
 
         expect(response.statusCode).toBe(401);
@@ -116,7 +117,7 @@ describe('PUT /api/users/:id', () => {
 
     it('should fail update of user with wrong token', async () => {
         const response = await api
-            .put(`/api/users/${global.global.updateUserId}`)
+            .put(`/api/users/${idData.updateUserId}`)
             .set('x-access-token', userToken); // Assuming you have a valid token
 
         expect(response.statusCode).toBe(401);
@@ -130,7 +131,7 @@ describe('PUT /api/users/:id', () => {
         };
 
         const response = await api
-            .put(`/api/users/${global.global.updateUserId}`)
+            .put(`/api/users/${idData.updateUserId}`)
             .set('x-access-token', updateUserToken)
             .send(badUpdatedUserData);
 
@@ -144,7 +145,7 @@ describe('PUT /api/users/:id', () => {
         };
 
         const response = await api
-            .put(`/api/users/${global.global.updateUserId}`)
+            .put(`/api/users/${idData.updateUserId}`)
             .set('x-access-token', updateUserToken)
             .send(updatedUserData);
 
