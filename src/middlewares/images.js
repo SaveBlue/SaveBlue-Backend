@@ -42,11 +42,9 @@ export const uploadImageMemory = (req, res, next) => {
 
 import {fileTypeFromBuffer} from 'file-type';
 
-async function isValidFileType(buffer) {
-    const fileType = await fileTypeFromBuffer(buffer)
-
+function isValidFileType(type) {
     // Check if the detected file type is among the allowed types
-    return ['image/jpeg', 'image/png'].includes(fileType.mime);
+    return ['image/jpeg', 'image/png'].includes(type.mime);
 }
 
 const MAX_SIZE = 2 * 1024 * 1024;
@@ -61,7 +59,7 @@ export const checkImageValidity = async (req, res, next) => {
        return next();
     }
 
-    const imageBuffer = Buffer.from(req.body.image.data, 'base64');
+    const imageBuffer = Buffer.from(req.body.image, 'base64');
 
     if (!isValidSize(imageBuffer)) {
         return res.status(400).send({
@@ -69,14 +67,18 @@ export const checkImageValidity = async (req, res, next) => {
         });
     }
 
-    if (!await isValidFileType(imageBuffer)) {
+    const fileType = await fileTypeFromBuffer(imageBuffer)
+    if (!isValidFileType(fileType)) {
         return res.status(400).send({
             message: "Invalid file type."
         });
     }
 
     // if everything is valid, convert the image to a buffer and update the request body
-    req.body.image.data = imageBuffer;
+    req.body.image= {
+        contentType: fileType.mime,
+        data: imageBuffer
+    }
 
     next();
 }
