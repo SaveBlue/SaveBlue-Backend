@@ -12,21 +12,12 @@ const findAllExpensesByAccountID = async (req, res) => {
 
         // Fetch expenses with specified conditions
         const expenses = await Expense
-            .find({accountID: req.params.aid})
+            .find({accountID: req.params.aid}, "-image")
             .sort({date: -1, _id: -1})
             .skip(expensesPerPage * page)
             .limit(expensesPerPage);
 
-        const response = expenses.map(expense => {
-
-            // Remove image from response
-            expense = expense.toObject();
-            delete expense.image;
-
-            return expense;
-        })
-
-        res.status(200).json(response);
+        res.status(200).json(expenses);
 
     } catch (error) {
         res.status(500).send({
@@ -40,7 +31,7 @@ const findAllExpensesByAccountID = async (req, res) => {
 // Find an expense with requested id
 const findExpenseByID = async (req, res) => {
     try {
-        let expense = await Expense.findById(req.params.id);
+        let expense = await Expense.findById(req.params.id, "-image.data -image._id");
 
         if (!expense) {
             return res.status(404).json({
@@ -48,11 +39,10 @@ const findExpenseByID = async (req, res) => {
             });
         }
 
-        // Remove image from response
-        const expenseObject = expense.toObject();
-        delete expenseObject.image;
+        const expenseData = expense.toObject();
+        expenseData.image = expense.image ? expense.image.contentType : false;
 
-        res.status(200).json(expenseObject);
+        res.status(200).json(expenseData);
 
     } catch (error) {
         res.status(500).send({
@@ -61,7 +51,7 @@ const findExpenseByID = async (req, res) => {
     }
 };
 
-// Find an expense with requested id
+// Find an image of expense with requested expense id
 const findExpenseImageByID = async (req, res) => {
     try {
         const expense = await Expense.findById(req.params.id);
