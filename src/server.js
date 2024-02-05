@@ -25,7 +25,6 @@ server.use(express.urlencoded({ extended: true }));
 
 //----------------------------------------------------------------------------------------------------------------------
 
-import dbConnection from './models/db.js';
 import './models/db.js';
 import authenticationRouter from './routes/authentication.js';
 import usersRouter from './routes/users.js';
@@ -53,31 +52,6 @@ server.use(passport.initialize({}));
 
 server.get("/", (req, res) => {
     res.json({ message: "Test server running!" });
-});
-
-import { GridFSBucket } from 'mongodb';
-server.get('/image/:filename', (req, res) => {
-    try {
-        const db = dbConnection.connection.db;
-        const bucket = new GridFSBucket(db, { bucketName: 'images' });
-
-        const downloadStream = bucket.openDownloadStreamByName(req.params.filename);
-
-        downloadStream.on('data', (chunk) => {
-            res.write(chunk);
-        });
-
-        downloadStream.on('error', () => {
-            res.sendStatus(404);
-        });
-
-        downloadStream.on('end', () => {
-            res.end();
-        });
-    } catch (error) {
-        console.error(error);
-        res.sendStatus(500);
-    }
 });
 
 /**

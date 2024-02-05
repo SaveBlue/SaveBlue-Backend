@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import updateAccountBalances from '../services/updateAccountBalances.js';
 
 const Expense = mongoose.model('Expense');
-const Image = mongoose.model('Image');
+const File = mongoose.model('File');
 
 // Find all expenses of the account with requested id
 const findAllExpensesByAccountID = async (req, res) => {
@@ -12,7 +12,7 @@ const findAllExpensesByAccountID = async (req, res) => {
 
         // Fetch expenses with specified conditions
         const expenses = await Expense
-            .find({accountID: req.params.aid}, "-image")
+            .find({accountID: req.params.aid}, "-file")
             .sort({date: -1, _id: -1})
             .skip(expensesPerPage * page)
             .limit(expensesPerPage);
@@ -31,7 +31,7 @@ const findAllExpensesByAccountID = async (req, res) => {
 // Find an expense with requested id
 const findExpenseByID = async (req, res) => {
     try {
-        let expense = await Expense.findById(req.params.id, "-image.data -image._id");
+        let expense = await Expense.findById(req.params.id, "-file.data -file._id");
 
         if (!expense) {
             return res.status(404).json({
@@ -40,7 +40,7 @@ const findExpenseByID = async (req, res) => {
         }
 
         const expenseData = expense.toObject();
-        expenseData.image = expense.image ? expense.image.contentType : false;
+        expenseData.file = expense.file ? expense.file.contentType : false;
 
         res.status(200).json(expenseData);
 
@@ -51,8 +51,8 @@ const findExpenseByID = async (req, res) => {
     }
 };
 
-// Find an image of expense with requested expense id
-const findExpenseImageByID = async (req, res) => {
+// Find a file of expense with requested expense id
+const findExpenseFileByID = async (req, res) => {
     try {
         const expense = await Expense.findById(req.params.id);
 
@@ -62,21 +62,16 @@ const findExpenseImageByID = async (req, res) => {
             });
         }
 
-        const image = expense.image;
+        const file = expense.file;
 
-        if (!image) {
+        if (!file) {
             return res.status(404).json({
-                message: "No image with selected expense ID!"
+                message: "No file with selected expense ID!"
             });
         }
 
-        /*const dataUrl = `data:${image.contentType};base64,${image.data}`;
-        res.json({ filename: image.filename, dataUrl });*/
-
-        //const imgBuffer = Buffer.from(image.data, 'base64');
-
-        res.set('Content-Type', image.contentType);
-        res.send(image.data);
+        res.set('Content-Type', file.contentType);
+        res.send(file.data);
 
     } catch (error) {
         res.status(500).send({
@@ -91,7 +86,7 @@ const findExpenseImageByID = async (req, res) => {
 // Create an expense
 const create = async (req, res) => {
 
-    const {userID, accountID, category1, category2, description, date, amount, image} = req.body;
+    const {userID, accountID, category1, category2, description, date, amount, file} = req.body;
 
     // Check expense description length
     if (description?.length > 32) {
@@ -107,12 +102,12 @@ const create = async (req, res) => {
         });
     }
 
-    let newImage = null;
+    let newFile = null;
 
-    if (image) {
-        newImage = new Image({
-            contentType: image.contentType,
-            data: image.data
+    if (file) {
+        newFile = new File({
+            contentType: file.contentType,
+            data: file.data
         })
     }
 
@@ -124,7 +119,7 @@ const create = async (req, res) => {
         description: description,
         date: date,
         amount: amount,
-        image: newImage
+        file: newFile
     });
 
     try {
@@ -134,9 +129,9 @@ const create = async (req, res) => {
         // Update account balance
         await updateAccountBalances.updateAllAccountBalances(accountID, amount, "-");
 
-        // Prepare response data (exclude image data)
+        // Prepare response data (exclude file data)
         const responseData = savedExpense.toObject();
-        delete responseData.image; // Remove image from response
+        delete responseData.file; // Remove file from response
 
         res.json(responseData);
 
@@ -177,7 +172,7 @@ const remove = async (req, res) => {
 // Update expense with requested ID
 const update = async (req, res) => {
 
-    const {accountID, category1, category2, description, date, amount, image} = req.body;
+    const {accountID, category1, category2, description, date, amount, file} = req.body;
 
     // Check expense description length
     if (description?.length > 32) {
@@ -203,13 +198,13 @@ const update = async (req, res) => {
         ...(amount && {amount: amount}),
     };
 
-    if (image) {
-        editedExpense.image = new Image({
-            contentType: image.contentType,
-            data: image.data
+    if (file) {
+        editedExpense.file = new File({
+            contentType: file.contentType,
+            data: file.data
         })
-    } else if (image === false) {
-        editedExpense.image = null;
+    } else if (file === false) {
+        editedExpense.file = null;
     }
 
 
@@ -294,7 +289,7 @@ const expensesBreakdown = async (req, res) => {
 export default {
     findAllExpensesByAccountID,
     findExpenseByID,
-    findExpenseImageByID,
+    findExpenseFileByID,
     create,
     remove,
     update,
