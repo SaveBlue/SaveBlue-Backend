@@ -24,6 +24,8 @@ export default async () => {
 
     await populateTestData();
 
+    // Create a file to store the test IDs as a workaround for the lack of global variables
+    // each test file has its own context, so we need to store the IDs in a file
     fs.writeFileSync( 'test_ids.json', JSON.stringify(testIds, null, 2));
 };
 
