@@ -12,7 +12,7 @@ let file = new Schema({
 });
 
 function validateFile(file) {
-    return file.length <= (2 * 1024 * 1024);
+    return file.length <= (1 * 1024 * 1024);
 }
 
 mongoose.model('File', file);

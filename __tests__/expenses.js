@@ -1,5 +1,5 @@
 import supertest from 'supertest';
-import {testUserData, userToDelete, userToUpdate} from '../test_entries.js'
+import {testUserData, userToDelete, userToUpdate, pngString} from '../test_entries.js'
 import {server} from '../src/server.js'
 
 const api = supertest(server);
@@ -74,18 +74,67 @@ describe('GET /api/expenses/:id', () => {
         expect(response.body).toHaveProperty('message', 'Unauthorized!');
     });
 
-    it('should return specific expense by ID', async () => {
+    it('should return specific expense by ID without file', async () => {
         const response = await api
             .get(`/api/expenses/${global.testExpenseId}`)
             .set('x-access-token', userToken);
 
         expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty('file', false);
+        expect(response.body).toHaveProperty('description', 'Test Expense');
+    });
+
+    it('should return specific expense by ID with file', async () => {
+        const response = await api
+            .get(`/api/expenses/${global.fileTestExpenseId}`)
+            .set('x-access-token', userToken);
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty('file', 'image/png');
         expect(response.body).toHaveProperty('description', 'Test Expense');
     });
 
 });
 
-describe('DELETE /api/expenses/:id', () => {
+describe('GET /api/expenses/file/:id', () => {
+
+    it('should fail to return expense with non-whitelist token', async () => {
+        const response = await api
+            .get(`/api/expenses/file/${global.testExpenseId}`)
+            .set('x-access-token', 'non-whitelist-token');
+
+        expect(response.statusCode).toBe(401);
+        expect(response.body).toHaveProperty('message', 'Unauthorized!');
+    });
+
+    it('should fail to return expense with wrong token', async () => {
+        const response = await api
+            .get(`/api/expenses/file/${global.testExpenseId}`)
+            .set('x-access-token', updateUserToken);
+
+        expect(response.statusCode).toBe(401);
+        expect(response.body).toHaveProperty('message', 'Unauthorized!');
+    });
+
+    it('should not return file for specific expense without file by ID ', async () => {
+        const response = await api
+            .get(`/api/expenses/file/${global.testExpenseId}`)
+            .set('x-access-token', userToken);
+
+        expect(response.statusCode).toBe(404);
+    });
+
+    it('should return file for specific expense by ID', async () => {
+        const response = await api
+            .get(`/api/expenses/file/${global.fileTestExpenseId}`)
+            .set('x-access-token', userToken);
+
+        expect(response.statusCode).toBe(200);
+    });
+
+});
+
+describe('DELETE /api/expenses/file/:id', () => {
 
     it('should fail to delete expense with non-whitelist token', async () => {
         const response = await api
@@ -335,13 +384,97 @@ describe('POST /api/expenses/:id', () => {
         expect(response.body).toHaveProperty('message', 'Amount not a valid number.');
     });
 
-    it('should create expense', async () => {
+    it('should create expense without file', async () => {
         const newExpenseData = {
             category1: "Food & Drinks",
             category2: "Alcohol",
             amount: 10000,
             userID: testUserId,
             accountID: global.testAccountId,
+        };
+
+        const response = await api
+            .post('/api/expenses')
+            .set('x-access-token', userToken)
+            .send(newExpenseData);
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty('amount', 10000);
+        expect(response.body).toHaveProperty('category1', "Food & Drinks");
+        expect(response.body).toHaveProperty('category2', "Alcohol");
+    });
+
+    it('should fail to create expense with invalid file format', async () => {
+        const newExpenseData = {
+            category1: "Food & Drinks",
+            category2: "Alcohol",
+            amount: 10000,
+            userID: testUserId,
+            accountID: global.testAccountId,
+            file: "R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+        };
+
+        const response = await api
+            .post('/api/expenses')
+            .set('x-access-token', userToken)
+            .send(newExpenseData);
+
+        console.log(response.body)
+
+        expect(response.statusCode).toBe(400);
+        expect(response.body).toHaveProperty('message', 'Invalid file type.');
+    });
+
+    it('should fail to create expense with invalid file format', async () => {
+        const newExpenseData = {
+            category1: "Food & Drinks",
+            category2: "Alcohol",
+            amount: 10000,
+            userID: testUserId,
+            accountID: global.testAccountId,
+            file: 1234
+        };
+
+        const response = await api
+            .post('/api/expenses')
+            .set('x-access-token', userToken)
+            .send(newExpenseData);
+
+        console.log(response.body)
+
+        expect(response.statusCode).toBe(400);
+        expect(response.body).toHaveProperty('message', 'Invalid file format.');
+    });
+
+    it('should fail to create expense with too large file size', async () => {
+        const newExpenseData = {
+            category1: "Food & Drinks",
+            category2: "Alcohol",
+            amount: 10000,
+            userID: testUserId,
+            accountID: global.testAccountId,
+            file: 1234
+        };
+
+        const response = await api
+            .post('/api/expenses')
+            .set('x-access-token', userToken)
+            .send(newExpenseData);
+
+        console.log(response.body)
+
+        expect(response.statusCode).toBe(400);
+        expect(response.body).toHaveProperty('message', 'Invalid file format.');
+    });
+
+    it('should create expense with file', async () => {
+        const newExpenseData = {
+            category1: "Food & Drinks",
+            category2: "Alcohol",
+            amount: 10000,
+            userID: testUserId,
+            accountID: global.testAccountId,
+            file: pngString
         };
 
         const response = await api

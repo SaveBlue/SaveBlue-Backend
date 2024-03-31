@@ -5,7 +5,7 @@ function isValidFileType(type) {
     return ['image/jpeg', 'image/png', 'application/pdf'].includes(type?.mime);
 }
 
-const MAX_SIZE = 2 * 1024 * 1024;
+const MAX_SIZE = 1 * 1024 * 1024;
 
 function isValidSize(buffer) {
     return buffer.length <= MAX_SIZE;

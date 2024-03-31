@@ -39,6 +39,9 @@ const testIds ={
 }
 
 async function populateTestData() {
+    const File = mongoose.model('File');
+    const pngFile = new File(mockData.pngFile);
+
     // add user data to db
     const testUser = await saveUserToDB({
         ...mockData.testUserData,
@@ -59,7 +62,14 @@ async function populateTestData() {
     const testExpense = await saveExpenseToDB({
         ...mockData.testExpenseData,
         userID: testUser._id,
-        accountID: testUser.accounts[0]._id
+        accountID: testUser.accounts[0]._id,
+
+    });
+    const fileTestExpense = await saveExpenseToDB({
+        ...mockData.testExpenseData,
+        userID: testUser._id,
+        accountID: testUser.accounts[0]._id,
+        file: pngFile
     });
     const expenseToDelete = await saveExpenseToDB({
         ...mockData.expenseDataToDelete,
@@ -73,6 +83,7 @@ async function populateTestData() {
     });
 
     global.testExpenseId = testExpense._id;
+    global.fileTestExpenseId = fileTestExpense._id;
     global.deleteExpenseId = expenseToDelete._id;
     global.updateExpenseId = expenseToUpdate._id;
 

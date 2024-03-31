@@ -106,7 +106,8 @@ const mockData = {
     expenseDataToUpdate,
     testIncomeData,
     incomeDataToDelete,
-    incomeDataToUpdate
+    incomeDataToUpdate,
+    pngFile
 };
 
 export default mockData;
