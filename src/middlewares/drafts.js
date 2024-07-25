@@ -37,8 +37,9 @@ const parseSmsWithAI = async (sms) => {
 exports.createExpenseSMS = async (req, res, next) => {
 
     // Fetch user id and draftsAccount id
+    let user = null
     try {
-        const user = await User.findOne({'_id': req.params.tokenId}, 'draftsAccount')
+        user = await User.findOne({'_id': req.params.tokenId}, 'draftsAccount')
         if (!user) {
             return res.status(404).json({
                 message: "No user with selected ID!"
