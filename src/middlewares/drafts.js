@@ -1,6 +1,7 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+import openai from './openai'
+
 const User = mongoose.model('User');
-const openai = require("./openai");
 
 const parseSmsManually = (sms, isNlb) => {
     let smsData = {}
