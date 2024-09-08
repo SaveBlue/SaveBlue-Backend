@@ -1,3 +1,12 @@
+import mongoose from "mongoose";
+
+export const pngString = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQAAAAA3bvkkAAAACklEQVR4AWNgAAAAAgABc3UBGAAAAABJRU5ErkJggg==";
+export const tooLongPngString = "Invalid file type."
+const pngFile = {
+    contentType: "image/png",
+    data: Buffer.from(pngString, 'base64')
+}
+
 export const testUserData = {
     username: 'testuser',
     password: 'testpassword',
@@ -54,7 +63,7 @@ export const testExpenseData = {
     category1: "Food & Drinks",
     category2: "Alcohol",
     description: "Test Expense",
-    date: "2024-04-09"
+    date: "2024-04-09",
 }
 
 export const expenseDataToDelete = {

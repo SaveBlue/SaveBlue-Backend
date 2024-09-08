@@ -32,7 +32,6 @@ const checkFileValidity = async (req, res, next) => {
     }
 
     const fileType = await fileTypeFromBuffer(fileBuffer)
-    console.log("fileType", fileType)
     if (!isValidFileType(fileType)) {
         return res.status(400).send({
             message: "Invalid file type."
