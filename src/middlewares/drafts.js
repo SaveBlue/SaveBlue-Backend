@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import openai from './openai'
+import openai from './openai.js'
 
 const User = mongoose.model('User');
 
