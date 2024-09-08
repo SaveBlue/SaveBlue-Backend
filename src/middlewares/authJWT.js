@@ -1,6 +1,7 @@
-const jwt = require("jsonwebtoken");
-const config = require("../config/auth");
-const mongoose = require('mongoose');
+import jwt from "jsonwebtoken";
+import config from "../config/auth.js";
+import mongoose from 'mongoose';
+
 const User = mongoose.model('User');
 const Expense = mongoose.model('Expense');
 const Income = mongoose.model('Income');
@@ -8,7 +9,7 @@ const Token = mongoose.model('Token');
 
 
 // Verify token in whitelist
-verifyTokenWhitelist = (req, res, next) => {
+const verifyTokenWhitelist = async (req, res, next) => {
 
     let token = req.headers["x-access-token"];
 
@@ -18,38 +19,36 @@ verifyTokenWhitelist = (req, res, next) => {
     }
 
     // verify token
-    jwt.verify(token, config.secret, (err, decoded) => {
+    jwt.verify(token, config.secret, async (err, decoded) => {
 
         // invalid token
         if (err) {
             return res.status(401).send({message: "Unauthorized!"});
         }
 
-        Token.findOne({'token': token})
-            .then(token => {
-                if (!token) {
-                    return res.status(401).json({
-                        message: "Unauthorized!"
-                    });
-                }
+        try {
+            // Verify token in whitelist
+            const tokenExists = await Token.findOne({ 'token': token });
 
-                req.params.tokenId = decoded.id
+            if (!tokenExists) {
+                return res.status(401).json({ message: "Unauthorized!" });
+            }
 
-                next();
+            req.params.tokenId = decoded.id;
+            next();
 
-            })
-            .catch(error => {
-                res.status(500).send({
-                    message: error.message || "An error occurred while checking whitelist!"
-                });
+        } catch (error) {
+            res.status(500).send({
+                message: error.message || "An error occurred while checking whitelist!"
             });
+        }
     })
 };
 //----------------------------------------------------------------------------------------------------------------------
 
 
 // Verify User
-verifyTokenUser = (req, res, next) => {
+const verifyTokenUser = (req, res, next) => {
 
     let token = req.headers["x-access-token"];
 
@@ -63,7 +62,7 @@ verifyTokenUser = (req, res, next) => {
         }
 
         // Verify that sent user id is the same as token's
-        if(req.params.id === decoded.id || req.params.uid === decoded.id)
+        if (req.params.id === decoded.id || req.params.uid === decoded.id)
             next();
         else
             return res.status(401).send({message: "Unauthorized!"});
@@ -73,7 +72,7 @@ verifyTokenUser = (req, res, next) => {
 
 
 // Verify Account
-verifyTokenAccount = (req, res, next) => {
+const verifyTokenAccount = (req, res, next) => {
 
     let token = req.headers["x-access-token"];
 
@@ -91,7 +90,7 @@ verifyTokenAccount = (req, res, next) => {
         //verifyUsersCall(req, res, next, {'accounts._id': req.params.id || req.params.aid},decoded.id)
         verifyUsersCall(req, res, next, [
             {'accounts._id': req.params.id || req.params.aid},
-        ],decoded.id)
+        ], decoded.id)
 
     });
 };
@@ -99,7 +98,7 @@ verifyTokenAccount = (req, res, next) => {
 
 
 // Verify Account or Drafts Account
-verifyTokenAccountOrDrafts = (req, res, next) => {
+const verifyTokenAccountOrDrafts = (req, res, next) => {
 
     let token = req.headers["x-access-token"];
 
@@ -117,7 +116,7 @@ verifyTokenAccountOrDrafts = (req, res, next) => {
         verifyUsersCall(req, res, next, [
             {'accounts._id': req.params.id || req.params.aid},
             {'draftsAccount._id': req.params.aid},
-        ],decoded.id)
+        ], decoded.id)
 
     });
 };
@@ -125,90 +124,83 @@ verifyTokenAccountOrDrafts = (req, res, next) => {
 
 
 // Verify Expenses
-verifyTokenExpense = (req, res, next) => {
-
+const verifyTokenExpense = (req, res, next) => {
     let token = req.headers["x-access-token"];
 
     if (!token) {
-        return res.status(403).send({message: "No token provided!"});
+        return res.status(403).send({ message: "No token provided!" });
     }
 
-    jwt.verify(token, config.secret, (err, decoded) => {
+    jwt.verify(token, config.secret, async (err, decoded) => {
+
         if (err) {
-            return res.status(401).send({message: "Unauthorized!"});
+            return res.status(401).send({ message: "Unauthorized!" });
         }
 
-        // Verification if user id in expense belongs to the same user id provided in JWT token
-        Expense.findById(req.params.id, 'userID')
-            .then(userID => {
+        try {
+            // Verification if user id in expense belongs to the same user id provided in JWT token
+            const expense = await Expense.findById(req.params.id, 'userID');
 
-                if (!userID) {
-                    return res.status(404).json({
-                        message: "No expense with selected ID!"
-                    });
-                }
+            if (!expense) {
+                return res.status(404).json({ message: "No expense with selected ID!" });
+            }
 
-                // Verify that user id of requested expense is the same as the one provided in JWT token
-                if(userID.userID === decoded.id)
-                    next();
-                else
-                    return res.status(401).send({message: "Unauthorized!"});
+            // Verify that user id of requested expense is the same as the one provided in JWT token
+            if (expense.userID !== decoded.id) {
+                return res.status(401).send({ message: "Unauthorized!" });
+            }
 
-            })
-            .catch(error => {
-                res.status(500).send({
-                    message: error.message || "An error occurred while fetching account!"
-                });
+            next();
+
+        } catch (error) {
+            res.status(500).send({
+                message: error.message || "An error occurred while fetching expense!"
             });
-
+        }
     });
 };
 //----------------------------------------------------------------------------------------------------------------------
 
 
 // Verify Incomes
-verifyTokenIncome = (req, res, next) => {
-
+const verifyTokenIncome = (req, res, next) => {
     let token = req.headers["x-access-token"];
 
     if (!token) {
-        return res.status(403).send({message: "No token provided!"});
+        return res.status(403).send({ message: "No token provided!" });
     }
 
-    jwt.verify(token, config.secret, (err, decoded) => {
+    jwt.verify(token, config.secret, async (err, decoded) => {
         if (err) {
-            return res.status(401).send({message: "Unauthorized!"});
+            return res.status(401).send({ message: "Unauthorized!" });
         }
 
-        // Verification if user id in expense belongs to the same user id provided in JWT token
-        Income.findById(req.params.id, 'userID')
-            .then(userID => {
+        try {
+            // Verification if user id in income matches the user id in the JWT token
+            const income = await Income.findById(req.params.id, 'userID');
 
-                if (!userID) {
-                    return res.status(404).json({
-                        message: "No income with selected ID!"
-                    });
-                }
+            if (!income) {
+                return res.status(404).json({ message: "No income with selected ID!" });
+            }
 
-                // Verify that user id of requested income is the same as the one provided in JWT token
-                if(userID.userID === decoded.id)
-                    next();
-                else
-                    return res.status(401).send({message: "Unauthorized!"});
+            // Verify that user id of requested income is the same as the one provided in JWT token
+            if (income.userID !== decoded.id) {
+                return res.status(401).send({ message: "Unauthorized!" });
+            }
 
-            })
-            .catch(error => {
-                res.status(500).send({
-                    message: error.message || "An error occurred while fetching account!"
-                });
+            next();
+
+        } catch (error) {
+            res.status(500).send({
+                message: error.message || "An error occurred while fetching income!"
             });
-
+        }
     });
 };
 //----------------------------------------------------------------------------------------------------------------------
 
 
-verifyTokenExpenseIncomePost = (req, res, next) => {
+const verifyTokenExpenseIncomePost = (req, res, next) => {
 
     let token = req.headers["x-access-token"];
 
@@ -221,12 +213,12 @@ verifyTokenExpenseIncomePost = (req, res, next) => {
             return res.status(401).send({message: "Unauthorized!"});
         }
 
-        // Verification if user id in expense request belongs to the same user id provided in JWT token
-        if(req.body.userID !== decoded.id)
+        // Verification if user id in income/expense request belongs to the same user id provided in JWT token
+        if (req.body.userID !== decoded.id)
             return res.status(401).send({message: "Unauthorized!"});
 
         // Verification if users account id in expense request belongs to the same user provided in JWT token
-        verifyUsersCall(req, res, next, [{'accounts._id': req.body.accountID}],decoded.id)
+        verifyUsersCall(req, res, next, [{'accounts._id': req.body.accountID}], decoded.id)
 
     });
 };
@@ -234,7 +226,7 @@ verifyTokenExpenseIncomePost = (req, res, next) => {
 
 
 // Verify Goal
-verifyTokenGoal = (req, res, next) => {
+const verifyTokenGoal = (req, res, next) => {
 
     let token = req.headers["x-access-token"];
 
@@ -265,9 +257,9 @@ verifyTokenGoal = (req, res, next) => {
  *
  * Function checks users permission if his JWT token allows access to requested data
  */
-verifyUsersCall = (req, res, next, searchParam, decodedID) =>{
+const verifyUsersCall = (req, res, next, searchParam, decodedID) => {
 
-    User.findOne({$or:searchParam}, '_id')
+    User.findOne({$or: searchParam}, '_id')
         .then(ID => {
 
             if (!ID) {
@@ -277,7 +269,7 @@ verifyUsersCall = (req, res, next, searchParam, decodedID) =>{
             }
 
             // Verify that user id of requested account is the same as the one provided in JWT token
-            if(ID._id.equals(decodedID))
+            if (ID._id.equals(decodedID))
                 next();
             else
                 return res.status(401).send({message: "Unauthorized!"});
@@ -291,15 +283,13 @@ verifyUsersCall = (req, res, next, searchParam, decodedID) =>{
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-
-const authJwt = {
-    verifyTokenWhitelist: verifyTokenWhitelist,
-    verifyTokenUser: verifyTokenUser,
-    verifyTokenAccount: verifyTokenAccount,
-    verifyTokenAccountOrDrafts: verifyTokenAccountOrDrafts,
-    verifyTokenExpense: verifyTokenExpense,
-    verifyTokenIncome: verifyTokenIncome,
-    verifyTokenExpenseIncomePost: verifyTokenExpenseIncomePost,
-    verifyTokenGoal: verifyTokenGoal
+export default {
+    verifyTokenWhitelist,
+    verifyTokenUser,
+    verifyTokenAccount,
+    verifyTokenAccountOrDrafts,
+    verifyTokenExpense,
+    verifyTokenIncome,
+    verifyTokenExpenseIncomePost,
+    verifyTokenGoal
 };
-module.exports = authJwt;

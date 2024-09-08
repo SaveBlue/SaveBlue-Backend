@@ -1,44 +1,46 @@
-const router = require("express").Router();
-const authJWT = require("../middlewares/authJWT");
-const drafts = require("../middlewares/drafts");
-const expensesController = require("../controllers/expenses");
-const categoriesExpenses = require("../models/expenses")
+import {Router} from "express";
+import authJWT from "../middlewares/authJWT.js";
+import drafts from "../middlewares/drafts.js";
+import expensesController from "../controllers/expenses.js";
+import categoriesExpenses from "../models/expenses.js";
+
+const router = Router();
+
+router.use(function (req, res, next) {
+    res.header(
+        "Access-Control-Allow-Headers",
+        "x-access-token, Origin, Content-Type, Accept"
+    );
+    next();
+});
 
 
-module.exports = expensesRouter => {
+// Return list of all available expense categories
+router.get("/", [authJWT.verifyTokenWhitelist], (req, res) => {
+    res.status(200).json(categoriesExpenses)
+});
 
-    expensesRouter.use(function (req, res, next) {
-        res.header(
-            "Access-Control-Allow-Headers",
-            "x-access-token, Origin, Content-Type, Accept"
-        );
-        next();
-    });
+// Return all expenses of account by account ID - paginated
+router.get("/find/:aid", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenAccountOrDrafts], expensesController.findAllExpensesByAccountID);
 
+// Return an expense by ID
+router.get("/:id", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenExpense], expensesController.findExpenseByID);
 
-    // Return list of all available expense categories
-    router.get("/",[authJWT.verifyTokenWhitelist], (req, res) => {res.status(200).json(categoriesExpenses)});
+// Create an expense
+router.post("/", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenExpenseIncomePost, drafts.block], expensesController.create);
 
-    // Return all expenses of account by account ID - paginated
-    router.get("/find/:aid",[authJWT.verifyTokenWhitelist, authJWT.verifyTokenAccountOrDrafts], expensesController.findAllExpensesByAccountID);
+// Delete an expense by ID
+router.delete("/:id", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenExpense], expensesController.remove);
 
-    // Return an expense by ID
-    router.get("/:id",[authJWT.verifyTokenWhitelist, authJWT.verifyTokenExpense], expensesController.findExpenseByID);
+// Update an expense by ID
+router.put("/:id", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenExpense, drafts.block], expensesController.update);
 
-    // Create an expense
-    router.post("/",[authJWT.verifyTokenWhitelist, authJWT.verifyTokenExpenseIncomePost, drafts.block], expensesController.create);
+// Return expense breakdown by primary categories
+router.get("/breakdown/:aid", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenAccount], expensesController.expensesBreakdown);
 
-    // Delete an expense by ID
-    router.delete("/:id",[authJWT.verifyTokenWhitelist, authJWT.verifyTokenExpense], expensesController.delete);
+// Create sms expense draft
+router.post("/sms", [authJWT.verifyTokenWhitelist, drafts.createExpenseSMS], expensesController.create);
 
-    // Update an expense by ID
-    router.put("/:id",[authJWT.verifyTokenWhitelist, authJWT.verifyTokenExpense, drafts.block], expensesController.update);
+router.use('/api/expenses', router);
 
-    // Return expense breakdown by primary categories
-    router.get("/breakdown/:aid",[authJWT.verifyTokenWhitelist, authJWT.verifyTokenAccount], expensesController.expensesBreakdown);
-
-    // Create sms expense draft
-    router.post("/sms",[authJWT.verifyTokenWhitelist, drafts.createExpenseSMS], expensesController.create);
-
-    expensesRouter.use('/api/expenses', router);
-};
+export default router;

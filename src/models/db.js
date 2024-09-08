@@ -1,7 +1,13 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+import './tokens.js';
+import './users.js';
+import './incomes.js';
+import './expenses.js';
 
-
-let dbURI = process.env.MONGODB_CLOUD_URI || 'mongodb://127.0.0.1/SaveBlue';
+// When testing connect to test database, otherwise connect to the main database
+const dbURI = process.env.NODE_ENV === 'test'
+    ? 'mongodb://127.0.0.1/SaveBlue_test'
+    : process.env.MONGODB_CLOUD_URI || 'mongodb://127.0.0.1/SaveBlue';
 
 // Connect to the database
 mongoose.connect(dbURI, {
@@ -10,7 +16,6 @@ mongoose.connect(dbURI, {
     useUnifiedTopology: true,
     useFindAndModify: false
 });
-
 
 // Database state debug messages
 mongoose.connection.on('connected', () => {
@@ -22,9 +27,8 @@ mongoose.connection.on('error', error => {
 });
 
 mongoose.connection.on('disconnected', () => {
-    console.log('Mongoose not connected.');
+    console.log('Mongoose disconnected.');
 });
-
 
 // Close connection to the database
 const safeExit = (message, callback) => {
@@ -34,14 +38,12 @@ const safeExit = (message, callback) => {
     });
 };
 
-
 // Nodemon restart
 process.once('SIGUSR2', () => {
     safeExit('nodemon restart', () => {
         process.kill(process.pid, 'SIGUSR2');
     });
 });
-
 
 // Exit application
 process.on('SIGINT', () => {
@@ -50,7 +52,6 @@ process.on('SIGINT', () => {
     });
 });
 
-
 // Exit application Heroku
 process.on('SIGTERM', () => {
     safeExit('Exit application Heroku', () => {
@@ -58,8 +59,4 @@ process.on('SIGTERM', () => {
     });
 });
 
-
-require('./tokens');
-require('./users');
-require('./incomes');
-require('./expenses');
+export default mongoose

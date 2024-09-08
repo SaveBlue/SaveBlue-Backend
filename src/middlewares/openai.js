@@ -1,10 +1,12 @@
-const OpenAI = require("openai");
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-});
-const categoriesExpenses = require("../models/expenses");
+import OpenAI from "openai";
+import categoriesExpenses from "../models/expenses.js";
 
-exports.createExpense = async (sms) => {
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY || 'api-key',
+});
+
+
+const createExpense = async (sms) => {
 
     const completion = await openai.chat.completions.create({
         //model: "gpt-4-1106-preview",
@@ -20,10 +22,12 @@ exports.createExpense = async (sms) => {
                 role: "system",
                 content: JSON.stringify(categoriesExpenses)
             },
-            { role: "user", content: sms },
+            {role: "user", content: sms},
         ],
-        response_format: { type: "json_object" }
+        response_format: {type: "json_object"}
     });
 
     return JSON.parse(completion.choices[0].message.content);
 }
+
+export default { createExpense }

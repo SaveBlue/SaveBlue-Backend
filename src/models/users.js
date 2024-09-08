@@ -1,9 +1,9 @@
-const mongoose = require('mongoose');
-let crypto = require('crypto');
-let jwt = require('jsonwebtoken');
-let config = require('../config/auth');
-let Schema = mongoose.Schema;
+import mongoose from 'mongoose';
+import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
+import config from '../config/auth.js';
 
+let Schema = mongoose.Schema;
 
 const budget = new Schema({
         category: {type: String, required: true},
@@ -56,7 +56,6 @@ const user = new Schema({
     {
         timestamps: true
     });
-
 
 // User functions
 
