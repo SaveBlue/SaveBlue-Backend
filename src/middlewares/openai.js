@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import categoriesExpenses from "../models/expenses.js";
+import {categoriesExpenses} from "../models/expenses.js";
 
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY || 'api-key',

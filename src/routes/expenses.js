@@ -2,7 +2,7 @@ import {Router} from "express";
 import authJWT from "../middlewares/authJWT.js";
 import drafts from "../middlewares/drafts.js";
 import expensesController from "../controllers/expenses.js";
-import categoriesExpenses from "../models/expenses.js";
+import {categoriesExpenses} from "../models/expenses.js";
 
 const router = Router();
 
