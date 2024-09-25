@@ -29,19 +29,8 @@ export default async () => {
     fs.writeFileSync( 'test_ids.json', JSON.stringify(testIds, null, 2));
 };
 
+// Object to store test IDs to be accessed in test files
 const testIds ={
-    testUserId: '',
-    deleteUserId: '',
-    updateUserId: '',
-    testAccountId: '',
-    deleteAccountId: '',
-    updateAccountId: '',
-    testExpenseId: '',
-    deleteExpenseId: '',
-    updateExpenseId: '',
-    testIncomeId: '',
-    deleteIncomeId: '',
-    updateIncomeId: ''
 }
 
 async function populateTestData() {
@@ -71,7 +60,25 @@ async function populateTestData() {
         accountID: testUser.accounts[0]._id,
 
     });
-    const fileTestExpense = await saveExpenseToDB({
+    const fileTestExpense1 = await saveExpenseToDB({
+        ...mockData.testExpenseData,
+        userID: testUser._id,
+        accountID: testUser.accounts[0]._id,
+        file: pngFile
+    });
+    const fileTestExpense2 = await saveExpenseToDB({
+        ...mockData.testExpenseData,
+        userID: testUser._id,
+        accountID: testUser.accounts[0]._id,
+        file: pngFile
+    });
+    const fileTestExpense3 = await saveExpenseToDB({
+        ...mockData.testExpenseData,
+        userID: testUser._id,
+        accountID: testUser.accounts[0]._id,
+        file: pngFile
+    });
+    const fileTestExpense4 = await saveExpenseToDB({
         ...mockData.testExpenseData,
         userID: testUser._id,
         accountID: testUser.accounts[0]._id,
@@ -89,7 +96,10 @@ async function populateTestData() {
     });
 
     testIds.testExpenseId = testExpense._id;
-    testIds.fileTestExpenseId = fileTestExpense._id;
+    testIds.fileTestExpense1Id = fileTestExpense1._id;
+    testIds.fileTestExpense2Id = fileTestExpense2._id;
+    testIds.fileTestExpense3Id = fileTestExpense3._id;
+    testIds.fileTestExpense4Id = fileTestExpense4._id;
     testIds.deleteExpenseId = expenseToDelete._id;
     testIds.updateExpenseId = expenseToUpdate._id;
 
@@ -171,11 +181,6 @@ const saveExpenseToDB = async (expenseData) => {
     } catch (error) {
         console.error('Error creating test expense:', error);
     }
-}
-
-export const returnTestIds = async () => {
-    console.log(testIds)
-    return testIds;
 }
 
 

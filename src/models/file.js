@@ -6,7 +6,7 @@ let file = new Schema({
     contentType: {type: String, required: true},
     data: {
         type: Buffer,
-        validate: {validator: validateFile, message: "File is too Large."},
+        validate: {validator: validateFile, message: "File is too large."},
         required: true
     }
 });

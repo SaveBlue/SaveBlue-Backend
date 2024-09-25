@@ -1,5 +1,21 @@
+import { PNG } from 'pngjs';
+import crypto from 'crypto';
+
 export const pngString = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQAAAAA3bvkkAAAACklEQVR4AWNgAAAAAgABc3UBGAAAAABJRU5ErkJggg==";
-const pngFile = {
+
+export const pngStringTooLarge = () => {
+    const width = 500;
+    const height = 550;
+    const png = new PNG({ width, height });
+    const pixelDataSize = width * height * 4;
+    const randomBytes = crypto.randomBytes(pixelDataSize);
+    randomBytes.copy(png.data);
+    const buffer = PNG.sync.write(png);
+
+    return buffer.toString('base64')
+}
+
+export const pngFile = {
     contentType: "image/png",
     data: Buffer.from(pngString, 'base64')
 }
@@ -100,6 +116,7 @@ export const incomeDataToUpdate = {
     date: "2024-04-09"
 }
 
+// TODO: zakaj vse exportamo posebej, če delamo potem še mockData objekt?
 const mockData = {
     testUserData,
     userToDelete,
@@ -113,7 +130,7 @@ const mockData = {
     testIncomeData,
     incomeDataToDelete,
     incomeDataToUpdate,
-    pngFile
+    pngFile,
 };
 
 export default mockData;
