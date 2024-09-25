@@ -1,7 +1,4 @@
-import mongoose from "mongoose";
-
 export const pngString = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQAAAAA3bvkkAAAACklEQVR4AWNgAAAAAgABc3UBGAAAAABJRU5ErkJggg==";
-export const tooLongPngString = "Invalid file type."
 const pngFile = {
     contentType: "image/png",
     data: Buffer.from(pngString, 'base64')

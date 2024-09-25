@@ -4,7 +4,7 @@ import file from './file.js';
 let Schema = mongoose.Schema;
 
 
-const categoriesExpenses = [
+export const categoriesExpenses = [
     {
         category1: "Personal",
         category2: ["Clothing & Footwear", "Personal Hygiene", "Personal Care Services", "Subscriptions", "Consumer Electronics", "Education"]
@@ -81,6 +81,3 @@ function round(value) {
 
 
 mongoose.model('Expense', expense);
-
-
-export default categoriesExpenses;

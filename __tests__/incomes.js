@@ -1,6 +1,7 @@
 import supertest from 'supertest';
 import {testUserData, userToDelete, userToUpdate} from '../test_entries.js'
 import {server} from '../src/server.js'
+import idData from '../test_ids.json';
 
 const api = supertest(server);
 
@@ -27,7 +28,7 @@ describe('GET /api/incomes/find/:aid', () => {
 
     it('should fail to return data with non-whitelist token', async () => {
         const response = await api
-            .get(`/api/incomes/find/${global.testAccountId}`)
+            .get(`/api/incomes/find/${idData.testAccountId}`)
             .set('x-access-token', 'non-whitelist-token'); // Assuming you have a valid token
 
         expect(response.statusCode).toBe(401);
@@ -36,7 +37,7 @@ describe('GET /api/incomes/find/:aid', () => {
 
     it('should fail to return data with wrong token', async () => {
         const response = await api
-            .get(`/api/incomes/find/${global.testAccountId}`)
+            .get(`/api/incomes/find/${idData.testAccountId}`)
             .set('x-access-token', updateUserToken); // Assuming you have a valid token
 
         expect(response.statusCode).toBe(401);
@@ -45,7 +46,7 @@ describe('GET /api/incomes/find/:aid', () => {
 
     it('should return all incomes of an account', async () => {
         const response = await api
-            .get(`/api/incomes/find/${global.testAccountId}`)
+            .get(`/api/incomes/find/${idData.testAccountId}`)
             .set('x-access-token', userToken);
 
         expect(response.statusCode).toBe(200);
@@ -58,7 +59,7 @@ describe('GET /api/incomes/:id', () => {
 
     it('should fail to return income with non-whitelist token', async () => {
         const response = await api
-            .get(`/api/incomes/${global.testIncomeId}`)
+            .get(`/api/incomes/${idData.testIncomeId}`)
             .set('x-access-token', 'non-whitelist-token');
 
         expect(response.statusCode).toBe(401);
@@ -67,7 +68,7 @@ describe('GET /api/incomes/:id', () => {
 
     it('should fail to return income with wrong token', async () => {
         const response = await api
-            .get(`/api/incomes/${global.testIncomeId}`)
+            .get(`/api/incomes/${idData.testIncomeId}`)
             .set('x-access-token', updateUserToken);
 
         expect(response.statusCode).toBe(401);
@@ -76,7 +77,7 @@ describe('GET /api/incomes/:id', () => {
 
     it('should return specific income by ID', async () => {
         const response = await api
-            .get(`/api/incomes/${global.testIncomeId}`)
+            .get(`/api/incomes/${idData.testIncomeId}`)
             .set('x-access-token', userToken);
 
         expect(response.statusCode).toBe(200);
@@ -90,7 +91,7 @@ describe('DELETE /api/incomes/:id', () => {
 
     it('should fail to delete income with non-whitelist token', async () => {
         const response = await api
-            .delete(`/api/incomes/${global.deleteIncomeId}`)
+            .delete(`/api/incomes/${idData.deleteIncomeId}`)
             .set('x-access-token', 'non-whitelist-token');
 
         expect(response.statusCode).toBe(401);
@@ -99,7 +100,7 @@ describe('DELETE /api/incomes/:id', () => {
 
     it('should fail to return income with wrong token', async () => {
         const response = await api
-            .delete(`/api/incomes/${global.deleteIncomeId}`)
+            .delete(`/api/incomes/${idData.deleteIncomeId}`)
             .set('x-access-token', updateUserToken);
 
         expect(response.statusCode).toBe(401);
@@ -109,7 +110,7 @@ describe('DELETE /api/incomes/:id', () => {
 
     it('should delete a specific income by ID', async () => {
         const response = await api
-            .delete(`/api/incomes/${global.deleteIncomeId}`)
+            .delete(`/api/incomes/${idData.deleteIncomeId}`)
             .set('x-access-token', userToken);
 
         expect(response.statusCode).toBe(200);
@@ -121,7 +122,7 @@ describe('PUT /api/incomes/:id', () => {
 
     it('should fail to update income with non-whitelist token', async () => {
         const response = await api
-            .put(`/api/incomes/${global.updateIncomeId}`)
+            .put(`/api/incomes/${idData.updateIncomeId}`)
             .set('x-access-token', 'non-whitelist-token');
 
         expect(response.statusCode).toBe(401);
@@ -130,7 +131,7 @@ describe('PUT /api/incomes/:id', () => {
 
     it('should fail to update income with wrong token', async () => {
         const response = await api
-            .put(`/api/incomes/${global.updateIncomeId}`)
+            .put(`/api/incomes/${idData.updateIncomeId}`)
             .set('x-access-token', updateUserToken)
 
         expect(response.statusCode).toBe(401);
@@ -144,7 +145,7 @@ describe('PUT /api/incomes/:id', () => {
         };
 
         const response = await api
-            .put(`/api/incomes/${global.updateIncomeId}`)
+            .put(`/api/incomes/${idData.updateIncomeId}`)
             .set('x-access-token', userToken)
             .send(draftUpdateData);
 
@@ -159,7 +160,7 @@ describe('PUT /api/incomes/:id', () => {
         };
 
         const response = await api
-            .put(`/api/incomes/${global.updateIncomeId}`)
+            .put(`/api/incomes/${idData.updateIncomeId}`)
             .set('x-access-token', userToken)
             .send(tooLongDescriptionData);
 
@@ -174,7 +175,7 @@ describe('PUT /api/incomes/:id', () => {
         };
 
         const response = await api
-            .put(`/api/incomes/${global.updateIncomeId}`)
+            .put(`/api/incomes/${idData.updateIncomeId}`)
             .set('x-access-token', userToken)
             .send(unsafeIntegerAmountData);
 
@@ -189,7 +190,7 @@ describe('PUT /api/incomes/:id', () => {
         };
 
         const response = await api
-            .put(`/api/incomes/${global.updateIncomeId}`)
+            .put(`/api/incomes/${idData.updateIncomeId}`)
             .set('x-access-token', userToken)
             .send(negativeIntegerAmountData);
 
@@ -204,7 +205,7 @@ describe('PUT /api/incomes/:id', () => {
         };
 
         const response = await api
-            .put(`/api/incomes/${global.updateIncomeId}`)
+            .put(`/api/incomes/${idData.updateIncomeId}`)
             .set('x-access-token', userToken)
             .send(tooBigIntegerAmountData);
 
@@ -219,7 +220,7 @@ describe('PUT /api/incomes/:id', () => {
         };
 
         const response = await api
-            .put(`/api/incomes/${global.updateIncomeId}`)
+            .put(`/api/incomes/${idData.updateIncomeId}`)
             .set('x-access-token', userToken)
             .send(incomeData);
 
@@ -253,8 +254,8 @@ describe('POST /api/incomes/:id', () => {
         const draftCreateData = {
             category1: "Draft",
             amount: 10000,
-            userID: testUserId,
-            accountID: global.testAccountId,
+            userID: idData.testUserId,
+            accountID: idData.testAccountId,
         };
 
         const response = await api
@@ -270,8 +271,8 @@ describe('POST /api/incomes/:id', () => {
 
         const tooLongDescriptionData = {
             description: "VeryMuchTooLongIncomeDescriptionWeWillNotAcceptItVeryMuchTooLongIncomeDescriptionWeWillNotAcceptIt",
-            userID: testUserId,
-            accountID: global.testAccountId,
+            userID: idData.testUserId,
+            accountID: idData.testAccountId,
         };
 
         const response = await api
@@ -287,8 +288,8 @@ describe('POST /api/incomes/:id', () => {
 
         const unsafeIntegerAmountData = {
             amount: Math.pow(2, 53),
-            userID: testUserId,
-            accountID: global.testAccountId,
+            userID: idData.testUserId,
+            accountID: idData.testAccountId,
         };
 
         const response = await api
@@ -304,8 +305,8 @@ describe('POST /api/incomes/:id', () => {
 
         const negativeIntegerAmountData = {
             amount: -1,
-            userID: testUserId,
-            accountID: global.testAccountId,
+            userID: idData.testUserId,
+            accountID: idData.testAccountId,
         };
 
         const response = await api
@@ -321,8 +322,8 @@ describe('POST /api/incomes/:id', () => {
 
         const tooBigIntegerAmountData = {
             amount: 100000001,
-            userID: testUserId,
-            accountID: global.testAccountId,
+            userID: idData.testUserId,
+            accountID: idData.testAccountId,
         };
 
         const response = await api
@@ -338,8 +339,8 @@ describe('POST /api/incomes/:id', () => {
         const newIncomeData = {
             category1: "Salary & Wage",
             amount: 10000,
-            userID: testUserId,
-            accountID: global.testAccountId,
+            userID: idData.testUserId,
+            accountID: idData.testAccountId,
         };
 
         const response = await api
@@ -358,7 +359,7 @@ describe('GET /api/incomes/breakdown/:aid', () => {
 
     it('should fail to return breakdown with non-whitelist token', async () => {
         const response = await api
-            .get(`/api/incomes/breakdown/${global.testAccountId}`)
+            .get(`/api/incomes/breakdown/${idData.testAccountId}`)
             .set('x-access-token', 'non-whitelist-token');
 
         expect(response.statusCode).toBe(401);
@@ -367,7 +368,7 @@ describe('GET /api/incomes/breakdown/:aid', () => {
 
     it('should fail to return breakdown with wrong token', async () => {
         const response = await api
-            .get(`/api/incomes/breakdown/${global.testAccountId}`)
+            .get(`/api/incomes/breakdown/${idData.testAccountId}`)
             .set('x-access-token', updateUserToken);
 
         expect(response.statusCode).toBe(401);
@@ -376,7 +377,7 @@ describe('GET /api/incomes/breakdown/:aid', () => {
 
     it('should fail to return breakdown without a start date', async () => {
         const response = await api
-            .get(`/api/incomes/breakdown/${global.testAccountId}`)
+            .get(`/api/incomes/breakdown/${idData.testAccountId}`)
             .set('x-access-token', userToken);
 
         expect(response.statusCode).toBe(400);
@@ -385,7 +386,7 @@ describe('GET /api/incomes/breakdown/:aid', () => {
 
     it('should fail to return breakdown without an end date', async () => {
         const response = await api
-            .get(`/api/incomes/breakdown/${global.testAccountId}`)
+            .get(`/api/incomes/breakdown/${idData.testAccountId}`)
             .set('x-access-token', userToken)
         .query({ startDate: '1234' });
 
@@ -395,7 +396,7 @@ describe('GET /api/incomes/breakdown/:aid', () => {
 
     it('should return incomes breakdown', async () => {
         const response = await api
-            .get(`/api/incomes/breakdown/${global.testAccountId}`)
+            .get(`/api/incomes/breakdown/${idData.testAccountId}`)
             .set('x-access-token', userToken)
             .query({
                 startDate: "2000-12-31",

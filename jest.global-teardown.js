@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import fs from "fs";
 
 export default async () => {
 
@@ -6,4 +7,6 @@ export default async () => {
     mongoose.connection.close(function(){
         process.exit(0);
     });
+
+    fs.unlinkSync( 'test_ids.json');
 };

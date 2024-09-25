@@ -1,6 +1,7 @@
 import supertest from 'supertest';
 import {testUserData, userToDelete, userToUpdate} from '../test_entries.js'
 import {server} from '../src/server.js'
+import idData from '../test_ids.json';
 
 const api = supertest(server);
 
@@ -26,7 +27,7 @@ beforeAll(async () => {
 describe('GET /api/accounts/:uid', () => {
     it('should fail return all accounts of a user with non-whitelist token', async () => {
         const response = await api
-            .get(`/api/accounts/${global.testUserId}`) // Replace with a valid user ID
+            .get(`/api/accounts/${idData.testUserId}`) // Replace with a valid user ID
             .set('x-access-token', 'non-whitelist-token');
 
         expect(response.statusCode).toBe(401);
@@ -35,7 +36,7 @@ describe('GET /api/accounts/:uid', () => {
 
     it('should fail return all accounts of a user with wrong token', async () => {
         const response = await api
-            .get(`/api/accounts/${global.testUserId}`) // Replace with a valid user ID
+            .get(`/api/accounts/${idData.testUserId}`) // Replace with a valid user ID
             .set('x-access-token', deleteUserToken);
 
         expect(response.statusCode).toBe(401);
@@ -44,7 +45,7 @@ describe('GET /api/accounts/:uid', () => {
 
     it('should return all accounts of a user', async () => {
         const response = await api
-            .get(`/api/accounts/${global.testUserId}`) // Replace with a valid user ID
+            .get(`/api/accounts/${idData.testUserId}`) // Replace with a valid user ID
             .set('x-access-token', userToken);
 
         expect(response.statusCode).toBe(200);
@@ -57,7 +58,7 @@ describe('GET /api/accounts/find/:id', () => {
 
     it('should fail return of account with non-whitelist token', async () => {
         const response = await api
-            .get(`/api/accounts/find/${global.testAccountId}`) // Replace with a valid user ID
+            .get(`/api/accounts/find/${idData.testAccountId}`) // Replace with a valid user ID
             .set('x-access-token', 'non-whitelist-token');
 
         expect(response.statusCode).toBe(401);
@@ -66,7 +67,7 @@ describe('GET /api/accounts/find/:id', () => {
 
     it('should fail return of account with wrong token', async () => {
         const response = await api
-            .get(`/api/accounts/find/${global.testAccountId}`) // Replace with a valid user ID
+            .get(`/api/accounts/find/${idData.testAccountId}`) // Replace with a valid user ID
             .set('x-access-token', deleteUserToken);
 
         expect(response.statusCode).toBe(401);
@@ -75,7 +76,7 @@ describe('GET /api/accounts/find/:id', () => {
 
     it('should return specific account by ID', async () => {
         const response = await api
-            .get(`/api/accounts/find/${global.testAccountId}`) // Replace with a valid account ID
+            .get(`/api/accounts/find/${idData.testAccountId}`) // Replace with a valid account ID
             .set('x-access-token', userToken);
 
         expect(response.statusCode).toBe(200);
@@ -89,7 +90,7 @@ describe('DELETE /api/accounts/:id', () => {
 
     it('should fail return of account with non-whitelist token', async () => {
         const response = await api
-            .delete(`/api/accounts/${global.deleteAccountId}`) // Replace with a valid user ID
+            .delete(`/api/accounts/${idData.deleteAccountId}`) // Replace with a valid user ID
             .set('x-access-token', 'non-whitelist-token');
 
         expect(response.statusCode).toBe(401);
@@ -98,7 +99,7 @@ describe('DELETE /api/accounts/:id', () => {
 
     it('should fail return of account with wrong token', async () => {
         const response = await api
-            .delete(`/api/accounts/${global.deleteAccountId}`) // Replace with a valid user ID
+            .delete(`/api/accounts/${idData.deleteAccountId}`) // Replace with a valid user ID
             .set('x-access-token', deleteUserToken);
 
         expect(response.statusCode).toBe(401);
@@ -108,7 +109,7 @@ describe('DELETE /api/accounts/:id', () => {
 
     it('should delete a specific account by ID', async () => {
         const response = await api
-            .delete(`/api/accounts/${global.deleteAccountId}`) // Replace with a valid account ID
+            .delete(`/api/accounts/${idData.deleteAccountId}`) // Replace with a valid account ID
             .set('x-access-token', userToken);
 
         expect(response.statusCode).toBe(200);
@@ -120,7 +121,7 @@ describe('PUT /api/accounts/:id', () => {
 
     it('should fail account update of user with non-whitelist token', async () => {
         const response = await api
-            .put(`/api/accounts/${global.updateAccountId}`)
+            .put(`/api/accounts/${idData.updateAccountId}`)
             .set('x-access-token', 'non-whitelist-token'); // Assuming you have a valid token
 
         expect(response.statusCode).toBe(401);
@@ -129,7 +130,7 @@ describe('PUT /api/accounts/:id', () => {
 
     it('should fail account update of user with wrong token', async () => {
         const response = await api
-            .put(`/api/accounts/${global.updateAccountId}`)
+            .put(`/api/accounts/${idData.updateAccountId}`)
             .set('x-access-token', deleteUserToken); // Assuming you have a valid token
 
         expect(response.statusCode).toBe(401);
@@ -143,7 +144,7 @@ describe('PUT /api/accounts/:id', () => {
         };
 
         const response = await api
-            .put(`/api/accounts/${global.updateAccountId}`)
+            .put(`/api/accounts/${idData.updateAccountId}`)
             .set('x-access-token', userToken)
             .send(badUpdatedAccountData);
 
@@ -157,7 +158,7 @@ describe('PUT /api/accounts/:id', () => {
         };
 
         const response = await api
-            .put(`/api/accounts/${global.updateAccountId}`) // Replace with a valid account ID
+            .put(`/api/accounts/${idData.updateAccountId}`) // Replace with a valid account ID
             .set('x-access-token', userToken)
             .send(updatedAccountData);
 
@@ -170,7 +171,7 @@ describe('PUT /api/accounts/:id', () => {
 describe('POST /api/accounts/:uid', () => {
     it('should fail account create of user with non-whitelist token', async () => {
         const response = await api
-            .post(`/api/accounts/${global.testUserId}`)
+            .post(`/api/accounts/${idData.testUserId}`)
             .set('x-access-token', 'non-whitelist-token'); // Assuming you have a valid token
 
         expect(response.statusCode).toBe(401);
@@ -179,7 +180,7 @@ describe('POST /api/accounts/:uid', () => {
 
     it('should fail account create of user with wrong token', async () => {
         const response = await api
-            .post(`/api/accounts/${global.testUserId}`)
+            .post(`/api/accounts/${idData.testUserId}`)
             .set('x-access-token', deleteUserToken); // Assuming you have a valid token
 
         expect(response.statusCode).toBe(401);
@@ -193,7 +194,7 @@ describe('POST /api/accounts/:uid', () => {
         };
 
         const response = await api
-            .post(`/api/accounts/${global.testUserId}`)
+            .post(`/api/accounts/${idData.testUserId}`)
             .set('x-access-token', userToken)
             .send(badUpdatedAccountData);
 
@@ -207,7 +208,7 @@ describe('POST /api/accounts/:uid', () => {
         };
 
         const response = await api
-            .post(`/api/accounts/${global.testUserId}`) // Replace with a valid user ID
+            .post(`/api/accounts/${idData.testUserId}`) // Replace with a valid user ID
             .set('x-access-token', userToken)
             .send(newAccountData);
 
@@ -221,7 +222,7 @@ describe('GET /api/accounts/drafts/:uid', () => {
 
     it('should fail return drafts account of a user with non-whitelist token', async () => {
         const response = await api
-            .get(`/api/accounts/drafts/${global.testUserId}`)
+            .get(`/api/accounts/drafts/${idData.testUserId}`)
             .set('x-access-token', 'non-whitelist-token'); // Assuming you have a valid token
 
         expect(response.statusCode).toBe(401);
@@ -230,7 +231,7 @@ describe('GET /api/accounts/drafts/:uid', () => {
 
     it('should fail return drafts account of a user with wrong token', async () => {
         const response = await api
-            .get(`/api/accounts/drafts/${global.testUserId}`)
+            .get(`/api/accounts/drafts/${idData.testUserId}`)
             .set('x-access-token', deleteUserToken); // Assuming you have a valid token
 
         expect(response.statusCode).toBe(401);
@@ -239,7 +240,7 @@ describe('GET /api/accounts/drafts/:uid', () => {
 
     it('should return drafts account of a user', async () => {
         const response = await api
-            .get(`/api/accounts/drafts/${global.testUserId}`) // Replace with a valid user ID
+            .get(`/api/accounts/drafts/${idData.testUserId}`) // Replace with a valid user ID
             .set('x-access-token', userToken);
 
         expect(response.statusCode).toBe(200);

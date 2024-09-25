@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 let Schema = mongoose.Schema;
 
 
-const categoriesIncomes = [
+export const categoriesIncomes = [
     {category1: "Salary & Wage"},
     {category1: "Assets"},
     {category1: "Student Work"},
@@ -41,6 +41,3 @@ function round(value) {
 
 
 mongoose.model('Income', income);
-
-
-export default categoriesIncomes;

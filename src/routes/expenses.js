@@ -2,7 +2,7 @@ import {Router} from "express";
 import authJWT from "../middlewares/authJWT.js";
 import drafts from "../middlewares/drafts.js";
 import expensesController from "../controllers/expenses.js";
-import categoriesExpenses from "../models/expenses.js";
+import {categoriesExpenses} from "../models/expenses.js";
 import fileMiddleware from "../middlewares/files.js";
 
 const router = Router();
@@ -44,7 +44,6 @@ router.get("/breakdown/:aid", [authJWT.verifyTokenWhitelist, authJWT.verifyToken
 
 // Create sms expense draft
 router.post("/sms", [authJWT.verifyTokenWhitelist, drafts.createExpenseSMS], expensesController.create);
-
 
 router.use('/api/expenses', router);
 

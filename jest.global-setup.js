@@ -1,6 +1,8 @@
 import mongoose from './src/models/db.js'
 import mockData from './test_entries.js'; // Assuming this is a module you can import
-import {server, start as start_server} from './src/server.js';
+import {start as start_server} from './src/server.js';
+import fs from 'fs';
+import path from "path";
 
 export default async () => {
 
@@ -21,6 +23,10 @@ export default async () => {
     }
 
     await populateTestData();
+
+    // Create a file to store the test IDs as a workaround for the lack of global variables
+    // each test file has its own context, so we need to store the IDs in a file
+    fs.writeFileSync( 'test_ids.json', JSON.stringify(testIds, null, 2));
 };
 
 const testIds ={
@@ -50,13 +56,13 @@ async function populateTestData() {
     const userToDelete = await saveUserToDB({...mockData.userToDelete, accounts: [mockData.accountDataToDelete]});
     const userToUpdate = await saveUserToDB({...mockData.userToUpdate, accounts: []});
 
-    global.testUserId = testUser._id;
-    global.deleteUserId = userToDelete._id;
-    global.updateUserId = userToUpdate._id;
+    testIds.testUserId = testUser._id;
+    testIds.deleteUserId = userToDelete._id;
+    testIds.updateUserId = userToUpdate._id;
 
-    global.testAccountId = testUser.accounts[0]._id;
-    global.deleteAccountId = testUser.accounts[1]._id;
-    global.updateAccountId = testUser.accounts[2]._id;
+    testIds.testAccountId = testUser.accounts[0]._id;
+    testIds.deleteAccountId = testUser.accounts[1]._id;
+    testIds.updateAccountId = testUser.accounts[2]._id;
 
     // add expense data to db
     const testExpense = await saveExpenseToDB({
@@ -82,10 +88,10 @@ async function populateTestData() {
         accountID: testUser.accounts[0]._id
     });
 
-    global.testExpenseId = testExpense._id;
-    global.fileTestExpenseId = fileTestExpense._id;
-    global.deleteExpenseId = expenseToDelete._id;
-    global.updateExpenseId = expenseToUpdate._id;
+    testIds.testExpenseId = testExpense._id;
+    testIds.fileTestExpenseId = fileTestExpense._id;
+    testIds.deleteExpenseId = expenseToDelete._id;
+    testIds.updateExpenseId = expenseToUpdate._id;
 
     // add income data to db
     const testIncome = await saveIncomeToDB({
@@ -104,9 +110,9 @@ async function populateTestData() {
         accountID: testUser.accounts[0]._id
     });
 
-    global.testIncomeId = testIncome._id;
-    global.deleteIncomeId = incomeToDelete._id;
-    global.updateIncomeId = incomeToUpdate._id;
+    testIds.testIncomeId = testIncome._id;
+    testIds.deleteIncomeId = incomeToDelete._id;
+    testIds.updateIncomeId = incomeToUpdate._id;
 }
 
 const saveUserToDB = async (userData) => {

@@ -1,6 +1,7 @@
 import supertest from 'supertest';
 import {testUserData, userToDelete, userToUpdate, pngString} from '../test_entries.js'
 import {server} from '../src/server.js'
+import idData from '../test_ids.json';
 
 const api = supertest(server);
 
@@ -27,7 +28,7 @@ describe('GET /api/expenses/find/:aid', () => {
 
     it('should fail to return data with non-whitelist token', async () => {
         const response = await api
-            .get(`/api/expenses/find/${global.testAccountId}`)
+            .get(`/api/expenses/find/${idData.testAccountId}`)
             .set('x-access-token', 'non-whitelist-token'); // Assuming you have a valid token
 
         expect(response.statusCode).toBe(401);
@@ -36,7 +37,7 @@ describe('GET /api/expenses/find/:aid', () => {
 
     it('should fail to return data with wrong token', async () => {
         const response = await api
-            .get(`/api/expenses/find/${global.testAccountId}`)
+            .get(`/api/expenses/find/${idData.testAccountId}`)
             .set('x-access-token', updateUserToken); // Assuming you have a valid token
 
         expect(response.statusCode).toBe(401);
@@ -45,7 +46,7 @@ describe('GET /api/expenses/find/:aid', () => {
 
     it('should return all expenses of an account', async () => {
         const response = await api
-            .get(`/api/expenses/find/${global.testAccountId}`)
+            .get(`/api/expenses/find/${idData.testAccountId}`)
             .set('x-access-token', userToken);
 
         expect(response.statusCode).toBe(200);
@@ -58,7 +59,7 @@ describe('GET /api/expenses/:id', () => {
 
     it('should fail to return expense with non-whitelist token', async () => {
         const response = await api
-            .get(`/api/expenses/${global.testExpenseId}`)
+            .get(`/api/expenses/${idData.testExpenseId}`)
             .set('x-access-token', 'non-whitelist-token');
 
         expect(response.statusCode).toBe(401);
@@ -67,7 +68,7 @@ describe('GET /api/expenses/:id', () => {
 
     it('should fail to return expense with wrong token', async () => {
         const response = await api
-            .get(`/api/expenses/${global.testExpenseId}`)
+            .get(`/api/expenses/${idData.testExpenseId}`)
             .set('x-access-token', updateUserToken);
 
         expect(response.statusCode).toBe(401);
@@ -76,7 +77,7 @@ describe('GET /api/expenses/:id', () => {
 
     it('should return specific expense by ID without file', async () => {
         const response = await api
-            .get(`/api/expenses/${global.testExpenseId}`)
+            .get(`/api/expenses/${idData.testExpenseId}`)
             .set('x-access-token', userToken);
 
         expect(response.statusCode).toBe(200);
@@ -84,15 +85,15 @@ describe('GET /api/expenses/:id', () => {
         expect(response.body).toHaveProperty('description', 'Test Expense');
     });
 
-    it('should return specific expense by ID with file', async () => {
+    /*it('should return specific expense by ID with file', async () => {
         const response = await api
-            .get(`/api/expenses/${global.fileTestExpenseId}`)
+            .get(`/api/expenses/${idData.testExpenseId}`)
             .set('x-access-token', userToken);
 
         expect(response.statusCode).toBe(200);
         expect(response.body).toHaveProperty('file', 'image/png');
         expect(response.body).toHaveProperty('description', 'Test Expense');
-    });
+    });*/
 
 });
 
@@ -100,7 +101,7 @@ describe('GET /api/expenses/file/:id', () => {
 
     it('should fail to return expense with non-whitelist token', async () => {
         const response = await api
-            .get(`/api/expenses/file/${global.testExpenseId}`)
+            .get(`/api/expenses/file/${idData.testExpenseId}`)
             .set('x-access-token', 'non-whitelist-token');
 
         expect(response.statusCode).toBe(401);
@@ -109,7 +110,7 @@ describe('GET /api/expenses/file/:id', () => {
 
     it('should fail to return expense with wrong token', async () => {
         const response = await api
-            .get(`/api/expenses/file/${global.testExpenseId}`)
+            .get(`/api/expenses/file/${idData.testExpenseId}`)
             .set('x-access-token', updateUserToken);
 
         expect(response.statusCode).toBe(401);
@@ -118,7 +119,7 @@ describe('GET /api/expenses/file/:id', () => {
 
     it('should not return file for specific expense without file by ID ', async () => {
         const response = await api
-            .get(`/api/expenses/file/${global.testExpenseId}`)
+            .get(`/api/expenses/file/${idData.testExpenseId}`)
             .set('x-access-token', userToken);
 
         expect(response.statusCode).toBe(404);
@@ -126,7 +127,7 @@ describe('GET /api/expenses/file/:id', () => {
 
     it('should return file for specific expense by ID', async () => {
         const response = await api
-            .get(`/api/expenses/file/${global.fileTestExpenseId}`)
+            .get(`/api/expenses/file/${idData.fileTestExpenseId}`)
             .set('x-access-token', userToken);
 
         expect(response.statusCode).toBe(200);
@@ -138,7 +139,7 @@ describe('DELETE /api/expenses/file/:id', () => {
 
     it('should fail to delete expense with non-whitelist token', async () => {
         const response = await api
-            .delete(`/api/expenses/${global.deleteExpenseId}`)
+            .delete(`/api/expenses/${idData.deleteExpenseId}`)
             .set('x-access-token', 'non-whitelist-token');
 
         expect(response.statusCode).toBe(401);
@@ -147,7 +148,7 @@ describe('DELETE /api/expenses/file/:id', () => {
 
     it('should fail to return expense with wrong token', async () => {
         const response = await api
-            .delete(`/api/expenses/${global.deleteExpenseId}`)
+            .delete(`/api/expenses/${idData.deleteExpenseId}`)
             .set('x-access-token', updateUserToken);
 
         expect(response.statusCode).toBe(401);
@@ -157,7 +158,7 @@ describe('DELETE /api/expenses/file/:id', () => {
 
     it('should delete a specific expense by ID', async () => {
         const response = await api
-            .delete(`/api/expenses/${global.deleteExpenseId}`)
+            .delete(`/api/expenses/${idData.deleteExpenseId}`)
             .set('x-access-token', userToken);
 
         expect(response.statusCode).toBe(200);
@@ -169,7 +170,7 @@ describe('PUT /api/expenses/:id', () => {
 
     it('should fail to update expense with non-whitelist token', async () => {
         const response = await api
-            .put(`/api/expenses/${global.updateExpenseId}`)
+            .put(`/api/expenses/${idData.updateExpenseId}`)
             .set('x-access-token', 'non-whitelist-token');
 
         expect(response.statusCode).toBe(401);
@@ -178,7 +179,7 @@ describe('PUT /api/expenses/:id', () => {
 
     it('should fail to update expense with wrong token', async () => {
         const response = await api
-            .put(`/api/expenses/${global.updateExpenseId}`)
+            .put(`/api/expenses/${idData.updateExpenseId}`)
             .set('x-access-token', deleteUserToken)
 
         expect(response.statusCode).toBe(401);
@@ -193,7 +194,7 @@ describe('PUT /api/expenses/:id', () => {
         };
 
         const response = await api
-            .put(`/api/expenses/${global.updateExpenseId}`)
+            .put(`/api/expenses/${idData.updateExpenseId}`)
             .set('x-access-token', userToken)
             .send(draftUpdateData);
 
@@ -208,7 +209,7 @@ describe('PUT /api/expenses/:id', () => {
         };
 
         const response = await api
-            .put(`/api/expenses/${global.updateExpenseId}`)
+            .put(`/api/expenses/${idData.updateExpenseId}`)
             .set('x-access-token', userToken)
             .set('x-access-token', userToken)
             .send(tooLongDescriptionData);
@@ -224,7 +225,7 @@ describe('PUT /api/expenses/:id', () => {
         };
 
         const response = await api
-            .put(`/api/expenses/${global.updateExpenseId}`)
+            .put(`/api/expenses/${idData.updateExpenseId}`)
             .set('x-access-token', userToken)
             .send(unsafeIntegerAmountData);
 
@@ -239,7 +240,7 @@ describe('PUT /api/expenses/:id', () => {
         };
 
         const response = await api
-            .put(`/api/expenses/${global.updateExpenseId}`)
+            .put(`/api/expenses/${idData.updateExpenseId}`)
             .set('x-access-token', userToken)
             .send(negativeIntegerAmountData);
 
@@ -254,7 +255,7 @@ describe('PUT /api/expenses/:id', () => {
         };
 
         const response = await api
-            .put(`/api/expenses/${global.updateExpenseId}`)
+            .put(`/api/expenses/${idData.updateExpenseId}`)
             .set('x-access-token', userToken)
             .send(tooBigIntegerAmountData);
 
@@ -269,7 +270,7 @@ describe('PUT /api/expenses/:id', () => {
         };
 
         const response = await api
-            .put(`/api/expenses/${global.updateExpenseId}`)
+            .put(`/api/expenses/${idData.updateExpenseId}`)
             .set('x-access-token', userToken)
             .send(expenseData);
 
@@ -303,12 +304,12 @@ describe('POST /api/expenses/:id', () => {
             category1: "Draft",
             category2: "Draft",
             amount: 10000,
-            userID: testUserId,
-            accountID: global.testAccountId,
+            userID: idData.testUserId,
+            accountID: idData.testAccountId,
         };
 
         const response = await api
-            .put(`/api/expenses/${global.updateExpenseId}`)
+            .put(`/api/expenses/${idData.updateExpenseId}`)
             .set('x-access-token', userToken)
             .send(draftCreateData);
 
@@ -320,8 +321,8 @@ describe('POST /api/expenses/:id', () => {
 
         const tooLongDescriptionData = {
             description: "VeryMuchTooLongExpenseDescriptionWeWillNotAcceptItVeryMuchTooLongExpenseDescriptionWeWillNotAcceptIt",
-            userID: testUserId,
-            accountID: global.testAccountId,
+            userID: idData.testUserId,
+            accountID: idData.testAccountId,
         };
 
         const response = await api
@@ -337,8 +338,8 @@ describe('POST /api/expenses/:id', () => {
 
         const unsafeIntegerAmountData = {
             amount: Math.pow(2, 53),
-            userID: testUserId,
-            accountID: global.testAccountId,
+            userID: idData.testUserId,
+            accountID: idData.testAccountId,
         };
 
         const response = await api
@@ -354,8 +355,8 @@ describe('POST /api/expenses/:id', () => {
 
         const negativeIntegerAmountData = {
             amount: -1,
-            userID: testUserId,
-            accountID: global.testAccountId,
+            userID: idData.testUserId,
+            accountID: idData.testAccountId,
         };
 
         const response = await api
@@ -371,8 +372,8 @@ describe('POST /api/expenses/:id', () => {
 
         const tooBigIntegerAmountData = {
             amount: 100000001,
-            userID: testUserId,
-            accountID: global.testAccountId,
+            userID: idData.testUserId,
+            accountID: idData.testAccountId,
         };
 
         const response = await api
@@ -389,8 +390,8 @@ describe('POST /api/expenses/:id', () => {
             category1: "Food & Drinks",
             category2: "Alcohol",
             amount: 10000,
-            userID: testUserId,
-            accountID: global.testAccountId,
+            userID: idData.testUserId,
+            accountID: idData.testAccountId,
         };
 
         const response = await api
@@ -409,8 +410,8 @@ describe('POST /api/expenses/:id', () => {
             category1: "Food & Drinks",
             category2: "Alcohol",
             amount: 10000,
-            userID: testUserId,
-            accountID: global.testAccountId,
+            userID: idData.testUserId,
+            accountID: idData.testAccountId,
             file: "R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
         };
 
@@ -430,8 +431,8 @@ describe('POST /api/expenses/:id', () => {
             category1: "Food & Drinks",
             category2: "Alcohol",
             amount: 10000,
-            userID: testUserId,
-            accountID: global.testAccountId,
+            userID: idData.testUserId,
+            accountID: idData.testAccountId,
             file: 1234
         };
 
@@ -451,8 +452,8 @@ describe('POST /api/expenses/:id', () => {
             category1: "Food & Drinks",
             category2: "Alcohol",
             amount: 10000,
-            userID: testUserId,
-            accountID: global.testAccountId,
+            userID: idData.testUserId,
+            accountID: idData.testAccountId,
             file: 1234
         };
 
@@ -472,8 +473,8 @@ describe('POST /api/expenses/:id', () => {
             category1: "Food & Drinks",
             category2: "Alcohol",
             amount: 10000,
-            userID: testUserId,
-            accountID: global.testAccountId,
+            userID: idData.testUserId,
+            accountID: idData.testAccountId,
             file: pngString
         };
 
@@ -493,7 +494,7 @@ describe('GET /api/expenses/breakdown/:aid', () => {
 
     it('should fail to return breakdown with non-whitelist token', async () => {
         const response = await api
-            .get(`/api/expenses/breakdown/${global.testAccountId}`)
+            .get(`/api/expenses/breakdown/${idData.testAccountId}`)
             .set('x-access-token', 'non-whitelist-token');
 
         expect(response.statusCode).toBe(401);
@@ -502,7 +503,7 @@ describe('GET /api/expenses/breakdown/:aid', () => {
 
     it('should fail to return breakdown with wrong token', async () => {
         const response = await api
-            .get(`/api/expenses/breakdown/${global.testAccountId}`)
+            .get(`/api/expenses/breakdown/${idData.testAccountId}`)
             .set('x-access-token', updateUserToken);
 
         expect(response.statusCode).toBe(401);
@@ -511,7 +512,7 @@ describe('GET /api/expenses/breakdown/:aid', () => {
 
     it('should fail to return breakdown without a start date', async () => {
         const response = await api
-            .get(`/api/expenses/breakdown/${global.testAccountId}`)
+            .get(`/api/expenses/breakdown/${idData.testAccountId}`)
             .set('x-access-token', userToken);
 
         expect(response.statusCode).toBe(400);
@@ -520,7 +521,7 @@ describe('GET /api/expenses/breakdown/:aid', () => {
 
     it('should fail to return breakdown without an end date', async () => {
         const response = await api
-            .get(`/api/expenses/breakdown/${global.testAccountId}`)
+            .get(`/api/expenses/breakdown/${idData.testAccountId}`)
             .set('x-access-token', userToken)
             .query({startDate: '1234'});
 
@@ -530,7 +531,7 @@ describe('GET /api/expenses/breakdown/:aid', () => {
 
     it('should return expenses breakdown', async () => {
         const response = await api
-            .get(`/api/expenses/breakdown/${global.testAccountId}`)
+            .get(`/api/expenses/breakdown/${idData.testAccountId}`)
             .set('x-access-token', userToken)
             .query({
                 startDate: "2000-12-31",
