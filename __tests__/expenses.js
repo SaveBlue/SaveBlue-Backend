@@ -334,8 +334,6 @@ describe('PUT /api/expenses/:id', () => {
 
     it('should update specific expense by ID with a file', async () => {
         const expenseData = {
-            // TODO: morajo bit potem vsi updati tako?
-            ...testExpenseData,
             file: pngString
         };
 

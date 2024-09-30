@@ -116,7 +116,6 @@ export const incomeDataToUpdate = {
     date: "2024-04-09"
 }
 
-// TODO: zakaj vse exportamo posebej, če delamo potem še mockData objekt?
 const mockData = {
     testUserData,
     userToDelete,
