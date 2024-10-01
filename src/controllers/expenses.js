@@ -207,10 +207,9 @@ const update = async (req, res) => {
         editedExpense.file = null;
     }
 
-
     try {
         // Fetch the old expense and edit it
-        const expense = await Expense.findByIdAndUpdate(req.params.id, {$set: editedExpense}, {new: true});
+        const expense = await Expense.findByIdAndUpdate(req.params.id, {$set: editedExpense});
 
         if (!expense) {
             return res.status(404).send({

@@ -1,8 +1,7 @@
 import mongoose from './src/models/db.js'
-import mockData from './test_entries.js'; // Assuming this is a module you can import
+import mockData from './test_entries.js';
 import {start as start_server} from './src/server.js';
 import fs from 'fs';
-import path from "path";
 
 export default async () => {
 
@@ -40,7 +39,7 @@ async function populateTestData() {
     // add user data to db
     const testUser = await saveUserToDB({
         ...mockData.testUserData,
-        accounts: [mockData.testAccountData, mockData.accountDataToDelete, mockData.accountDataToUpdate]
+        accounts: [mockData.testAccountData, mockData.accountDataToDelete, mockData.accountDataToUpdate, mockData.accountDataToChangeExpenseAccountStart, mockData.accountDataToChangeExpenseAccountDest]
     });
     const userToDelete = await saveUserToDB({...mockData.userToDelete, accounts: [mockData.accountDataToDelete]});
     const userToUpdate = await saveUserToDB({...mockData.userToUpdate, accounts: []});
@@ -50,6 +49,8 @@ async function populateTestData() {
     testIds.updateUserId = userToUpdate._id;
 
     testIds.testAccountId = testUser.accounts[0]._id;
+    testIds.accountDataToChangeExpenseAccountStartId = testUser.accounts[3]._id;
+    testIds.accountDataToChangeExpenseAccountDestId = testUser.accounts[4]._id;
     testIds.deleteAccountId = testUser.accounts[1]._id;
     testIds.updateAccountId = testUser.accounts[2]._id;
 
@@ -59,6 +60,11 @@ async function populateTestData() {
         userID: testUser._id,
         accountID: testUser.accounts[0]._id,
 
+    });
+    const testExpense2 = await saveExpenseToDB({
+        ...mockData.testExpenseData,
+        userID: testUser._id,
+        accountID: testUser.accounts[3]._id,
     });
     const fileTestExpense1 = await saveExpenseToDB({
         ...mockData.testExpenseData,
@@ -96,6 +102,7 @@ async function populateTestData() {
     });
 
     testIds.testExpenseId = testExpense._id;
+    testIds.testExpense2Id = testExpense2._id;
     testIds.fileTestExpense1Id = fileTestExpense1._id;
     testIds.fileTestExpense2Id = fileTestExpense2._id;
     testIds.fileTestExpense3Id = fileTestExpense3._id;
@@ -130,7 +137,7 @@ const saveUserToDB = async (userData) => {
         const User = mongoose.model('User');
 
         // Create a new user instance
-        let testUser = new User(userData);
+        const testUser = new User(userData);
 
         // Hash the password
         testUser.hashPassword(userData.password);

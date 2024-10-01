@@ -166,7 +166,6 @@ describe('DELETE /api/expenses/file/:id', () => {
         expect(response.body).toHaveProperty('message', 'Unauthorized!');
     });
 
-
     it('should delete a specific expense by ID', async () => {
         const response = await api
             .delete(`/api/expenses/${idData.deleteExpenseId}`)
@@ -287,6 +286,35 @@ describe('PUT /api/expenses/:id', () => {
 
         expect(response.statusCode).toBe(200);
         expect(response.body).toHaveProperty('message', 'Expense updated!');
+    });
+
+    it('should update balance of account after changing account id', async () => {
+        const expenseData = {
+            accountID: idData.accountDataToChangeExpenseAccountDestId,
+        };
+
+        const response = await api
+            .put(`/api/expenses/${idData.testExpense2Id}`)
+            .set('x-access-token', userToken)
+            .send(expenseData);
+
+        const response2 = await api
+            .get(`/api/accounts/find/${idData.accountDataToChangeExpenseAccountStartId}`)
+            .set('x-access-token', userToken);
+
+        const response3 = await api
+            .get(`/api/accounts/find/${idData.accountDataToChangeExpenseAccountDestId}`)
+            .set('x-access-token', userToken);
+
+        expect(response.statusCode).toBe(200);
+        expect(response2.statusCode).toBe(200);
+        expect(response3.statusCode).toBe(200);
+
+        expect(response2.body).toHaveProperty('availableBalance', 0);
+        expect(response2.body).toHaveProperty('totalBalance', 0);
+        expect(response3.body).toHaveProperty('availableBalance', -testExpenseData.amount);
+        expect(response3.body).toHaveProperty('totalBalance', -testExpenseData.amount);
+
     });
 
     it('should fail to update expense with invalid file type', async () => {

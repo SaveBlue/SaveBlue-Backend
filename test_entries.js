@@ -116,6 +116,28 @@ export const incomeDataToUpdate = {
     date: "2024-04-09"
 }
 
+export const accountDataToChangeExpenseAccountStart = {
+    name: 'Remove from acc',
+    availableBalance: -testExpenseData.amount,
+    totalBalance: -testExpenseData.amount,
+    startOfMonth: 1,
+    budgets: [],
+    goals: [],
+    expenses: [],
+    incomes: [],
+}
+
+export const accountDataToChangeExpenseAccountDest = {
+    name: 'Add to acc',
+    availableBalance: 0,
+    totalBalance: 0,
+    startOfMonth: 1,
+    budgets: [],
+    goals: [],
+    expenses: [],
+    incomes: [],
+}
+
 const mockData = {
     testUserData,
     userToDelete,
@@ -123,6 +145,8 @@ const mockData = {
     testAccountData,
     accountDataToDelete,
     accountDataToUpdate,
+    accountDataToChangeExpenseAccountStart,
+    accountDataToChangeExpenseAccountDest,
     testExpenseData,
     expenseDataToDelete,
     expenseDataToUpdate,
