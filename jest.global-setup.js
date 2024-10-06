@@ -39,7 +39,15 @@ async function populateTestData() {
     // add user data to db
     const testUser = await saveUserToDB({
         ...mockData.testUserData,
-        accounts: [mockData.testAccountData, mockData.accountDataToDelete, mockData.accountDataToUpdate, mockData.accountDataToChangeExpenseAccountStart, mockData.accountDataToChangeExpenseAccountDest]
+        accounts: [
+            mockData.testAccountData,
+            mockData.accountDataToDelete,
+            mockData.accountDataToUpdate,
+            mockData.accountDataToChangeExpenseAccountStart,
+            mockData.accountDataToChangeExpenseAccountDest,
+            mockData.accountDataToChangeIncomeAccountStart,
+            mockData.accountDataToChangeIncomeAccountDest
+        ]
     });
     const userToDelete = await saveUserToDB({...mockData.userToDelete, accounts: [mockData.accountDataToDelete]});
     const userToUpdate = await saveUserToDB({...mockData.userToUpdate, accounts: []});
@@ -116,6 +124,11 @@ async function populateTestData() {
         userID: testUser._id,
         accountID: testUser.accounts[0]._id
     });
+    const testIncome2 = await saveIncomeToDB({
+        ...mockData.testIncomeData,
+        userID: testUser._id,
+        accountID: testUser.accounts[5]._id,
+    });
     const incomeToDelete = await saveIncomeToDB({
         ...mockData.incomeDataToDelete,
         userID: testUser._id,
@@ -128,8 +141,41 @@ async function populateTestData() {
     });
 
     testIds.testIncomeId = testIncome._id;
+    testIds.testIncome2Id = testIncome2._id;
+    testIds.accountDataToChangeIncomeAccountStartId = testUser.accounts[5]._id;
+    testIds.accountDataToChangeIncomeAccountDestId = testUser.accounts[6]._id;
     testIds.deleteIncomeId = incomeToDelete._id;
     testIds.updateIncomeId = incomeToUpdate._id;
+
+    const fileTestIncome1 = await saveIncomeToDB({
+        ...mockData.testIncomeData,
+        userID: testUser._id,
+        accountID: testUser.accounts[0]._id,
+        file: pngFile
+    });
+    const fileTestIncome2 = await saveIncomeToDB({
+        ...mockData.testIncomeData,
+        userID: testUser._id,
+        accountID: testUser.accounts[0]._id,
+        file: pngFile
+    });
+    const fileTestIncome3 = await saveIncomeToDB({
+        ...mockData.testIncomeData,
+        userID: testUser._id,
+        accountID: testUser.accounts[0]._id,
+        file: pngFile
+    });
+    const fileTestIncome4 = await saveIncomeToDB({
+        ...mockData.testIncomeData,
+        userID: testUser._id,
+        accountID: testUser.accounts[0]._id,
+        file: pngFile
+    });
+
+    testIds.fileTestIncome1Id = fileTestIncome1._id;
+    testIds.fileTestIncome2Id = fileTestIncome2._id;
+    testIds.fileTestIncome3Id = fileTestIncome3._id;
+    testIds.fileTestIncome4Id = fileTestIncome4._id;
 }
 
 const saveUserToDB = async (userData) => {
@@ -153,8 +199,6 @@ const saveUserToDB = async (userData) => {
         console.error('Error creating test user:', error);
     }
 }
-
-
 
 const saveIncomeToDB = async (incomeData) => {
     try {

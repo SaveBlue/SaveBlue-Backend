@@ -13,7 +13,6 @@ import idData from '../test_ids.json';
 const api = supertest(server);
 
 let userToken, deleteUserToken, updateUserToken;
-
 let pngTooLargeString;
 
 async function loginUserAndGetToken(userData) {
@@ -146,7 +145,7 @@ describe('GET /api/expenses/file/:id', () => {
 
 });
 
-describe('DELETE /api/expenses/file/:id', () => {
+describe('DELETE /api/expenses/:id', () => {
 
     it('should fail to delete expense with non-whitelist token', async () => {
         const response = await api

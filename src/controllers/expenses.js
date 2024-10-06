@@ -31,7 +31,7 @@ const findAllExpensesByAccountID = async (req, res) => {
 // Find an expense with requested id
 const findExpenseByID = async (req, res) => {
     try {
-        let expense = await Expense.findById(req.params.id, "-file.data -file._id");
+        const expense = await Expense.findById(req.params.id, "-file.data -file._id");
 
         if (!expense) {
             return res.status(404).json({
@@ -103,7 +103,6 @@ const create = async (req, res) => {
     }
 
     let newFile = null;
-
     if (file) {
         newFile = new File({
             contentType: file.contentType,
