@@ -5,9 +5,9 @@ name: CI/CD Staging
 
 on:
   push:
-    branches: [staging]
+    branches: [ImageStorage]
   pull_request:
-    branches: [staging]
+    branches: [ImageStorage]
 
 jobs:
 
