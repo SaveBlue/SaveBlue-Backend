@@ -116,7 +116,50 @@ export const incomeDataToUpdate = {
     date: "2024-04-09"
 }
 
-// TODO: zakaj vse exportamo posebej, če delamo potem še mockData objekt?
+export const accountDataToChangeExpenseAccountStart = {
+    name: 'Remove from acc EXPENSE',
+    availableBalance: -testExpenseData.amount,
+    totalBalance: -testExpenseData.amount,
+    startOfMonth: 1,
+    budgets: [],
+    goals: [],
+    expenses: [],
+    incomes: [],
+}
+
+export const accountDataToChangeExpenseAccountDest = {
+    name: 'Add to acc EXPENSE',
+    availableBalance: 0,
+    totalBalance: 0,
+    startOfMonth: 1,
+    budgets: [],
+    goals: [],
+    expenses: [],
+    incomes: [],
+}
+
+export const accountDataToChangeIncomeAccountStart = {
+    name: 'Remove from acc INCOME',
+    availableBalance: testIncomeData.amount,
+    totalBalance: testIncomeData.amount,
+    startOfMonth: 1,
+    budgets: [],
+    goals: [],
+    expenses: [],
+    incomes: [],
+}
+
+export const accountDataToChangeIncomeAccountDest = {
+    name: 'Add to acc INCOME',
+    availableBalance: 0,
+    totalBalance: 0,
+    startOfMonth: 1,
+    budgets: [],
+    goals: [],
+    expenses: [],
+    incomes: [],
+}
+
 const mockData = {
     testUserData,
     userToDelete,
@@ -124,6 +167,10 @@ const mockData = {
     testAccountData,
     accountDataToDelete,
     accountDataToUpdate,
+    accountDataToChangeExpenseAccountStart,
+    accountDataToChangeExpenseAccountDest,
+    accountDataToChangeIncomeAccountStart,
+    accountDataToChangeIncomeAccountDest,
     testExpenseData,
     expenseDataToDelete,
     expenseDataToUpdate,

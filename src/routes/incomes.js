@@ -3,6 +3,7 @@ import authJWT from "../middlewares/authJWT.js";
 import drafts from "../middlewares/drafts.js";
 import incomesController from "../controllers/incomes.js";
 import {categoriesIncomes} from "../models/incomes.js";
+import fileMiddleware from "../middlewares/files.js";
 
 const router = Router();
 
@@ -25,14 +26,17 @@ router.get("/find/:aid", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenAccou
 // Return an income by ID
 router.get("/:id", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenIncome], incomesController.findIncomeByID);
 
+// Return a saved income file by income ID
+router.get("/file/:id", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenIncome], incomesController.findIncomeFileByID);
+
 // Create income
-router.post("/", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenExpenseIncomePost, drafts.block], incomesController.create);
+router.post("/", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenExpenseIncomePost, drafts.block, fileMiddleware.checkFileValidity], incomesController.create);
 
 // Delete income by ID
 router.delete("/:id", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenIncome], incomesController.remove);
 
 // Update income by ID
-router.put("/:id", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenIncome, drafts.block], incomesController.update);
+router.put("/:id", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenIncome, drafts.block, fileMiddleware.checkFileValidity], incomesController.update);
 
 // Return income breakdown by primary categories
 router.get("/breakdown/:aid", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenAccount], incomesController.incomesBreakdown);

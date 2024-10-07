@@ -31,7 +31,7 @@ const findAllExpensesByAccountID = async (req, res) => {
 // Find an expense with requested id
 const findExpenseByID = async (req, res) => {
     try {
-        let expense = await Expense.findById(req.params.id, "-file.data -file._id");
+        const expense = await Expense.findById(req.params.id, "-file.data -file._id");
 
         if (!expense) {
             return res.status(404).json({
@@ -103,7 +103,6 @@ const create = async (req, res) => {
     }
 
     let newFile = null;
-
     if (file) {
         newFile = new File({
             contentType: file.contentType,
@@ -182,7 +181,7 @@ const update = async (req, res) => {
     }
 
     // Check if amount is an integer
-    if (!Number.isSafeInteger(amount) || amount <= 0 || amount > 100000000) {
+    if (amount && (!Number.isSafeInteger(amount) || amount <= 0 || amount > 100000000)) {
         return res.status(400).json({
             message: "Amount not a valid number."
         });
@@ -193,7 +192,7 @@ const update = async (req, res) => {
         ...(category1 && {category1: category1}),
         ...(category2 && {category2: category2}),
         ...(accountID && {accountID: accountID}),
-        description: description || "",
+        ...(description && {description: description}),
         ...(date && {date: date}),
         ...(amount && {amount: amount}),
     };
@@ -207,10 +206,9 @@ const update = async (req, res) => {
         editedExpense.file = null;
     }
 
-
     try {
         // Fetch the old expense and edit it
-        const expense = await Expense.findByIdAndUpdate(req.params.id, {$set: editedExpense}, {new: true});
+        const expense = await Expense.findByIdAndUpdate(req.params.id, {$set: editedExpense});
 
         if (!expense) {
             return res.status(404).send({
@@ -220,7 +218,7 @@ const update = async (req, res) => {
 
         // Get expense amount difference and choose operation
         let oldAmount = expense.amount;
-        let newAmount = editedExpense.amount;
+        let newAmount = editedExpense?.amount || oldAmount;
         let difference = Math.abs(oldAmount - newAmount);
         let operation = oldAmount >= newAmount ? "+" : "-";
 
