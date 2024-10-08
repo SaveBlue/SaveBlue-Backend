@@ -1,8 +1,7 @@
 import mongoose from './src/models/db.js'
-import mockData from './test_entries.js'; // Assuming this is a module you can import
+import mockData from './test_entries.js';
 import {start as start_server} from './src/server.js';
 import fs from 'fs';
-import path from "path";
 
 export default async () => {
 
@@ -29,26 +28,26 @@ export default async () => {
     fs.writeFileSync( 'test_ids.json', JSON.stringify(testIds, null, 2));
 };
 
-let testIds ={
-    testUserId: '',
-    deleteUserId: '',
-    updateUserId: '',
-    testAccountId: '',
-    deleteAccountId: '',
-    updateAccountId: '',
-    testExpenseId: '',
-    deleteExpenseId: '',
-    updateExpenseId: '',
-    testIncomeId: '',
-    deleteIncomeId: '',
-    updateIncomeId: ''
+// Object to store test IDs to be accessed in test files
+const testIds ={
 }
 
 async function populateTestData() {
+    const File = mongoose.model('File');
+    const pngFile = new File(mockData.pngFile);
+
     // add user data to db
     const testUser = await saveUserToDB({
         ...mockData.testUserData,
-        accounts: [mockData.testAccountData, mockData.accountDataToDelete, mockData.accountDataToUpdate]
+        accounts: [
+            mockData.testAccountData,
+            mockData.accountDataToDelete,
+            mockData.accountDataToUpdate,
+            mockData.accountDataToChangeExpenseAccountStart,
+            mockData.accountDataToChangeExpenseAccountDest,
+            mockData.accountDataToChangeIncomeAccountStart,
+            mockData.accountDataToChangeIncomeAccountDest
+        ]
     });
     const userToDelete = await saveUserToDB({...mockData.userToDelete, accounts: [mockData.accountDataToDelete]});
     const userToUpdate = await saveUserToDB({...mockData.userToUpdate, accounts: []});
@@ -58,6 +57,8 @@ async function populateTestData() {
     testIds.updateUserId = userToUpdate._id;
 
     testIds.testAccountId = testUser.accounts[0]._id;
+    testIds.accountDataToChangeExpenseAccountStartId = testUser.accounts[3]._id;
+    testIds.accountDataToChangeExpenseAccountDestId = testUser.accounts[4]._id;
     testIds.deleteAccountId = testUser.accounts[1]._id;
     testIds.updateAccountId = testUser.accounts[2]._id;
 
@@ -65,7 +66,37 @@ async function populateTestData() {
     const testExpense = await saveExpenseToDB({
         ...mockData.testExpenseData,
         userID: testUser._id,
-        accountID: testUser.accounts[0]._id
+        accountID: testUser.accounts[0]._id,
+
+    });
+    const testExpense2 = await saveExpenseToDB({
+        ...mockData.testExpenseData,
+        userID: testUser._id,
+        accountID: testUser.accounts[3]._id,
+    });
+    const fileTestExpense1 = await saveExpenseToDB({
+        ...mockData.testExpenseData,
+        userID: testUser._id,
+        accountID: testUser.accounts[0]._id,
+        file: pngFile
+    });
+    const fileTestExpense2 = await saveExpenseToDB({
+        ...mockData.testExpenseData,
+        userID: testUser._id,
+        accountID: testUser.accounts[0]._id,
+        file: pngFile
+    });
+    const fileTestExpense3 = await saveExpenseToDB({
+        ...mockData.testExpenseData,
+        userID: testUser._id,
+        accountID: testUser.accounts[0]._id,
+        file: pngFile
+    });
+    const fileTestExpense4 = await saveExpenseToDB({
+        ...mockData.testExpenseData,
+        userID: testUser._id,
+        accountID: testUser.accounts[0]._id,
+        file: pngFile
     });
     const expenseToDelete = await saveExpenseToDB({
         ...mockData.expenseDataToDelete,
@@ -79,6 +110,11 @@ async function populateTestData() {
     });
 
     testIds.testExpenseId = testExpense._id;
+    testIds.testExpense2Id = testExpense2._id;
+    testIds.fileTestExpense1Id = fileTestExpense1._id;
+    testIds.fileTestExpense2Id = fileTestExpense2._id;
+    testIds.fileTestExpense3Id = fileTestExpense3._id;
+    testIds.fileTestExpense4Id = fileTestExpense4._id;
     testIds.deleteExpenseId = expenseToDelete._id;
     testIds.updateExpenseId = expenseToUpdate._id;
 
@@ -87,6 +123,11 @@ async function populateTestData() {
         ...mockData.testIncomeData,
         userID: testUser._id,
         accountID: testUser.accounts[0]._id
+    });
+    const testIncome2 = await saveIncomeToDB({
+        ...mockData.testIncomeData,
+        userID: testUser._id,
+        accountID: testUser.accounts[5]._id,
     });
     const incomeToDelete = await saveIncomeToDB({
         ...mockData.incomeDataToDelete,
@@ -100,8 +141,41 @@ async function populateTestData() {
     });
 
     testIds.testIncomeId = testIncome._id;
+    testIds.testIncome2Id = testIncome2._id;
+    testIds.accountDataToChangeIncomeAccountStartId = testUser.accounts[5]._id;
+    testIds.accountDataToChangeIncomeAccountDestId = testUser.accounts[6]._id;
     testIds.deleteIncomeId = incomeToDelete._id;
     testIds.updateIncomeId = incomeToUpdate._id;
+
+    const fileTestIncome1 = await saveIncomeToDB({
+        ...mockData.testIncomeData,
+        userID: testUser._id,
+        accountID: testUser.accounts[0]._id,
+        file: pngFile
+    });
+    const fileTestIncome2 = await saveIncomeToDB({
+        ...mockData.testIncomeData,
+        userID: testUser._id,
+        accountID: testUser.accounts[0]._id,
+        file: pngFile
+    });
+    const fileTestIncome3 = await saveIncomeToDB({
+        ...mockData.testIncomeData,
+        userID: testUser._id,
+        accountID: testUser.accounts[0]._id,
+        file: pngFile
+    });
+    const fileTestIncome4 = await saveIncomeToDB({
+        ...mockData.testIncomeData,
+        userID: testUser._id,
+        accountID: testUser.accounts[0]._id,
+        file: pngFile
+    });
+
+    testIds.fileTestIncome1Id = fileTestIncome1._id;
+    testIds.fileTestIncome2Id = fileTestIncome2._id;
+    testIds.fileTestIncome3Id = fileTestIncome3._id;
+    testIds.fileTestIncome4Id = fileTestIncome4._id;
 }
 
 const saveUserToDB = async (userData) => {
@@ -109,7 +183,7 @@ const saveUserToDB = async (userData) => {
         const User = mongoose.model('User');
 
         // Create a new user instance
-        let testUser = new User(userData);
+        const testUser = new User(userData);
 
         // Hash the password
         testUser.hashPassword(userData.password);
@@ -125,8 +199,6 @@ const saveUserToDB = async (userData) => {
         console.error('Error creating test user:', error);
     }
 }
-
-
 
 const saveIncomeToDB = async (incomeData) => {
     try {
@@ -160,11 +232,6 @@ const saveExpenseToDB = async (expenseData) => {
     } catch (error) {
         console.error('Error creating test expense:', error);
     }
-}
-
-export const returnTestIds = async () => {
-    console.log(testIds)
-    return testIds;
 }
 
 

@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+import file from './file.js';
+
 let Schema = mongoose.Schema;
 
 
@@ -49,7 +51,8 @@ let expense = new Schema({
             required: true
         },
         date: {type: Date, default: Date.now},
-        amount: {type: Number, min: 1, max: 100000000, set: round, required: true}
+        amount: {type: Number, min: 1, max: 100000000, set: round, required: true},
+        file: {type: file}
     },
     {
         timestamps: true

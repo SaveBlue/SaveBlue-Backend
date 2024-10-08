@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import updateAccountBalances from '../services/updateAccountBalances.js';
 
 const Income = mongoose.model('Income');
+const File = mongoose.model('File');
 
 // Find all incomes of the account with requested id
 const findAllIncomesByAccountID = async (req, res) => {
@@ -11,7 +12,7 @@ const findAllIncomesByAccountID = async (req, res) => {
 
         // Fetch income with specified conditions
         const income = await Income
-            .find({accountID: req.params.aid})
+            .find({accountID: req.params.aid}, '-file')
             .sort({date: -1, _id: -1})
             .skip(incomePerPage * page)
             .limit(incomePerPage);
@@ -30,7 +31,7 @@ const findAllIncomesByAccountID = async (req, res) => {
 // Find an income with an id
 const findIncomeByID = async (req, res) => {
     try {
-        const income = await Income.findById(req.params.id);
+        const income = await Income.findById(req.params.id, "-file.data -file._id");
 
         if (!income) {
             return res.status(404).json({
@@ -38,7 +39,10 @@ const findIncomeByID = async (req, res) => {
             });
         }
 
-        res.status(200).json(income);
+        const incomeData = income.toObject();
+        incomeData.file = income.file ? income.file.contentType : false;
+
+        res.status(200).json(incomeData);
 
     } catch (error) {
         res.status(500).send({
@@ -48,42 +52,87 @@ const findIncomeByID = async (req, res) => {
 };
 //----------------------------------------------------------------------------------------------------------------------
 
+// Find a file of income with requested income id
+const findIncomeFileByID = async (req, res) => {
+    try {
+        const income = await Income.findById(req.params.id);
+
+        if (!income) {
+            return res.status(404).json({
+                message: "No income with selected ID!"
+            });
+        }
+
+        const file = income.file;
+
+        if (!file) {
+            return res.status(404).json({
+                message: "No file with selected income ID!"
+            });
+        }
+
+        res.set('Content-Type', file.contentType);
+        res.send(file.data);
+
+    } catch (error) {
+        res.status(500).send({
+            message: error.message || "An error occurred while fetching the income!"
+        });
+    }
+};
+
+//----------------------------------------------------------------------------------------------------------------------
+
 
 // Create an income
 const create = async (req, res) => {
 
+    const {userID, accountID, category1, description, date, amount, file} = req.body;
+
     // Check income description length
-    if (req.body.description?.length > 32) {
+    if (description?.length > 32) {
         return res.status(400).json({
             message: "Description too long."
         });
     }
 
-    // Check if amount is an integer
-    if (!Number.isSafeInteger(req.body.amount) || req.body.amount <= 0 || req.body.amount > 100000000) {
+    // Check if amount is a valid integer and within range
+    if (!Number.isSafeInteger(amount) || amount <= 0 || amount > 100000000) {
         return res.status(400).json({
             message: "Amount not a valid number."
         });
     }
 
-    const newIncome = new Income({
-        userID: req.body.userID,
-        accountID: req.body.accountID,
-        category1: req.body.category1,
-        description: req.body.description,
-        date: req.body.date,
-        amount: req.body.amount
-    });
+    let newFile = null;
+    if (file) {
+        newFile = new File({
+            contentType: file.contentType,
+            data: file.data
+        })
+    }
 
+    const newIncome = new Income({
+        userID: userID,
+        accountID: accountID,
+        category1: category1,
+        description: description,
+        date: date,
+        amount: amount,
+        file: newFile
+    });
 
     try {
         // Save income
-        const data = await newIncome.save(newIncome);
+        const savedIncome = await newIncome.save(newIncome);
 
         // Update account balance
-        await updateAccountBalances.updateAllAccountBalances(newIncome.accountID, newIncome.amount, "+");
+        await updateAccountBalances.updateAllAccountBalances(accountID, amount, "+");
 
-        res.send(data);
+        // Prepare response data (exclude file data)
+        const responseData = savedIncome.toObject();
+        delete responseData.file; // Remove file from response
+
+        res.json(responseData);
 
     } catch (error) {
         res.status(500).send({
@@ -123,15 +172,17 @@ const remove = async (req, res) => {
 // update income with the ID
 const update = async (req, res) => {
 
+    const {accountID, category1, description, date, amount, file} = req.body;
+
     // Check income description length
-    if (req.body.description?.length > 32) {
+    if (description?.length > 32) {
         return res.status(400).json({
             message: "Description too long."
         });
     }
 
     // Check if amount is an integer
-    if (!Number.isSafeInteger(req.body.amount) || req.body.amount <= 0 || req.body.amount > 100000000) {
+    if (amount && (!Number.isSafeInteger(amount) || amount <= 0 || amount > 100000000)) {
         return res.status(400).json({
             message: "Amount not a valid number."
         });
@@ -139,16 +190,25 @@ const update = async (req, res) => {
 
     let editedIncome = {
         // Add properties to the object
-        ...(req.body.category1 && {category1: req.body.category1}),
-        ...(req.body.accountID && {accountID: req.body.accountID}),
-        description: req.body.description || "",
-        ...(req.body.date && {date: req.body.date}),
-        ...(req.body.amount && {amount: req.body.amount}),
+        ...(category1 && {category1: category1}),
+        ...(accountID && {accountID: accountID}),
+        ...(description && {description: description}),
+        ...(date && {date: date}),
+        ...(amount && {amount: amount}),
     };
+
+    if (file) {
+        editedIncome.file = new File({
+            contentType: file.contentType,
+            data: file.data
+        })
+    } else if (file === false) {
+        editedIncome.file = null;
+    }
 
     try {
         // Fetch the old income and edit it
-        const income = await Income.findByIdAndUpdate(req.params.id, {$set: editedIncome}, {new: true});
+        const income = await Income.findByIdAndUpdate(req.params.id, {$set: editedIncome});
 
         if (!income) {
             return res.status(404).send({
@@ -158,12 +218,12 @@ const update = async (req, res) => {
 
         // Get income amount difference and choose operation
         let oldAmount = income.amount;
-        let newAmount = editedIncome.amount;
+        let newAmount = editedIncome.amount || oldAmount;
         let difference = Math.abs(oldAmount - newAmount);
         let operation = oldAmount >= newAmount ? "-" : "+";
 
         // Handle account change
-        if (editedIncome.accountID && (income.accountID !== editedIncome.accountID)){
+        if (editedIncome.accountID && (income.accountID !== editedIncome.accountID)) {
 
             // Subtract from old account
             await updateAccountBalances.updateAllAccountBalances(income.accountID, oldAmount, "-");
@@ -228,6 +288,7 @@ const incomesBreakdown = async (req, res) => {
 export default {
     findAllIncomesByAccountID,
     findIncomeByID,
+    findIncomeFileByID,
     create,
     remove,
     update,
