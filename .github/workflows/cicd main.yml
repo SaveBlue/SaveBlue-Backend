@@ -5,9 +5,9 @@ name: CI/CD Production
 
 on:
   push:
-    branches: [ImageStorage]
+    branches: [main]
   pull_request:
-    branches: [ImageStorage]
+    branches: [main]
 
 jobs:
 
