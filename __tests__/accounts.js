@@ -27,7 +27,7 @@ beforeAll(async () => {
 describe('GET /api/accounts/:uid', () => {
     it('should fail return all accounts of a user with non-whitelist token', async () => {
         const response = await api
-            .get(`/api/accounts/${idData.testUserId}`) // Replace with a valid user ID
+            .get(`/api/accounts/${idData.testUserId}`)
             .set('x-access-token', 'non-whitelist-token');
 
         expect(response.statusCode).toBe(401);
@@ -36,7 +36,7 @@ describe('GET /api/accounts/:uid', () => {
 
     it('should fail return all accounts of a user with wrong token', async () => {
         const response = await api
-            .get(`/api/accounts/${idData.testUserId}`) // Replace with a valid user ID
+            .get(`/api/accounts/${idData.testUserId}`)
             .set('x-access-token', deleteUserToken);
 
         expect(response.statusCode).toBe(401);
@@ -45,7 +45,7 @@ describe('GET /api/accounts/:uid', () => {
 
     it('should return all accounts of a user', async () => {
         const response = await api
-            .get(`/api/accounts/${idData.testUserId}`) // Replace with a valid user ID
+            .get(`/api/accounts/${idData.testUserId}`)
             .set('x-access-token', userToken);
 
         expect(response.statusCode).toBe(200);
@@ -58,7 +58,7 @@ describe('GET /api/accounts/find/:id', () => {
 
     it('should fail return of account with non-whitelist token', async () => {
         const response = await api
-            .get(`/api/accounts/find/${idData.testAccountId}`) // Replace with a valid user ID
+            .get(`/api/accounts/find/${idData.testAccountId}`)
             .set('x-access-token', 'non-whitelist-token');
 
         expect(response.statusCode).toBe(401);
@@ -67,7 +67,7 @@ describe('GET /api/accounts/find/:id', () => {
 
     it('should fail return of account with wrong token', async () => {
         const response = await api
-            .get(`/api/accounts/find/${idData.testAccountId}`) // Replace with a valid user ID
+            .get(`/api/accounts/find/${idData.testAccountId}`)
             .set('x-access-token', deleteUserToken);
 
         expect(response.statusCode).toBe(401);
@@ -76,7 +76,7 @@ describe('GET /api/accounts/find/:id', () => {
 
     it('should return specific account by ID', async () => {
         const response = await api
-            .get(`/api/accounts/find/${idData.testAccountId}`) // Replace with a valid account ID
+            .get(`/api/accounts/find/${idData.testAccountId}`)
             .set('x-access-token', userToken);
 
         expect(response.statusCode).toBe(200);
@@ -90,7 +90,7 @@ describe('DELETE /api/accounts/:id', () => {
 
     it('should fail return of account with non-whitelist token', async () => {
         const response = await api
-            .delete(`/api/accounts/${idData.deleteAccountId}`) // Replace with a valid user ID
+            .delete(`/api/accounts/${idData.deleteAccountId}`)
             .set('x-access-token', 'non-whitelist-token');
 
         expect(response.statusCode).toBe(401);
@@ -99,17 +99,16 @@ describe('DELETE /api/accounts/:id', () => {
 
     it('should fail return of account with wrong token', async () => {
         const response = await api
-            .delete(`/api/accounts/${idData.deleteAccountId}`) // Replace with a valid user ID
+            .delete(`/api/accounts/${idData.deleteAccountId}`)
             .set('x-access-token', deleteUserToken);
 
         expect(response.statusCode).toBe(401);
         expect(response.body).toHaveProperty('message', 'Unauthorized!');
     });
 
-
     it('should delete a specific account by ID', async () => {
         const response = await api
-            .delete(`/api/accounts/${idData.deleteAccountId}`) // Replace with a valid account ID
+            .delete(`/api/accounts/${idData.deleteAccountId}`)
             .set('x-access-token', userToken);
 
         expect(response.statusCode).toBe(200);
@@ -122,7 +121,7 @@ describe('PUT /api/accounts/:id', () => {
     it('should fail account update of user with non-whitelist token', async () => {
         const response = await api
             .put(`/api/accounts/${idData.updateAccountId}`)
-            .set('x-access-token', 'non-whitelist-token'); // Assuming you have a valid token
+            .set('x-access-token', 'non-whitelist-token');
 
         expect(response.statusCode).toBe(401);
         expect(response.body).toHaveProperty('message', 'Unauthorized!');
@@ -131,7 +130,7 @@ describe('PUT /api/accounts/:id', () => {
     it('should fail account update of user with wrong token', async () => {
         const response = await api
             .put(`/api/accounts/${idData.updateAccountId}`)
-            .set('x-access-token', deleteUserToken); // Assuming you have a valid token
+            .set('x-access-token', deleteUserToken);
 
         expect(response.statusCode).toBe(401);
         expect(response.body).toHaveProperty('message', 'Unauthorized!');
@@ -158,7 +157,7 @@ describe('PUT /api/accounts/:id', () => {
         };
 
         const response = await api
-            .put(`/api/accounts/${idData.updateAccountId}`) // Replace with a valid account ID
+            .put(`/api/accounts/${idData.updateAccountId}`)
             .set('x-access-token', userToken)
             .send(updatedAccountData);
 
@@ -172,7 +171,7 @@ describe('POST /api/accounts/:uid', () => {
     it('should fail account create of user with non-whitelist token', async () => {
         const response = await api
             .post(`/api/accounts/${idData.testUserId}`)
-            .set('x-access-token', 'non-whitelist-token'); // Assuming you have a valid token
+            .set('x-access-token', 'non-whitelist-token');
 
         expect(response.statusCode).toBe(401);
         expect(response.body).toHaveProperty('message', 'Unauthorized!');
@@ -181,7 +180,7 @@ describe('POST /api/accounts/:uid', () => {
     it('should fail account create of user with wrong token', async () => {
         const response = await api
             .post(`/api/accounts/${idData.testUserId}`)
-            .set('x-access-token', deleteUserToken); // Assuming you have a valid token
+            .set('x-access-token', deleteUserToken);
 
         expect(response.statusCode).toBe(401);
         expect(response.body).toHaveProperty('message', 'Unauthorized!');
@@ -208,7 +207,7 @@ describe('POST /api/accounts/:uid', () => {
         };
 
         const response = await api
-            .post(`/api/accounts/${idData.testUserId}`) // Replace with a valid user ID
+            .post(`/api/accounts/${idData.testUserId}`)
             .set('x-access-token', userToken)
             .send(newAccountData);
 
@@ -223,7 +222,7 @@ describe('GET /api/accounts/drafts/:uid', () => {
     it('should fail return drafts account of a user with non-whitelist token', async () => {
         const response = await api
             .get(`/api/accounts/drafts/${idData.testUserId}`)
-            .set('x-access-token', 'non-whitelist-token'); // Assuming you have a valid token
+            .set('x-access-token', 'non-whitelist-token');
 
         expect(response.statusCode).toBe(401);
         expect(response.body).toHaveProperty('message', 'Unauthorized!');
@@ -232,7 +231,7 @@ describe('GET /api/accounts/drafts/:uid', () => {
     it('should fail return drafts account of a user with wrong token', async () => {
         const response = await api
             .get(`/api/accounts/drafts/${idData.testUserId}`)
-            .set('x-access-token', deleteUserToken); // Assuming you have a valid token
+            .set('x-access-token', deleteUserToken);
 
         expect(response.statusCode).toBe(401);
         expect(response.body).toHaveProperty('message', 'Unauthorized!');
@@ -240,7 +239,7 @@ describe('GET /api/accounts/drafts/:uid', () => {
 
     it('should return drafts account of a user', async () => {
         const response = await api
-            .get(`/api/accounts/drafts/${idData.testUserId}`) // Replace with a valid user ID
+            .get(`/api/accounts/drafts/${idData.testUserId}`)
             .set('x-access-token', userToken);
 
         expect(response.statusCode).toBe(200);
