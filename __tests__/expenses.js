@@ -1,11 +1,19 @@
 import supertest from 'supertest';
-import {testUserData, userToDelete, userToUpdate} from '../test_entries.js'
+import {
+    testUserData,
+    userToDelete,
+    userToUpdate,
+    pngString,
+    pngStringTooLarge,
+    testExpenseData,
+} from '../test_entries.js'
 import {server} from '../src/server.js'
 import idData from '../test_ids.json';
 
 const api = supertest(server);
 
 let userToken, deleteUserToken, updateUserToken;
+let pngTooLargeString;
 
 async function loginUserAndGetToken(userData) {
 
@@ -22,6 +30,8 @@ beforeAll(async () => {
     userToken = await loginUserAndGetToken(testUserData);
     deleteUserToken = await loginUserAndGetToken(userToDelete);
     updateUserToken = await loginUserAndGetToken(userToUpdate);
+
+    pngTooLargeString = pngStringTooLarge();
 });
 
 describe('GET /api/expenses/find/:aid', () => {
@@ -75,13 +85,62 @@ describe('GET /api/expenses/:id', () => {
         expect(response.body).toHaveProperty('message', 'Unauthorized!');
     });
 
-    it('should return specific expense by ID', async () => {
+    it('should return specific expense by ID without file', async () => {
         const response = await api
             .get(`/api/expenses/${idData.testExpenseId}`)
             .set('x-access-token', userToken);
 
         expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty('file', false);
         expect(response.body).toHaveProperty('description', 'Test Expense');
+    });
+
+    it('should return specific expense by ID with file', async () => {
+        const response = await api
+            .get(`/api/expenses/${idData.fileTestExpense1Id}`)
+            .set('x-access-token', userToken);
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty('file', 'image/png');
+        expect(response.body).toHaveProperty('description', 'Test Expense');
+    });
+
+});
+
+describe('GET /api/expenses/file/:id', () => {
+
+    it('should fail to return expense with non-whitelist token', async () => {
+        const response = await api
+            .get(`/api/expenses/file/${idData.testExpenseId}`)
+            .set('x-access-token', 'non-whitelist-token');
+
+        expect(response.statusCode).toBe(401);
+        expect(response.body).toHaveProperty('message', 'Unauthorized!');
+    });
+
+    it('should fail to return expense with wrong token', async () => {
+        const response = await api
+            .get(`/api/expenses/file/${idData.testExpenseId}`)
+            .set('x-access-token', updateUserToken);
+
+        expect(response.statusCode).toBe(401);
+        expect(response.body).toHaveProperty('message', 'Unauthorized!');
+    });
+
+    it('should not return file for specific expense without file by ID ', async () => {
+        const response = await api
+            .get(`/api/expenses/file/${idData.testExpenseId}`)
+            .set('x-access-token', userToken);
+
+        expect(response.statusCode).toBe(404);
+    });
+
+    it('should return file for specific expense by ID', async () => {
+        const response = await api
+            .get(`/api/expenses/file/${idData.fileTestExpense1Id}`)
+            .set('x-access-token', userToken);
+
+        expect(response.statusCode).toBe(200);
     });
 
 });
@@ -105,7 +164,6 @@ describe('DELETE /api/expenses/:id', () => {
         expect(response.statusCode).toBe(401);
         expect(response.body).toHaveProperty('message', 'Unauthorized!');
     });
-
 
     it('should delete a specific expense by ID', async () => {
         const response = await api
@@ -228,6 +286,122 @@ describe('PUT /api/expenses/:id', () => {
         expect(response.statusCode).toBe(200);
         expect(response.body).toHaveProperty('message', 'Expense updated!');
     });
+
+    it('should update balance of account after changing account id', async () => {
+        const expenseData = {
+            accountID: idData.accountDataToChangeExpenseAccountDestId,
+        };
+
+        const response = await api
+            .put(`/api/expenses/${idData.testExpense2Id}`)
+            .set('x-access-token', userToken)
+            .send(expenseData);
+
+        const response2 = await api
+            .get(`/api/accounts/find/${idData.accountDataToChangeExpenseAccountStartId}`)
+            .set('x-access-token', userToken);
+
+        const response3 = await api
+            .get(`/api/accounts/find/${idData.accountDataToChangeExpenseAccountDestId}`)
+            .set('x-access-token', userToken);
+
+        expect(response.statusCode).toBe(200);
+        expect(response2.statusCode).toBe(200);
+        expect(response3.statusCode).toBe(200);
+
+        expect(response2.body).toHaveProperty('availableBalance', 0);
+        expect(response2.body).toHaveProperty('totalBalance', 0);
+        expect(response3.body).toHaveProperty('availableBalance', -testExpenseData.amount);
+        expect(response3.body).toHaveProperty('totalBalance', -testExpenseData.amount);
+
+    });
+
+    it('should fail to update expense with invalid file type', async () => {
+        const invalidFileTypeData = {
+            file: "R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+        };
+
+        const response = await api
+            .put(`/api/expenses/${idData.updateExpenseId}`)
+            .set('x-access-token', userToken)
+            .send(invalidFileTypeData);
+
+        expect(response.statusCode).toBe(400);
+        expect(response.body).toHaveProperty('message', 'Invalid file type.');
+    });
+
+    it('should fail to update expense with invalid file format', async () => {
+        const invalidFileFormatData = {
+            file: 1234
+        };
+
+        const response = await api
+            .put(`/api/expenses/${idData.updateExpenseId}`)
+            .set('x-access-token', userToken)
+            .send(invalidFileFormatData);
+
+        expect(response.statusCode).toBe(400);
+        expect(response.body).toHaveProperty('message', 'Invalid file format.');
+    });
+
+    it('should fail to update expense with too large file size', async () => {
+        const tooLargeFileSizeData = {
+            ...testExpenseData,
+            file: pngTooLargeString
+        };
+
+        const response = await api
+            .put(`/api/expenses/${idData.updateExpenseId}`)
+            .set('x-access-token', userToken)
+            .send(tooLargeFileSizeData);
+
+        expect(response.statusCode).toBe(400);
+        expect(response.body).toHaveProperty('message', 'File is too large.');
+    });
+
+    it('should update specific expense by ID with a file', async () => {
+        const expenseData = {
+            file: pngString
+        };
+
+        const response = await api
+            .put(`/api/expenses/${idData.fileTestExpense2Id}`)
+            .set('x-access-token', userToken)
+            .send(expenseData);
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty('message', 'Expense updated!');
+    });
+
+    it('should update specific expense by ID removing its file', async () => {
+        const expenseData = {
+            ...testExpenseData,
+            file: false
+        };
+
+        const response = await api
+            .put(`/api/expenses/${idData.fileTestExpense3Id}`)
+            .set('x-access-token', userToken)
+            .send(expenseData);
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty('message', 'Expense updated!');
+    });
+
+    it('should update specific expense by ID updating its file', async () => {
+        const expenseData = {
+            ...testExpenseData,
+            file: pngString
+        };
+
+        const response = await api
+            .put(`/api/expenses/${idData.fileTestExpense4Id}`)
+            .set('x-access-token', userToken)
+            .send(expenseData);
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty('message', 'Expense updated!');
+    });
 });
 
 describe('POST /api/expenses/:id', () => {
@@ -336,13 +510,91 @@ describe('POST /api/expenses/:id', () => {
         expect(response.body).toHaveProperty('message', 'Amount not a valid number.');
     });
 
-    it('should create expense', async () => {
+    it('should create expense without file', async () => {
         const newExpenseData = {
             category1: "Food & Drinks",
             category2: "Alcohol",
             amount: 10000,
             userID: idData.testUserId,
             accountID: idData.testAccountId,
+        };
+
+        const response = await api
+            .post('/api/expenses')
+            .set('x-access-token', userToken)
+            .send(newExpenseData);
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty('amount', 10000);
+        expect(response.body).toHaveProperty('category1', "Food & Drinks");
+        expect(response.body).toHaveProperty('category2', "Alcohol");
+    });
+
+    it('should fail to create expense with invalid file type', async () => {
+        const newExpenseData = {
+            category1: "Food & Drinks",
+            category2: "Alcohol",
+            amount: 10000,
+            userID: idData.testUserId,
+            accountID: idData.testAccountId,
+            file: "R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+        };
+
+        const response = await api
+            .post('/api/expenses')
+            .set('x-access-token', userToken)
+            .send(newExpenseData);
+
+        expect(response.statusCode).toBe(400);
+        expect(response.body).toHaveProperty('message', 'Invalid file type.');
+    });
+
+    it('should fail to create expense with invalid file format', async () => {
+        const newExpenseData = {
+            category1: "Food & Drinks",
+            category2: "Alcohol",
+            amount: 10000,
+            userID: idData.testUserId,
+            accountID: idData.testAccountId,
+            file: 1234
+        };
+
+        const response = await api
+            .post('/api/expenses')
+            .set('x-access-token', userToken)
+            .send(newExpenseData);
+
+        expect(response.statusCode).toBe(400);
+        expect(response.body).toHaveProperty('message', 'Invalid file format.');
+    });
+
+    it('should fail to create expense with too large file size', async () => {
+        const newExpenseData = {
+            category1: "Food & Drinks",
+            category2: "Alcohol",
+            amount: 10000,
+            userID: idData.testUserId,
+            accountID: idData.testAccountId,
+            file: pngTooLargeString
+        };
+
+        const response = await api
+            .post('/api/expenses')
+            .set('x-access-token', userToken)
+            .send(newExpenseData);
+
+        expect(response.statusCode).toBe(400);
+        expect(response.body).toHaveProperty('message', 'File is too large.');
+    });
+
+    it('should create expense with file', async () => {
+        const newExpenseData = {
+            category1: "Food & Drinks",
+            category2: "Alcohol",
+            amount: 10000,
+            userID: idData.testUserId,
+            accountID: idData.testAccountId,
+            file: pngString
         };
 
         const response = await api

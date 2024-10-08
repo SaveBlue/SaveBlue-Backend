@@ -1,3 +1,25 @@
+import { PNG } from 'pngjs';
+import crypto from 'crypto';
+
+export const pngString = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQAAAAA3bvkkAAAACklEQVR4AWNgAAAAAgABc3UBGAAAAABJRU5ErkJggg==";
+
+export const pngStringTooLarge = () => {
+    const width = 500;
+    const height = 550;
+    const png = new PNG({ width, height });
+    const pixelDataSize = width * height * 4;
+    const randomBytes = crypto.randomBytes(pixelDataSize);
+    randomBytes.copy(png.data);
+    const buffer = PNG.sync.write(png);
+
+    return buffer.toString('base64')
+}
+
+export const pngFile = {
+    contentType: "image/png",
+    data: Buffer.from(pngString, 'base64')
+}
+
 export const testUserData = {
     username: 'testuser',
     password: 'testpassword',
@@ -54,7 +76,7 @@ export const testExpenseData = {
     category1: "Food & Drinks",
     category2: "Alcohol",
     description: "Test Expense",
-    date: "2024-04-09"
+    date: "2024-04-09",
 }
 
 export const expenseDataToDelete = {
@@ -94,6 +116,50 @@ export const incomeDataToUpdate = {
     date: "2024-04-09"
 }
 
+export const accountDataToChangeExpenseAccountStart = {
+    name: 'Remove from acc EXPENSE',
+    availableBalance: -testExpenseData.amount,
+    totalBalance: -testExpenseData.amount,
+    startOfMonth: 1,
+    budgets: [],
+    goals: [],
+    expenses: [],
+    incomes: [],
+}
+
+export const accountDataToChangeExpenseAccountDest = {
+    name: 'Add to acc EXPENSE',
+    availableBalance: 0,
+    totalBalance: 0,
+    startOfMonth: 1,
+    budgets: [],
+    goals: [],
+    expenses: [],
+    incomes: [],
+}
+
+export const accountDataToChangeIncomeAccountStart = {
+    name: 'Remove from acc INCOME',
+    availableBalance: testIncomeData.amount,
+    totalBalance: testIncomeData.amount,
+    startOfMonth: 1,
+    budgets: [],
+    goals: [],
+    expenses: [],
+    incomes: [],
+}
+
+export const accountDataToChangeIncomeAccountDest = {
+    name: 'Add to acc INCOME',
+    availableBalance: 0,
+    totalBalance: 0,
+    startOfMonth: 1,
+    budgets: [],
+    goals: [],
+    expenses: [],
+    incomes: [],
+}
+
 const mockData = {
     testUserData,
     userToDelete,
@@ -101,12 +167,17 @@ const mockData = {
     testAccountData,
     accountDataToDelete,
     accountDataToUpdate,
+    accountDataToChangeExpenseAccountStart,
+    accountDataToChangeExpenseAccountDest,
+    accountDataToChangeIncomeAccountStart,
+    accountDataToChangeIncomeAccountDest,
     testExpenseData,
     expenseDataToDelete,
     expenseDataToUpdate,
     testIncomeData,
     incomeDataToDelete,
-    incomeDataToUpdate
+    incomeDataToUpdate,
+    pngFile,
 };
 
 export default mockData;

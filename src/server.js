@@ -18,7 +18,7 @@ let corsOptions = {
 server.use(cors(corsOptions));
 
 // parse requests of content-type - application/json
-server.use(express.json());
+server.use(express.json({ limit: '2mb' }));
 
 // parse requests of content-type - application/x-www-form-urlencoded
 server.use(express.urlencoded({ extended: true }));

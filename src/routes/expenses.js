@@ -3,6 +3,7 @@ import authJWT from "../middlewares/authJWT.js";
 import drafts from "../middlewares/drafts.js";
 import expensesController from "../controllers/expenses.js";
 import {categoriesExpenses} from "../models/expenses.js";
+import fileMiddleware from "../middlewares/files.js";
 
 const router = Router();
 
@@ -26,14 +27,17 @@ router.get("/find/:aid", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenAccou
 // Return an expense by ID
 router.get("/:id", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenExpense], expensesController.findExpenseByID);
 
+// Return a saved expense file by expense ID
+router.get("/file/:id", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenExpense], expensesController.findExpenseFileByID);
+
 // Create an expense
-router.post("/", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenExpenseIncomePost, drafts.block], expensesController.create);
+router.post("/", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenExpenseIncomePost, drafts.block, fileMiddleware.checkFileValidity], expensesController.create);
 
 // Delete an expense by ID
 router.delete("/:id", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenExpense], expensesController.remove);
 
 // Update an expense by ID
-router.put("/:id", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenExpense, drafts.block], expensesController.update);
+router.put("/:id", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenExpense, drafts.block, fileMiddleware.checkFileValidity], expensesController.update);
 
 // Return expense breakdown by primary categories
 router.get("/breakdown/:aid", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenAccount], expensesController.expensesBreakdown);
