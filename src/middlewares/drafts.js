@@ -25,12 +25,13 @@ const parseSmsWithAI = async (sms) => {
         const smsAI = await openai.createExpense(sms)
         return {
             description: smsAI.description,
-            date: Date.now(),
+            date: new Date(smsAI.date) || Date.now(),
             amount: parseInt(smsAI.amount),
             category1: smsAI.category1,
             category2: smsAI.category2
         };
     } catch (e) {
+        console.log(e)
         throw new Error("AI SMS parsing failed.")
     }
 };
