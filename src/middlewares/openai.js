@@ -25,6 +25,7 @@ const createExpense = async (sms) => {
             },
             {role: "user", content: sms},
         ],
+        response_format: "json_object",
     });
 
     return JSON.parse(completion.choices[0].message.content);
