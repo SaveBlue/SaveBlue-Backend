@@ -30,7 +30,7 @@
     "mongodb": "^6.3.0",
     "mongoose": "^5.10.0",
     "nodemon": "^2.0.4",
-    "openai": "^4.21.0",
+    "openai": "^4.86.2",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0"
   },

@@ -10,7 +10,7 @@ const createExpense = async (sms) => {
 
     const completion = await openai.chat.completions.create({
         //model: "gpt-4-1106-preview",
-        model: "gpt-3.5-turbo-1106",
+        model: "gpt-4o-mini",
         messages: [
             {
                 role: "system",
@@ -24,7 +24,6 @@ const createExpense = async (sms) => {
             },
             {role: "user", content: sms},
         ],
-        response_format: {type: "json_object"}
     });
 
     return JSON.parse(completion.choices[0].message.content);
