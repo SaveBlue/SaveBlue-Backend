@@ -25,7 +25,7 @@ const parseSmsWithAI = async (sms) => {
         const smsAI = await openai.createExpense(sms)
         const parsedDate = (smsAI.date && (new Date(smsAI.date).toString() !== "Invalid Date")) ? new Date(smsAI.date) : Date.now()
         return {
-            description: smsAI.description,
+            description: smsAI.description?.slice(0, 31),
             date: parsedDate,
             amount: parseInt(smsAI.amount),
             category1: smsAI.category1,

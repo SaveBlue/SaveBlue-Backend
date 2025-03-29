@@ -11,7 +11,7 @@ const openai = new OpenAI({
 const createExpense = async (sms) => {
 
     const ExpenseEntry = z.object({
-        description: z.string().max(32),
+        description: z.string(),
         date: z.string().optional(),
         amount: z.number().int(),
         category1: z.string(),
