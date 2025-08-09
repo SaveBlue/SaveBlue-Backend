@@ -12,8 +12,8 @@ const findAllExpensesByAccountID = async (req, res) => {
 
         // Fetch expenses with specified conditions
         const expenses = await Expense
-            .find({accountID: req.params.aid}, "-file")
-            .sort({date: -1, _id: -1})
+            .find({ accountID: req.params.aid }, "-file")
+            .sort({ date: -1, _id: -1 })
             .skip(expensesPerPage * page)
             .limit(expensesPerPage);
 
@@ -86,7 +86,7 @@ const findExpenseFileByID = async (req, res) => {
 // Create an expense
 const create = async (req, res) => {
 
-    const {userID, accountID, category1, category2, description, date, amount, file} = req.body;
+    const { userID, accountID, category1, category2, description, date, amount, file } = req.body;
 
     // Check expense description length
     if (description?.length > 32) {
@@ -150,13 +150,13 @@ const remove = async (req, res) => {
         const expense = await Expense.findByIdAndDelete(req.params.id);
 
         if (!expense) {
-            return res.status(404).send({message: "No expense with selected ID!"});
+            return res.status(404).send({ message: "No expense with selected ID!" });
         }
 
         // Update account balance
         await updateAccountBalances.updateAllAccountBalances(expense.accountID, expense.amount, "+");
 
-        res.send({message: "Expense deleted!"});
+        res.send({ message: "Expense deleted!" });
 
     } catch (error) {
         res.status(500).send({
@@ -171,7 +171,7 @@ const remove = async (req, res) => {
 // Update expense with requested ID
 const update = async (req, res) => {
 
-    const {accountID, category1, category2, description, date, amount, file} = req.body;
+    const { accountID, category1, category2, description, date, amount, file } = req.body;
 
     // Check expense description length
     if (description?.length > 32) {
@@ -189,12 +189,12 @@ const update = async (req, res) => {
 
     let editedExpense = {
         // Add properties to the object
-        ...(category1 && {category1: category1}),
-        ...(category2 && {category2: category2}),
-        ...(accountID && {accountID: accountID}),
-        ...(description && {description: description}),
-        ...(date && {date: date}),
-        ...(amount && {amount: amount}),
+        ...(category1 && { category1: category1 }),
+        ...(category2 && { category2: category2 }),
+        ...(accountID && { accountID: accountID }),
+        ...(description && { description: description }),
+        ...(date && { date: date }),
+        ...(amount && { amount: amount }),
     };
 
     if (file) {
@@ -208,7 +208,7 @@ const update = async (req, res) => {
 
     try {
         // Fetch the old expense and edit it
-        const expense = await Expense.findByIdAndUpdate(req.params.id, {$set: editedExpense});
+        const expense = await Expense.findByIdAndUpdate(req.params.id, { $set: editedExpense });
 
         if (!expense) {
             return res.status(404).send({
@@ -236,7 +236,7 @@ const update = async (req, res) => {
             await updateAccountBalances.updateAllAccountBalances(expense.accountID, difference, operation);
         }
 
-        res.send({message: "Expense updated!"});
+        res.send({ message: "Expense updated!" });
 
     } catch (error) {
         res.status(500).send({
@@ -271,9 +271,22 @@ const expensesBreakdown = async (req, res) => {
     };
 
     try {
-        const breakdown = await Expense.aggregate()
-            .match(filterObject)
-            .group({"_id": "$category1", "sum": {$sum: "$amount"}});
+        const pipeline = [
+            { $match: filterObject },
+            { $group: { _id: { c1: "$category1", c2: "$category2" }, sum: { $sum: "$amount" } } },
+            { $sort: { "_id.c1": 1, sum: -1 } },
+            {
+                $group: {
+                    _id: "$_id.c1",
+                    total: { $sum: "$sum" },
+                    category2: { $push: { category2: "$_id.c2", sum: "$sum" } }
+                }
+            },
+            { $project: { _id: 0, category1: "$_id", total: 1, category2: 1 } },
+            { $sort: { total: -1 } }
+        ];
+
+        const breakdown = await Expense.aggregate(pipeline).option({ allowDiskUse: true });
 
         res.status(200).json(breakdown);
 
