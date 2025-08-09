@@ -23,14 +23,16 @@ const parseSmsManually = (sms, isNlb) => {
 const parseSmsWithAI = async (sms) => {
     try {
         const smsAI = await openai.createExpense(sms)
+        const parsedDate = (smsAI.date && (new Date(smsAI.date).toString() !== "Invalid Date")) ? new Date(smsAI.date) : Date.now()
         return {
-            description: smsAI.description,
-            date: Date.now(),
+            description: smsAI.description?.slice(0, 31),
+            date: parsedDate,
             amount: parseInt(smsAI.amount),
             category1: smsAI.category1,
             category2: smsAI.category2
         };
     } catch (e) {
+        console.log(e)
         throw new Error("AI SMS parsing failed.")
     }
 };
