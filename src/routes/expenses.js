@@ -42,6 +42,9 @@ router.put("/:id", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenExpense, dr
 // Return expense breakdown by primary categories
 router.get("/breakdown/:aid", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenAccount], expensesController.expensesBreakdown);
 
+// Return daily expense sums in date range
+router.get("/daily/:aid", [authJWT.verifyTokenWhitelist, authJWT.verifyTokenAccount], expensesController.expensesDaily);
+
 // Create sms expense draft
 router.post("/sms", [authJWT.verifyTokenWhitelist, drafts.createExpenseSMS], expensesController.create);
 
