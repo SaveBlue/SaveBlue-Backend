@@ -30,6 +30,9 @@ const income = new Schema({
         timestamps: true
     });
 
+// Compound index to optimize account-scoped date queries and sorted pagination (latest first)
+income.index({ accountID: 1, date: -1, _id: -1 });
+
 
 // Validate category1 with array of allowed categories1
 function validateCategory1(category) {

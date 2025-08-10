@@ -297,6 +297,51 @@ const expensesBreakdown = async (req, res) => {
     }
 };
 
+// Return daily expense sums within a date range
+const expensesDaily = async (req, res) => {
+    if (!req.query.startDate) {
+        return res.status(400).json({
+            message: "Start date must be present!"
+        });
+    }
+
+    if (!req.query.endDate) {
+        return res.status(400).json({
+            message: "End date must be present!"
+        });
+    }
+
+    const filterObject = {
+        accountID: req.params.aid,
+        date: {
+            $gte: new Date(req.query.startDate),
+            $lte: new Date(req.query.endDate)
+        }
+    };
+
+    try {
+        const pipeline = [
+            { $match: filterObject },
+            {
+                $group: {
+                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+                    total: { $sum: "$amount" }
+                }
+            },
+            { $project: { _id: 0, date: "$_id", total: 1 } },
+            { $sort: { date: 1 } }
+        ];
+
+        const daily = await Expense.aggregate(pipeline).option({ allowDiskUse: true });
+
+        res.status(200).json(daily);
+    } catch (error) {
+        res.status(500).send({
+            message: error.message || "An error occurred while fetching daily expenses!"
+        });
+    }
+};
+
 export default {
     findAllExpensesByAccountID,
     findExpenseByID,
@@ -304,5 +349,6 @@ export default {
     create,
     remove,
     update,
-    expensesBreakdown
+    expensesBreakdown,
+    expensesDaily,
 }
