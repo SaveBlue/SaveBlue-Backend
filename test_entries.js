@@ -41,7 +41,7 @@ export const userToUpdate = {
 export const testAccountData = {
     name: 'Test Wallet',
     availableBalance: 0,
-    totalBalance: 0,
+    investedAmount: 0,
     startOfMonth: 1,
     budgets: [],
     goals: [],
@@ -52,7 +52,7 @@ export const testAccountData = {
 export const accountDataToDelete = {
     name: 'Delete this Wallet',
     availableBalance: 0,
-    totalBalance: 0,
+    investedAmount: 0,
     startOfMonth: 1,
     budgets: [],
     goals: [],
@@ -63,7 +63,7 @@ export const accountDataToDelete = {
 export const accountDataToUpdate = {
     name: 'Update this Wallet',
     availableBalance: 0,
-    totalBalance: 0,
+    investedAmount: 0,
     startOfMonth: 1,
     budgets: [],
     goals: [],
@@ -119,7 +119,7 @@ export const incomeDataToUpdate = {
 export const accountDataToChangeExpenseAccountStart = {
     name: 'Remove from acc EXPENSE',
     availableBalance: -testExpenseData.amount,
-    totalBalance: -testExpenseData.amount,
+    investedAmount: 0,
     startOfMonth: 1,
     budgets: [],
     goals: [],
@@ -130,7 +130,7 @@ export const accountDataToChangeExpenseAccountStart = {
 export const accountDataToChangeExpenseAccountDest = {
     name: 'Add to acc EXPENSE',
     availableBalance: 0,
-    totalBalance: 0,
+    investedAmount: 0,
     startOfMonth: 1,
     budgets: [],
     goals: [],
@@ -141,7 +141,7 @@ export const accountDataToChangeExpenseAccountDest = {
 export const accountDataToChangeIncomeAccountStart = {
     name: 'Remove from acc INCOME',
     availableBalance: testIncomeData.amount,
-    totalBalance: testIncomeData.amount,
+    investedAmount: 0,
     startOfMonth: 1,
     budgets: [],
     goals: [],
@@ -152,7 +152,7 @@ export const accountDataToChangeIncomeAccountStart = {
 export const accountDataToChangeIncomeAccountDest = {
     name: 'Add to acc INCOME',
     availableBalance: 0,
-    totalBalance: 0,
+    investedAmount: 0,
     startOfMonth: 1,
     budgets: [],
     goals: [],

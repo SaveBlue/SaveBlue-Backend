@@ -10,7 +10,7 @@ const findAllAccountsByUserID = async (req, res) => {
         const userId = req.params.uid;
         const archived = !!req.query.archived;
 
-        const user = await User.findById(userId, 'accounts._id accounts.name accounts.totalBalance accounts.availableBalance accounts.startOfMonth accounts.archived');
+        const user = await User.findById(userId, 'accounts._id accounts.name accounts.investedAmount accounts.availableBalance accounts.startOfMonth accounts.archived');
 
         if (!user) {
             return res.status(404).json({
@@ -67,7 +67,6 @@ const createAccount = async (req, res) => {
 
     let newAccount = {
         name: req.body.name || "New Account",
-        totalBalance: 0,
         availableBalance: 0,
         budgets: [],
         goals: [],
@@ -80,7 +79,7 @@ const createAccount = async (req, res) => {
         // Finds user and appends newAccount to the accounts array, then returns the new account
         const user = await User.findByIdAndUpdate(req.params.uid, {$push: {accounts: newAccount}}, {
             new: true,
-            select: 'accounts._id accounts.name accounts.totalBalance accounts.availableBalance accounts.startOfMonth'
+            select: 'accounts._id accounts.name accounts.investedAmount accounts.availableBalance accounts.startOfMonth'
         });
 
         if (!user) {
@@ -126,6 +125,9 @@ const deleteAccountByID = async (req, res) => {
         // Delete account's expenses from db
         await deleteUserEntries.deleteExpenses("accountID", req.params.id);
 
+        // Delete account's investments from db
+        await deleteUserEntries.deleteInvestments("accountID", req.params.id);
+
         res.status(200).json(user);
 
     } catch (error) {
@@ -149,7 +151,7 @@ const updateAccountByID = async (req, res) => {
 
     try {
         // Find the user with the requested account
-        const user = await User.findOne({'accounts._id': req.params.id}, 'accounts._id accounts.name accounts.startOfMonth accounts.totalBalance accounts.availableBalance');
+        const user = await User.findOne({'accounts._id': req.params.id}, 'accounts._id accounts.name accounts.startOfMonth accounts.investedAmount accounts.availableBalance');
 
         if (!user) {
             return res.status(404).json({
