@@ -6,6 +6,8 @@ const User = mongoose.model('User');
 const Expense = mongoose.model('Expense');
 const Income = mongoose.model('Income');
 const Token = mongoose.model('Token');
+const InvestmentEvent = mongoose.model('InvestmentEvent');
+const InvestmentPosition = mongoose.model('InvestmentPosition');
 
 
 // Verify token in whitelist
@@ -247,6 +249,102 @@ const verifyTokenGoal = (req, res, next) => {
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Verify Investment Event
+const verifyTokenInvestmentEvent = (req, res, next) => {
+    let token = req.headers["x-access-token"];
+
+    if (!token) {
+        return res.status(403).send({ message: "No token provided!" });
+    }
+
+    jwt.verify(token, config.secret, async (err, decoded) => {
+        if (err) {
+            return res.status(401).send({ message: "Unauthorized!" });
+        }
+
+        try {
+            const event = await InvestmentEvent.findById(req.params.id, 'userID');
+
+            if (!event) {
+                return res.status(404).json({ message: "No investment event with selected ID!" });
+            }
+
+            if (event.userID !== decoded.id) {
+                return res.status(401).send({ message: "Unauthorized!" });
+            }
+
+            next();
+
+        } catch (error) {
+            res.status(500).send({
+                message: error.message || "An error occurred while fetching investment event!"
+            });
+        }
+    });
+};
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Verify Investment Position
+const verifyTokenInvestmentPosition = (req, res, next) => {
+    let token = req.headers["x-access-token"];
+
+    if (!token) {
+        return res.status(403).send({ message: "No token provided!" });
+    }
+
+    jwt.verify(token, config.secret, async (err, decoded) => {
+        if (err) {
+            return res.status(401).send({ message: "Unauthorized!" });
+        }
+
+        try {
+            const position = await InvestmentPosition.findById(req.params.id || req.params.pid, 'userID');
+
+            if (!position) {
+                return res.status(404).json({ message: "No investment position with selected ID!" });
+            }
+
+            if (position.userID !== decoded.id) {
+                return res.status(401).send({ message: "Unauthorized!" });
+            }
+
+            next();
+
+        } catch (error) {
+            res.status(500).send({
+                message: error.message || "An error occurred while fetching investment position!"
+            });
+        }
+    });
+};
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Verify Investment Post (same pattern as verifyTokenExpenseIncomePost)
+const verifyTokenInvestmentPost = (req, res, next) => {
+
+    let token = req.headers["x-access-token"];
+
+    if (!token) {
+        return res.status(403).send({ message: "No token provided!" });
+    }
+
+    jwt.verify(token, config.secret, (err, decoded) => {
+        if (err) {
+            return res.status(401).send({ message: "Unauthorized!" });
+        }
+
+        if (req.body.userID !== decoded.id)
+            return res.status(401).send({ message: "Unauthorized!" });
+
+        verifyUsersCall(req, res, next, [{ 'accounts._id': req.body.accountID }], decoded.id)
+
+    });
+};
+//----------------------------------------------------------------------------------------------------------------------
+
+
 /**
  *
  * @param req - request (passthrough)
@@ -291,5 +389,8 @@ export default {
     verifyTokenExpense,
     verifyTokenIncome,
     verifyTokenExpenseIncomePost,
-    verifyTokenGoal
+    verifyTokenGoal,
+    verifyTokenInvestmentEvent,
+    verifyTokenInvestmentPosition,
+    verifyTokenInvestmentPost
 };

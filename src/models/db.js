@@ -3,6 +3,7 @@ import './tokens.js';
 import './users.js';
 import './incomes.js';
 import './expenses.js';
+import './investments.js';
 
 // When testing connect to test database, otherwise connect to the main database
 const dbURI = process.env.NODE_ENV === 'test'

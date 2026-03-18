@@ -65,6 +65,9 @@ const remove = async (req, res) => {
         // Delete user's expenses from db
         await deleteUserEntries.deleteExpenses("userID", req.params.id);
 
+        // Delete user's investments from db
+        await deleteUserEntries.deleteInvestments("userID", req.params.id);
+
         res.send({message: "User deleted!"});
 
     } catch (error) {

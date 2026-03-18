@@ -6,7 +6,6 @@ const User = mongoose.model('User');
 const create = async (userID) => {
     const draftsAccount = {
         name: "Drafts",
-        totalBalance: 0,
         availableBalance: 0,
         budgets: [],
         goals: [],

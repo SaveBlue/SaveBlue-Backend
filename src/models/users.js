@@ -33,7 +33,7 @@ const goal = new Schema({
 const account = new Schema({
         name: {type: String, maxlength: 32, required: true},
         availableBalance: {type: Number, set: round, required: true},
-        totalBalance: {type: Number, set: round, required: true},
+        investedAmount: {type: Number, set: round, default: 0},
         budgets: [budget],
         goals: [goal],
         startOfMonth: {type: Number, min: 1, max: 31, set:round, required: true},

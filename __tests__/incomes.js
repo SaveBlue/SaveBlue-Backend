@@ -309,9 +309,9 @@ describe('PUT /api/incomes/:id', () => {
         expect(response3.statusCode).toBe(200);
 
         expect(response2.body).toHaveProperty('availableBalance', 0);
-        expect(response2.body).toHaveProperty('totalBalance', 0);
+        expect(response2.body).toHaveProperty('investedAmount', 0);
         expect(response3.body).toHaveProperty('availableBalance', testIncomeData.amount);
-        expect(response3.body).toHaveProperty('totalBalance', testIncomeData.amount);
+        expect(response3.body).toHaveProperty('investedAmount', 0);
 
     });
 

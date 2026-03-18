@@ -32,6 +32,7 @@ import accountsRouter from './routes/accounts.js';
 import incomesRouter from './routes/incomes.js';
 import expensesRouter from './routes/expenses.js';
 import goalsRouter from './routes/goals.js';
+import investmentsRouter from './routes/investments.js';
 import './config/passport.js';
 
 server.use(authenticationRouter);
@@ -40,6 +41,7 @@ server.use(accountsRouter);
 server.use(incomesRouter);
 server.use(expensesRouter);
 server.use(goalsRouter);
+server.use(investmentsRouter);
 
 // To handle paths correctly when using ES6 modules
 const __filename = fileURLToPath(import.meta.url);
